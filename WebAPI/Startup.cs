@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+
 using Persistence;
 
 //using Persistence;
@@ -31,7 +32,9 @@ namespace WebAPI
         public void ConfigureServices(IServiceCollection services)
         {
           //  services.AddApplication();
+
             services.AddPersistence(Configuration);
+           // services.AddPersistence(Configuration);
             services.AddControllers();
             #region Swagger
             services.AddSwaggerGen(c =>
@@ -57,6 +60,7 @@ namespace WebAPI
                 config.ReportApiVersions = true;
             });
             #endregion
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
