@@ -19,6 +19,7 @@ using Hotel_App.Service;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
+using System.Reflection;
 
 namespace Hotel_App
 {
@@ -39,6 +40,8 @@ namespace Hotel_App
             services.AddServerSideBlazor();
             services.AddHttpClient<HotelService<HoaDon>>();
             services.AddSingleton<WeatherForecastService>();
+
+          
 
             var appSettingSection = Configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettingSection);

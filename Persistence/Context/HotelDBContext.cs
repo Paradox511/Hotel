@@ -32,6 +32,10 @@ namespace Persistence.Context
 
         public virtual DbSet<TaiKhoan> taikhoan { get; set; }
         public virtual DbSet<PhuongThucThanhToan> ptthanhtoan { get; set; }
+        public async Task<int> SaveChangesAsync()
+        {
+            return await base.SaveChangesAsync();
+        }
     }
 
 }

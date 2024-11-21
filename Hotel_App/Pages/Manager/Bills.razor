@@ -58,7 +58,7 @@ else
 
     protected async Task LoadBills()
     {
-        bills = await BillService.GetAllAsync("https://localhost:7020/api/bills");
+        bills = await BillService.GetAllAsync("https://localhost:44359/api/Bills/GetBills");
     }
     protected override void OnInitialized()
     {
