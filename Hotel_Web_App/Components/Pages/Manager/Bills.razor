@@ -1,0 +1,43 @@
+﻿@page "/bills"
+@using Hotel_Web_App.Service
+@using Hotel_Web_App.Data
+
+@inject HotelService<HoaDon> BillService
+
+<h3>Bills</h3>
+
+@if (bills == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <table>
+        <thead>
+            <tr>
+                <th>MaHoaDon</th>
+                <th>NgayTao</th>
+                <th>TongSoTien</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var bill in bills)
+            {
+                <tr>
+                    <td>@bill.MaHoaDon</td>
+                    <td>@bill.NgayTao</td>
+                    <td>@bill.TongSoTien</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private IEnumerable<HoaDon> bills;
+
+    protected override async Task OnInitializedAsync()
+    {
+        bills = await BillService.GetAllAsync("https://localhost:7020/api/bills");
+    }
+}

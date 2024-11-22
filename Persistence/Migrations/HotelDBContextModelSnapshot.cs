@@ -24,11 +24,23 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Domain.Entities.CTHoaDon", b =>
                 {
+                    b.Property<int>("Macthd")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Macthd"));
+
                     b.Property<int>("MaDichVu")
                         .HasColumnType("int");
 
                     b.Property<int>("MaHoaDon")
                         .HasColumnType("int");
+
+                    b.HasKey("Macthd");
+
+                    b.HasIndex("MaDichVu");
+
+                    b.HasIndex("MaHoaDon");
 
                     b.ToTable("cthoadon");
                 });
@@ -77,7 +89,12 @@ namespace Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("cthdMacthd")
+                        .HasColumnType("int");
+
                     b.HasKey("MaDichVu");
+
+                    b.HasIndex("cthdMacthd");
 
                     b.ToTable("dichvu");
                 });
@@ -280,6 +297,36 @@ namespace Persistence.Migrations
                     b.ToTable("taikhoan");
                 });
 
+            modelBuilder.Entity("Domain.Entities.CTHoaDon", b =>
+                {
+                    b.HasOne("Domain.Entities.DichVu", "dv")
+                        .WithMany()
+                        .HasForeignKey("MaDichVu")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.HoaDon", "HoaDon")
+                        .WithMany("CTHoaDon")
+                        .HasForeignKey("MaHoaDon")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("HoaDon");
+
+                    b.Navigation("dv");
+                });
+
+            modelBuilder.Entity("Domain.Entities.DichVu", b =>
+                {
+                    b.HasOne("Domain.Entities.CTHoaDon", "cthd")
+                        .WithMany()
+                        .HasForeignKey("cthdMacthd")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("cthd");
+                });
+
             modelBuilder.Entity("Domain.Entities.Phong", b =>
                 {
                     b.HasOne("Domain.Entities.LoaiPhong", "LoaiPhong")
@@ -289,6 +336,11 @@ namespace Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("LoaiPhong");
+                });
+
+            modelBuilder.Entity("Domain.Entities.HoaDon", b =>
+                {
+                    b.Navigation("CTHoaDon");
                 });
 #pragma warning restore 612, 618
         }

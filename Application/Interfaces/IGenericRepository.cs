@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,10 @@ namespace Application.Interfaces
     {
         DbSet<T> DbSet { get; }
         Task<IEnumerable<T>> GetAllAsync();
+        Task<T> GetByIdAsync(int id);
+        Task<Unit> CreateCommandAsync(T entity);
+        Task<Unit> UpdateCommandAsync(T entity);
+        Task<Unit> DeleteCommandAsync(T entity);
         // Other generic methods as needed
     }
 
@@ -29,5 +34,32 @@ namespace Application.Interfaces
         {
             return await DbSet.ToListAsync();
         }
+        public async Task<T> GetByIdAsync(int id)
+        {
+            return await DbSet.FindAsync(id);
+        }
+        public async Task<Unit> CreateCommandAsync(T entity)
+        {
+            await DbSet.AddAsync(entity);
+            await _context.SaveChangesAsync();
+            return Unit.Value;
+        }
+
+        public async Task<Unit> UpdateCommandAsync(T entity)
+
+        {
+            _context.Entry(entity).State = EntityState.Modified;
+            _context.Update(entity);
+            await _context.SaveChangesAsync();
+            return Unit.Value;
+        }
+
+        public async Task<Unit> DeleteCommandAsync(T entity)
+        {
+            DbSet.Remove(entity);
+            await _context.SaveChangesAsync();
+            return Unit.Value;
+        }
+      
     }
 }

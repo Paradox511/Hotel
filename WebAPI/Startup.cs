@@ -1,4 +1,5 @@
-﻿//using Application;
+﻿using Application.Features.Commands;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -10,12 +11,17 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 
 using Persistence;
-
-//using Persistence;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
+using Application.Interfaces;
+using Domain.Entities;
+using Microsoft.EntityFrameworkCore;
+using Persistence.Context;
+using Application;
+
 
 namespace WebAPI
 {
@@ -31,7 +37,7 @@ namespace WebAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-          //  services.AddApplication();
+            services.AddApplication();
 
             services.AddPersistence(Configuration);
            // services.AddPersistence(Configuration);
@@ -48,6 +54,22 @@ namespace WebAPI
 
             });
             #endregion
+            services.AddDbContext<HotelDBContext>(options =>
+                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
+            services.AddMediatR(cfg =>
+            {
+                cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
+                cfg.RegisterServicesFromAssembly(typeof(Startup).Assembly);
+                cfg.RegisterServicesFromAssembly(typeof(Application.DependencyInjection).Assembly);
+            });
+            services.AddScoped(typeof(CreateCommand<>), typeof(CreateCommand<>));
+            services.AddScoped(typeof(DeleteCommand<>), typeof(DeleteCommand<>));
+            services.AddScoped(typeof(UpdateCommand<>), typeof(UpdateCommand<>));
+
+
+
             #region API Versioning
             // Add API Versioning to the Project
             services.AddApiVersioning(config =>

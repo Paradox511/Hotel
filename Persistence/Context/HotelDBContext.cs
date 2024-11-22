@@ -11,14 +11,26 @@ namespace Persistence.Context
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<CTHoaDon>().HasNoKey();
+            modelBuilder.Entity<CTHoaDon>().HasKey("Macthd");
             modelBuilder.Entity<HoaDon>().HasKey("MaHoaDon");
             modelBuilder.Entity<HoaDon>().Property(p => p.TongSoTien).HasColumnType("decimal(10,2)");
             modelBuilder.Entity<LoaiPhong>().Property(p => p.Gia).HasColumnType("decimal(10,2)");
             modelBuilder.Entity<DichVu>().Property(p => p.Gia).HasColumnType("decimal(10,2)");
 
+            modelBuilder.Entity<HoaDon>()
+           .HasMany(h => h.CTHoaDon)
+           .WithOne(ct => ct.HoaDon)
+           .HasForeignKey(ct => ct.MaHoaDon);
 
+            modelBuilder.Entity<CTHoaDon>()
+             .HasOne(ct => ct.HoaDon)
+            .WithMany(h => h.CTHoaDon)
+             .HasForeignKey(ct => ct.MaHoaDon);
 
+            modelBuilder.Entity<CTHoaDon>()
+                .HasOne(ct => ct.dv)
+                .WithOne(dv => dv.cthd)
+                .HasForeignKey<CTHoaDon>(ct => ct.MaDichVu);
             base.OnModelCreating(modelBuilder);
         }
         public virtual DbSet<HoaDon> hoadon { get; set; }
@@ -32,6 +44,10 @@ namespace Persistence.Context
 
         public virtual DbSet<TaiKhoan> taikhoan { get; set; }
         public virtual DbSet<PhuongThucThanhToan> ptthanhtoan { get; set; }
+        public async Task<int> SaveChangesAsync()
+        {
+            return await base.SaveChangesAsync();
+        }
     }
 
 }

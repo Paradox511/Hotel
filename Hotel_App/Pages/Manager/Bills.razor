@@ -1,0 +1,131 @@
+﻿@page "/bills"
+@using Hotel_App.Service
+@using Hotel_App.Data
+@using Blazored.LocalStorage
+@using Hotel_App.Shared
+@inject HotelService<HoaDon> BillService
+@implements IDisposable
+
+
+<br />
+    <div class="col-12">
+
+<h3>Bills</h3>
+ <SpinLoader IsLoading="isLoading">
+        <LoadingTemplate>
+            <div class="col-12" style="background-color: lightgray; height:400px; vertical-align:middle">
+                <br /><br />
+                <Chase Center="true" Color="#c21f13" Size="70px"></Chase>
+            </div>
+        </LoadingTemplate>
+        <ContentTemplate>
+@if (bills == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <table>
+        <thead>
+            <tr>
+                <th>MaHoaDon</th>
+                <th>NgayTao</th>
+                <th>TongSoTien</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var bill in bills)
+            {
+                <tr>
+                    <td>@bill.MaHoaDon</td>
+                    <td>@bill.NgayTao</td>
+                    <td>@bill.TongSoTien</td>
+                    <td>
+                        <NavLink href=@string.Format("/bills/details/{0}",bill.MaHoaDon)>View Details</NavLink>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+        </ContentTemplate>
+    </SpinLoader>
+</div>
+
+
+@code {
+    private IEnumerable<HoaDon> bills;
+    public HoaDon bill { get; set; }
+    public IEnumerable<HoaDon> filteredAuthorList { get; set; }
+    public bool IsVisible { get; set; }
+    public bool Result { get; set; }
+    public string RecordName { get; set; }
+    public bool IsGridViewFiltered { get; set; }
+    bool isLoading = true;
+
+    protected async Task LoadBills()
+    {
+        bills = await BillService.GetAllAsync("https://localhost:44359/api/Bills/GetBills");
+    }
+    protected override void OnInitialized()
+    {
+        Console.WriteLine("Authors - OnInitialized");
+        base.OnInitialized();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Console.WriteLine("Authors - OnInitializedAsync");
+
+        bill = new HoaDon();
+        //authorList = await authorService.GetAuthors();
+
+        await base.OnInitializedAsync();
+    }
+
+    protected override void OnParametersSet()
+    {
+        Console.WriteLine("Authors - OnParametersSet");
+        base.OnParametersSet();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        Console.WriteLine("Authors - OnParametersSetAsync");
+        await base.OnParametersSetAsync();
+    }
+
+    protected override bool ShouldRender()
+    {
+        base.ShouldRender();
+        Console.WriteLine("Authors - ShouldRender");
+
+        return true;
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        Console.WriteLine("Authors - OnAfterRender - firstRender = " + firstRender);
+        base.OnAfterRender(firstRender);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        Console.WriteLine("Authors - OnAfterRenderAsync - firstRender = " + firstRender);
+
+        if (firstRender)
+        {
+            await LoadBills();
+
+            isLoading = false;
+            StateHasChanged();
+        }
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    public void Dispose()
+    {
+        Console.WriteLine("Authors - Dispose");
+    }
+}

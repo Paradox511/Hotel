@@ -13,6 +13,8 @@ namespace Domain.Entities
         public decimal Gia { get; set; }
         [Required]
         public string Mota { get; set; }
+
+        public CTHoaDon cthd { get; set; }
         public DichVu() { }
     }
 }

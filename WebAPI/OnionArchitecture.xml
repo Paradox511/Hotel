@@ -4,5 +4,20 @@
         <name>WebAPI</name>
     </assembly>
     <members>
+        <member name="M:WebAPI.Controllers.V1.BillsController.Delete(DeleteCommand{Domain.Entities.HoaDon})">
+            <summary>
+            Deletes Product Entity based on Id.
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:WebAPI.Controllers.V1.BillsController.Update(Application.Features.Commands.UpdateCommand{Domain.Entities.HoaDon})">
+            <summary>
+            Updates the Product Entity based on Id.   
+            </summary>
+            <param name="id"></param>
+            <param name="command"></param>
+            <returns></returns>
+        </member>
     </members>
 </doc>
