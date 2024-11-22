@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+
   <ItemGroup>
     <Folder Include="Context\" />
     <Folder Include="Migrations\" />
@@ -22,5 +23,6 @@
     <ProjectReference Include="..\Application\Application.csproj" />
     <ProjectReference Include="..\Domain\Domain.csproj" />
   </ItemGroup>
+
 
 </Project>
