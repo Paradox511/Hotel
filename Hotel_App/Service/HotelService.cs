@@ -31,9 +31,21 @@ namespace Hotel_App.Service
             }
         }
 
-        public Task<T> GetByIdAsync(string requestUri, int Id)
+        public async Task<T> GetByIdAsync(string requestUri, int Id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var response = await _httpClient.GetAsync($"{requestUri}/{Id}");
+                response.EnsureSuccessStatusCode();
+                var data = await response.Content.ReadFromJsonAsync<T>();
+                return data;
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions here, e.g., log the error, return a default value, or throw a custom exception
+                Console.WriteLine("Error fetching data: " + ex.Message);
+                return default(T); // Or throw a custom exception
+            }
         }
 
         public Task<T> SaveAsync(string requestUri, T obj)

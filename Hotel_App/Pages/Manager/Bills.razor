@@ -1,9 +1,13 @@
 ﻿@page "/bills"
 @using Hotel_App.Service
 @using Hotel_App.Data
-
+@using Blazored.LocalStorage
+@using Hotel_App.Shared
 @inject HotelService<HoaDon> BillService
+@implements IDisposable
 
+
+<br />
     <div class="col-12">
 
 <h3>Bills</h3>
@@ -36,6 +40,9 @@ else
                     <td>@bill.MaHoaDon</td>
                     <td>@bill.NgayTao</td>
                     <td>@bill.TongSoTien</td>
+                    <td>
+                        <NavLink href=@string.Format("/bills/details/{0}",bill.MaHoaDon)>View Details</NavLink>
+                    </td>
                 </tr>
             }
         </tbody>

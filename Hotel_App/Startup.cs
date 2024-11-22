@@ -39,6 +39,7 @@ namespace Hotel_App
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddHttpClient<HotelService<HoaDon>>();
+            services.AddHttpClient<HoaDonService>();
             services.AddSingleton<WeatherForecastService>();
 
           

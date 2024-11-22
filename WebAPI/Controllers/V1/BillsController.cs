@@ -6,6 +6,8 @@ using Application.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using MediatR;
 using Application.Features.Commands;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 
 namespace WebAPI.Controllers.V1
@@ -40,13 +42,24 @@ namespace WebAPI.Controllers.V1
 
             return Ok(bills);
         }
-        [HttpGet("{id}")]
+        [HttpGet("/api/Bills/details/{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var query = new GetByIDQuery<HoaDon> { Id = id };
-            
-            var bill = await _context.hoadon.FindAsync(id);
-            return bill == null ? NotFound("Bill not found") : Ok(bill);
+            var bill = await _context.hoadon
+                .Include(h => h.CTHoaDon)
+                .ThenInclude(ct => ct.dv)// Include related CTHoaDon entities
+                .FirstOrDefaultAsync(h => h.MaHoaDon == id);
+
+            if (bill == null)
+            {
+                return NotFound("Bill not found");
+            }
+            var options = new JsonSerializerOptions
+            {
+                ReferenceHandler = ReferenceHandler.IgnoreCycles
+            };
+
+            return Ok(JsonSerializer.Serialize(bill, options));
         }
 
 
