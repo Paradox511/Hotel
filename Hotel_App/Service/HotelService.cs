@@ -1,4 +1,6 @@
 ﻿
+using System;
+
 namespace Hotel_App.Service
 {
     public class HotelService<T> : IHotelService<T>
@@ -35,18 +37,19 @@ namespace Hotel_App.Service
         {
             try
             {
-                var response = await _httpClient.GetAsync($"{requestUri}/{Id}");
+                var response = await _httpClient.GetAsync(string.Format(requestUri, Id));
                 response.EnsureSuccessStatusCode();
                 var data = await response.Content.ReadFromJsonAsync<T>();
                 return data;
             }
             catch (Exception ex)
             {
-                // Handle exceptions here, e.g., log the error, return a default value, or throw a custom exception
+                // Handle exceptions here, e.g., log the error, return default value, or throw a custom exception
                 Console.WriteLine("Error fetching data: " + ex.Message);
-                return default(T); // Or throw a custom exception
+                return default(T);
             }
-        }
+        
+    }
 
         public Task<T> SaveAsync(string requestUri, T obj)
         {
