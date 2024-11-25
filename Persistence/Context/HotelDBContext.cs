@@ -13,6 +13,7 @@ namespace Persistence.Context
         {
             modelBuilder.Entity<CTHoaDon>().HasKey("Macthd");
             modelBuilder.Entity<HoaDon>().HasKey("MaHoaDon");
+            modelBuilder.Entity<PhuongThucThanhToan>().HasKey("MaPhuongThuc");
             modelBuilder.Entity<HoaDon>().Property(p => p.TongSoTien).HasColumnType("decimal(10,2)");
             modelBuilder.Entity<LoaiPhong>().Property(p => p.Gia).HasColumnType("decimal(10,2)");
             modelBuilder.Entity<DichVu>().Property(p => p.Gia).HasColumnType("decimal(10,2)");
@@ -31,6 +32,7 @@ namespace Persistence.Context
                 .HasOne(ct => ct.dv)
                 .WithOne(dv => dv.cthd)
                 .HasForeignKey<CTHoaDon>(ct => ct.MaDichVu);
+        
             base.OnModelCreating(modelBuilder);
         }
         public virtual DbSet<HoaDon> hoadon { get; set; }

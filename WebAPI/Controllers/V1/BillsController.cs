@@ -81,7 +81,7 @@ namespace WebAPI.Controllers.V1
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpDelete]
+        [HttpDelete("DeleteBill")]
         public async Task<IActionResult> Delete([FromBody] DeleteCommand<HoaDon> command)
         {
             if (command == null || command.Id == null)
