@@ -1,10 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Domain.Entities;
 namespace Domain.Entities
 {
     public class NhanVien
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int MaNhanVien { get; set; }
         [Required]
         public string HoTen { get; set; }
