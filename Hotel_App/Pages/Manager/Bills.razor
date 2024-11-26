@@ -11,213 +11,215 @@
 
 
 <div class="col-12">
-    <h3><b>Enter Author Information</b></h3>
-    <hr />
+	<h3><b>Enter Author Information</b></h3>
+	<hr />
 
 
-    <form>
-        <div class="form-group">
-            <label for="MaHoaDon">Mã Hóa Đơn:</label>
-            <input type="text" class="form-control" id="MaHoaDon" name="MaHoaDon" readonly>
-        </div>
+	<form>
+		<div class="form-group">
+			<label for="MaHoaDon">Mã Hóa Đơn:</label>
+			<input type="text" class="form-control" id="MaHoaDon" name="MaHoaDon" readonly>
+		</div>
 
-        <div class="form-group">
-            1
-            <label for="MaDatPhong">Mã Đặt Phòng:</label>
-            <select class="form-control" id="MaDatPhong" name="MaDatPhong">
-                <option value="">Chọn Mã Đặt Phòng</option>
-                @if (reservations != null){
-                @foreach (var datPhong in reservations)
-                {
-                    <option value="@datPhong.MaDatPhong">@datPhong.MaDatPhong</option>
-                }
-                }
-            </select>
-        </div>
+		<div class="form-group">
+			1
+			<label for="MaDatPhong">Mã Đặt Phòng:</label>
+			<select class="form-control" id="MaDatPhong" name="MaDatPhong">
+				<option value="">Chọn Mã Đặt Phòng</option>
+				@if (reservations != null)
+				{
+					@foreach (var datPhong in reservations)
+					{
+						<option value="@datPhong.MaDatPhong">@datPhong.MaDatPhong</option>
+					}
+				}
+			</select>
+		</div>
 
-        <div class="form-group">
-            <label for="MaNhanVien">Nhân Viên:</label>
-            <select class="form-control" id="MaNhanVien" name="MaNhanVien">
-                <option value="">Chọn Nhân Viên</option>
-                @if(employees !=null){
-                @foreach (var nhanVien in employees)
-                {
-                    <option value="@nhanVien.MaNhanVien">@nhanVien.HoTen</option>
-                }
-                }
+		<div class="form-group">
+			<label for="MaNhanVien">Nhân Viên:</label>
+			<select class="form-control" id="MaNhanVien" name="MaNhanVien">
+				<option value="">Chọn Nhân Viên</option>
+				@if (employees != null)
+				{
+					@foreach (var nhanVien in employees)
+					{
+						<option value="@nhanVien.MaNhanVien">@nhanVien.HoTen</option>
+					}
+				}
 
-            </select>
-        </div>
+			</select>
+		</div>
 
-        <div class="form-group">
-            <label for="MaPhuongThuc">Phương Thức Thanh Toán:</label>
-            <select class="form-control" id="MaPhuongThuc" name="MaPhuongThuc">
-                <option value="">Chọn Phương Thức</option>
-                
-            </select>
-        </div>
+		<div class="form-group">
+			<label for="MaPhuongThuc">Phương Thức Thanh Toán:</label>
+			<select class="form-control" id="MaPhuongThuc" name="MaPhuongThuc">
+				<option value="">Chọn Phương Thức</option>
 
-        <button type="submit" class="btn btn-primary">Lưu Hóa Đơn</button>
-    </form>
+			</select>
+		</div>
+
+		<button type="submit" class="btn btn-primary">Lưu Hóa Đơn</button>
+	</form>
 </div>
 <br />
-    <div class="col-12">
+<div class="col-12">
 
-<h3>Bills</h3>
- <SpinLoader IsLoading="isLoading">
-        <LoadingTemplate>
-            <div class="col-12" style="background-color: lightgray; height:400px; vertical-align:middle">
-                <br /><br />
-                <Chase Center="true" Color="#c21f13" Size="70px"></Chase>
-            </div>
-        </LoadingTemplate>
-        <ContentTemplate>
-@if (bills == null)
-{
-    <p>Loading...</p>
-}
-else
-{
-    <table>
-        <thead>
-            <tr>
-                <th>Mã hóa đơn</th>
-                <th>Ngày tạo</th>
-                <th>Tổng tiền</th>
-                <th>Hành động</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var bill in bills)
-            {
-                <tr>
-                    <td>@bill.MaHoaDon</td>
-                    <td>@bill.NgayTao</td>
-                    <td>@bill.TongSoTien</td>
-                    <td>
-                                    <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => EditBill(bill))">Edit</a> |
-                                    <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => DeleteBill(bill.MaHoaDon))">Delete</a>
-                    </td>
-                    <td>
-                        <NavLink href=@string.Format("/bills/details/{0}",bill.MaHoaDon)>View Details</NavLink>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
-        </ContentTemplate>
-    </SpinLoader>
+	<h3>Bills</h3>
+	<SpinLoader IsLoading="isLoading">
+		<LoadingTemplate>
+			<div class="col-12" style="background-color: lightgray; height:400px; vertical-align:middle">
+				<br /><br />
+				<Chase Center="true" Color="#c21f13" Size="70px"></Chase>
+			</div>
+		</LoadingTemplate>
+		<ContentTemplate>
+			@if (bills == null)
+			{
+				<p>Loading...</p>
+			}
+			else
+			{
+				<table>
+					<thead>
+						<tr>
+							<th>Mã hóa đơn</th>
+							<th>Ngày tạo</th>
+							<th>Tổng tiền</th>
+							<th>Hành động</th>
+						</tr>
+					</thead>
+					<tbody>
+						@foreach (var bill in bills)
+						{
+							<tr>
+								<td>@bill.MaHoaDon</td>
+								<td>@bill.NgayTao</td>
+								<td>@bill.TongSoTien</td>
+								<td>
+									<a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => EditBill(bill))">Edit</a> |
+									<a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => DeleteBill(bill.MaHoaDon))">Delete</a>
+								</td>
+								<td>
+									<NavLink href=@string.Format("/bills/details/{0}",bill.MaHoaDon)>View Details</NavLink>
+								</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			}
+		</ContentTemplate>
+	</SpinLoader>
 </div>
 
 
 @code {
-    private IEnumerable<HoaDon> bills;
-    private IEnumerable<DatPhong> reservations;
-    private IEnumerable<NhanVien> employees;
-    private IEnumerable<PhuongThucThanhToan> methods;
-    public HoaDon bill { get; set; }
-    public IEnumerable<HoaDon> filteredAuthorList { get; set; }
-    public bool IsVisible { get; set; }
-    public bool Result { get; set; }
-    public string RecordName { get; set; }
-    public bool IsGridViewFiltered { get; set; }
-    bool isLoading = true;
+	private IEnumerable<HoaDon> bills;
+	private IEnumerable<DatPhong> reservations;
+	private IEnumerable<NhanVien> employees;
+	private IEnumerable<PhuongThucThanhToan> methods;
+	public HoaDon bill { get; set; }
+	public IEnumerable<HoaDon> filteredAuthorList { get; set; }
+	public bool IsVisible { get; set; }
+	public bool Result { get; set; }
+	public string RecordName { get; set; }
+	public bool IsGridViewFiltered { get; set; }
+	bool isLoading = true;
 
-    protected async Task LoadBills()
-    {
-        bills = await BillService.GetAllAsync("https://localhost:44359/api/Bills/GetBills");
-    }
-    protected override void OnInitialized()
-    {
-        Console.WriteLine("Authors - OnInitialized");
-        base.OnInitialized();
-    }
+	protected async Task LoadBills()
+	{
+		bills = await BillService.GetAllAsync("https://localhost:44359/api/Bills/GetBills");
+	}
+	protected override void OnInitialized()
+	{
+		Console.WriteLine("Authors - OnInitialized");
+		base.OnInitialized();
+	}
 
-    protected override async Task OnInitializedAsync()
-    {
-        Console.WriteLine("Authors - OnInitializedAsync");
+	protected override async Task OnInitializedAsync()
+	{
+		Console.WriteLine("Authors - OnInitializedAsync");
 
-        bill = new HoaDon();
-        //authorList = await authorService.GetAuthors();
-       
-        await base.OnInitializedAsync();
-    }
+		bill = new HoaDon();
+		//authorList = await authorService.GetAuthors();
 
-    protected override void OnParametersSet()
-    {
-        Console.WriteLine("Authors - OnParametersSet");
-        base.OnParametersSet();
-    }
+		await base.OnInitializedAsync();
+	}
 
-    protected override async Task OnParametersSetAsync()
-    {
-        Console.WriteLine("Authors - OnParametersSetAsync");
-        await base.OnParametersSetAsync();
-    }
+	protected override void OnParametersSet()
+	{
+		Console.WriteLine("Authors - OnParametersSet");
+		base.OnParametersSet();
+	}
 
-    protected override bool ShouldRender()
-    {
-        base.ShouldRender();
-        Console.WriteLine("Authors - ShouldRender");
+	protected override async Task OnParametersSetAsync()
+	{
+		Console.WriteLine("Authors - OnParametersSetAsync");
+		await base.OnParametersSetAsync();
+	}
 
-        return true;
-    }
+	protected override bool ShouldRender()
+	{
+		base.ShouldRender();
+		Console.WriteLine("Authors - ShouldRender");
 
-    protected override void OnAfterRender(bool firstRender)
-    {
-        Console.WriteLine("Authors - OnAfterRender - firstRender = " + firstRender);
-        base.OnAfterRender(firstRender);
-    }
+		return true;
+	}
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        Console.WriteLine("Authors - OnAfterRenderAsync - firstRender = " + firstRender);
+	protected override void OnAfterRender(bool firstRender)
+	{
+		Console.WriteLine("Authors - OnAfterRender - firstRender = " + firstRender);
+		base.OnAfterRender(firstRender);
+	}
 
-        if (firstRender)
-        {
-            LoadReservations();
-            LoadEmployees();
-            await LoadBills();
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		Console.WriteLine("Authors - OnAfterRenderAsync - firstRender = " + firstRender);
 
-            isLoading = false;
-            StateHasChanged();
-        }
+		if (firstRender)
+		{
+			LoadReservations();
+			LoadEmployees();
+			await LoadBills();
 
-        await base.OnAfterRenderAsync(firstRender);
-    }
+			isLoading = false;
+			StateHasChanged();
+		}
 
-    public void Dispose()
-    {
-        Console.WriteLine("Authors - Dispose");
-    }
-    private async Task DeleteBill(int Id)
-    {
-        await BillService.DeleteAsync("authors/DeleteAuthor/",Id);
-        await LoadBills();
+		await base.OnAfterRenderAsync(firstRender);
+	}
 
-        //throw new Exception("DeleteAuthor");
-    }
+	public void Dispose()
+	{
+		Console.WriteLine("Authors - Dispose");
+	}
+	private async Task DeleteBill(int Id)
+	{
+		await BillService.DeleteAsync("authors/DeleteAuthor/", Id);
+		await LoadBills();
 
-    private void EditBill(HoaDon argAuthor)
-    {
-       bill = argAuthor;
-    }
-    private void SaveBill(HoaDon bill)
-    {
+		//throw new Exception("DeleteAuthor");
+	}
 
-    }
-    protected async Task LoadReservations()
-    {
-        reservations = await dpservice.GetAllAsync("https://localhost:44359/api/DatPhong/GetDatPhong");
-    }
-    protected async Task LoadEmployees()
-    {
-       employees = await nvservice.GetAllAsync("https://localhost:44359/api/NhanVien/GetNhanVien");
-    }
-    protected async Task LoadMethods()
-    {
-        methods = await ptservice.GetAllAsync("https://localhost:44359/api/PTTT/GetPTTT");
-    }
+	private void EditBill(HoaDon argAuthor)
+	{
+		bill = argAuthor;
+	}
+	private void SaveBill(HoaDon bill)
+	{
+
+	}
+	protected async Task LoadReservations()
+	{
+		reservations = await dpservice.GetAllAsync("https://localhost:44359/api/DatPhong/GetDatPhong");
+	}
+	protected async Task LoadEmployees()
+	{
+		employees = await nvservice.GetAllAsync("https://localhost:44359/api/NhanVien/GetNhanVien");
+	}
+	protected async Task LoadMethods()
+	{
+		methods = await ptservice.GetAllAsync("https://localhost:44359/api/PTTT/GetPTTT");
+	}
 
 }
