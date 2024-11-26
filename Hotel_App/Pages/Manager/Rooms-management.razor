@@ -1,8 +1,44 @@
 ﻿@page "/rooms"
-
+@using Hotel_App.Service
+@using Hotel_App.Data
+@using Blazored.LocalStorage
+@inject HotelService<Phong> RoomService
+@using Hotel_App.Shared
 
 <h3>Rooms_management</h3>
 
+<div class="col-12">
+	<h3><b>Enter Room Information</b></h3>
+	<hr />
+
+	<form>
+		<div class="form-group">
+			<label for="MaPhong">Mã Phòng :</label>
+			<input type="text" class="form-control" id="MaPhong" name="MaPhong" readonly>
+		</div>
+
+		<div class="form-group">
+			<label for="TrangThai">Trạng Thái Phòng:</label>
+			<select class="form-control" id="TrangThai" name="TrangThai">
+				<option value="">Chọn Trạng Thái</option>
+				<option value="trong">Trống</option>
+				<option value="da_dat">Đã đặt</option>
+			</select>
+		</div>
+
+		<div class="form-group">
+			<label for="SoLuong">Nhập số phòng:</label>
+			<input type="text" class="form-control" id="SoLuong" name="SoLuong" placeholder="Nhập số phòng">
+		</div>
+
+	</form>
+</div>
+
 @code {
-	
+	private IEnumerable<Phong> Room;
+
+	protected async Task LoadBills()
+	{
+		Room = await RoomService.GetAllAsync("https://localhost:44359/api/Bills/GetBills");
+	}
 }
