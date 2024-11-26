@@ -39,6 +39,10 @@ namespace Hotel_App
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddHttpClient<HotelService<HoaDon>>();
+            services.AddHttpClient<HotelService<NhanVien>>();
+            services.AddHttpClient<HotelService<PhuongThucThanhToan>>();
+            services.AddHttpClient<HotelService<DatPhong>>();
+
             services.AddHttpClient<HoaDonService>();
             services.AddSingleton<WeatherForecastService>();
 
@@ -82,8 +86,9 @@ namespace Hotel_App
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapBlazorHub();
+               
                 endpoints.MapFallbackToPage("/_Host");
+                endpoints.MapBlazorHub();
             });
         }
     }
