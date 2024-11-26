@@ -9,6 +9,7 @@ main {
 }
 
 .sidebar {
+    
     background-image: linear-gradient(180deg, rgb(5, 39, 103) 0%, #3a0647 70%);
 }
 
@@ -36,7 +37,7 @@ main {
         text-overflow: ellipsis;
     }
 
-@media (max-width: 640.98px) {
+@media (max-width: 100%) {
     .top-row {
         justify-content: space-between;
     }
@@ -46,7 +47,7 @@ main {
     }
 }
 
-@media (min-width: 641px) {
+@media (min-width: 10%) {
     .page {
         flex-direction: row;
     }
