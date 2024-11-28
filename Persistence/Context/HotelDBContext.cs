@@ -17,7 +17,7 @@ namespace Persistence.Context
             modelBuilder.Entity<HoaDon>().Property(p => p.TongSoTien).HasColumnType("decimal(10,2)");
             modelBuilder.Entity<LoaiPhong>().Property(p => p.Gia).HasColumnType("decimal(10,2)");
             modelBuilder.Entity<DichVu>().Property(p => p.Gia).HasColumnType("decimal(10,2)");
-
+           
             modelBuilder.Entity<HoaDon>()
            .HasMany(h => h.CTHoaDon)
            .WithOne(ct => ct.HoaDon)
@@ -27,7 +27,7 @@ namespace Persistence.Context
              .HasOne(ct => ct.HoaDon)
             .WithMany(h => h.CTHoaDon)
              .HasForeignKey(ct => ct.MaHoaDon);
-
+            
             modelBuilder.Entity<CTHoaDon>()
                 .HasOne(ct => ct.dv)
                 .WithOne(dv => dv.cthd)

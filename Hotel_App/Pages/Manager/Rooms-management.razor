@@ -1,44 +1,219 @@
 ﻿@page "/rooms"
+<h3>Rooms_management</h3>
 @using Hotel_App.Service
 @using Hotel_App.Data
 @using Blazored.LocalStorage
-@inject HotelService<Phong> RoomService
 @using Hotel_App.Shared
+@inject HotelService<Phong> RoomService
+@inject HotelService<LoaiPhong> RoomTypeService
+@inject HotelService<HoaDon> BillService
+@inject HotelService<DatPhong> dpservice;
+@inject HotelService<NhanVien> nvservice;
+@inject HotelService<PhuongThucThanhToan> ptservice;
+@implements IDisposable
 
-<h3>Rooms_management</h3>
+
 
 <div class="col-12">
-	<h3><b>Enter Room Information</b></h3>
-	<hr />
+    <h3><b>Enter Room Information</b></h3>
+    <hr />
 
-	<form>
-		<div class="form-group">
-			<label for="MaPhong">Mã Phòng :</label>
-			<input type="text" class="form-control" id="MaPhong" name="MaPhong" readonly>
-		</div>
+    <form>
+        <div class="form-group">
+            <label for="MaPhong">Mã Phòng :</label>
+            <input type="text" class="form-control" id="MaPhong" name="MaPhong" readonly>
+        </div>
 
-		<div class="form-group">
-			<label for="TrangThai">Trạng Thái Phòng:</label>
-			<select class="form-control" id="TrangThai" name="TrangThai">
-				<option value="">Chọn Trạng Thái</option>
-				<option value="trong">Trống</option>
-				<option value="da_dat">Đã đặt</option>
-			</select>
-		</div>
+        <div class="form-group">
+            <label for="TrangThai">Trạng Thái Phòng:</label>
+            <select class="form-control" id="TrangThai" name="TrangThai">
+                <option value="trong">Trống</option>
+                <option value="da_dat">Đã đặt</option>
+            </select>
+        </div>
 
-		<div class="form-group">
-			<label for="SoLuong">Nhập số phòng:</label>
-			<input type="text" class="form-control" id="SoLuong" name="SoLuong" placeholder="Nhập số phòng">
-		</div>
+        <div class="form-group">
+            <label for="SoLuong">Nhập số phòng:</label>
+            <input type="text" class="form-control" id="SoLuong" name="SoLuong" placeholder="Nhập số phòng">
+        </div>
 
-	</form>
+        <div class="form-group">
+            <label for="MaLoaiPhong">Mã Loại Phòng :</label>
+            <select class="form-control" id="MaLoaiPhong" name="MaLoaiPhong">
+                <option value="">Chọn mã loại phòng</option>
+                @if (loaiphong != null)
+                {
+                    @foreach (var type in loaiphong)
+                    {
+                        <option value="@type.MaLoaiPhong">@type.TenLoaiPhong</option>
+                    }
+                }
+            </select>
+        </div>
+
+    </form>
+</div>
+<br />
+
+<button type="submit" class="btn btn-primary">Tạo</button>
+
+<div class="col-12">
+
+    <h3>Phòng</h3>
+    <SpinLoader IsLoading="isLoading">
+        <LoadingTemplate>
+            <div class="col-12" style="background-color: lightgray; height:400px; vertical-align:middle">
+                <br /><br />
+                <Chase Center="true" Color="#c21f13" Size="70px"></Chase>
+            </div>
+        </LoadingTemplate>
+        <ContentTemplate>
+            @if (Room == null)
+            {
+                <p>Loading...</p>
+            }
+            else
+            {
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Mã Phòng</th>
+                            <th>Trạng Thái Phòng</th>
+                            <th>Số Phòng</th>
+                            <th>Mã Loại Phòng</th>                            
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var room in Room)
+                        {
+                            <tr>
+                                <td>@room.MaPhong</td>
+                                <td>@room.TrangThaiPhong</td>
+                                <td>@room.SoPhong</td>
+                                <td>@room.MaLoaiPhong</td> 
+                                <td>
+                                    <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => EditRoom(room))">Edit</a> |
+                                    <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => DeleteRoom(room.MaPhong))">Delete</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </ContentTemplate>
+    </SpinLoader>
 </div>
 
 @code {
-	private IEnumerable<Phong> Room;
+    private IEnumerable<Phong> Room;
+    private IEnumerable<LoaiPhong> loaiphong;
+    private IEnumerable<HoaDon> bills;
+    private IEnumerable<DatPhong> reservations;
+    private IEnumerable<NhanVien> employees;
+    private IEnumerable<PhuongThucThanhToan> methods;
+    public Phong a { get; set; }
+    public LoaiPhong b { get; set; }
+    public bool IsVisible { get; set; }
+    public bool Result { get; set; }
+    public string RecordName { get; set; }
+    public bool IsGridViewFiltered { get; set; }
+    bool isLoading = true;
 
-	protected async Task LoadBills()
-	{
-		Room = await RoomService.GetAllAsync("https://localhost:44359/api/Bills/GetBills");
-	}
+
+    protected async Task LoadRooms()
+    {
+        Room = await RoomService.GetAllAsync("https://localhost:44359/api/Rooms/GetRooms");
+    }
+
+    protected override void OnInitialized()
+    {
+        Console.WriteLine("Room - OnInitialized");
+        base.OnInitialized();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Console.WriteLine("Room - OnInitializedAsync");
+
+        a = new Phong();
+        b = new LoaiPhong();
+        //authorList = await authorService.GetAuthors();
+
+        await base.OnInitializedAsync();
+    }
+
+    protected override void OnParametersSet()
+    {
+        Console.WriteLine("Rooms - OnParametersSet");
+        base.OnParametersSet();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        Console.WriteLine("Rooms - OnParametersSetAsync");
+        await base.OnParametersSetAsync();
+    }
+
+    protected override bool ShouldRender()
+    {
+        base.ShouldRender();
+        Console.WriteLine("Rooms - ShouldRender");
+
+        return true;
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        Console.WriteLine("Rooms - OnAfterRender - firstRender = " + firstRender);
+        base.OnAfterRender(firstRender);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        Console.WriteLine("Authors - OnAfterRenderAsync - firstRender = " + firstRender);
+
+        if (firstRender)
+        {
+
+            await LoadRooms();
+            await Loadloaiphong();
+            isLoading = false;
+            StateHasChanged();
+        }
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    public void Dispose()
+    {
+        Console.WriteLine("Rooms - Dispose");
+    }
+    private async Task DeleteRoom(int Id)
+    {
+        // await BillService.DeleteAsync("authors/DeleteAuthor/", Id);
+        // await LoadEmployees();
+
+        // throw new Exception("DeleteAuthor");
+    }
+
+    private void EditRoom(Phong room)
+    {
+        // employees = argAuthor;
+    }
+    private void SaveBill(HoaDon bill)
+    {
+
+    }
+     // protected async Task LoadReservations()
+     //     {
+     //     reservations = await dpservice.GetAllAsync("https:localhost:44359/api/DatPhong/GetDatPhong");
+     // }
+     protected async Task Loadloaiphong()
+         {
+        loaiphong = await RoomTypeService.GetAllAsync("https://localhost:44359/api/RoomTypes/GetRoomTypes");
+     }
+    //  protected async Task LoadMethods()
+    //      {
+    //      methods = await ptservice.GetAllAsync("https:localhost:44359/api/PTTT/GetPTTT");
+    // }
 }

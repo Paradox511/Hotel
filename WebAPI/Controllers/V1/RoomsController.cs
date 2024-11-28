@@ -37,28 +37,28 @@ namespace WebAPI.Controllers.V1
 
 				return Ok(rooms);
 			}
-			[HttpGet("/api/Rooms/{id}")]
-			public async Task<IActionResult> GetById(int id)
+		[HttpGet("/api/Rooms/{id}")]
+		public async Task<IActionResult> GetById(int id)
+		{
+			var room = await _context.phong
+				.Include(h => h.MaLoaiPhong)
+				//.ThenInclude(ct => ct.)// Include related CTHoaDon entities
+				.FirstOrDefaultAsync(h => h.MaPhong == id);
+
+			if (room == null)
 			{
-				var room = await _context.phong
-					.Include(h => h.MaLoaiPhong)
-					//.ThenInclude(ct => ct.)// Include related CTHoaDon entities
-					.FirstOrDefaultAsync(h => h.MaPhong == id);
-
-				if (room == null)
-				{
-					return NotFound("Room not found");
-				}
-				var options = new JsonSerializerOptions
-				{
-					ReferenceHandler = ReferenceHandler.IgnoreCycles
-				};
-
-				return Ok(JsonSerializer.Serialize(room, options));
+				return NotFound("Room not found");
 			}
+			var options = new JsonSerializerOptions
+			{
+				ReferenceHandler = ReferenceHandler.IgnoreCycles
+			};
+
+			return Ok(JsonSerializer.Serialize(room, options));
+		}
 
 
-			[HttpPost("CreateRoom")]
+		[HttpPost("CreateRoom")]
 			public async Task<IActionResult> CreateRoom([FromBody] CreateCommand<Phong> command)
 			{
 				if (command == null || command.Entity == null)
