@@ -1,5 +1,9 @@
 ﻿
+using Blazored.LocalStorage;
+using Newtonsoft.Json;
 using System;
+using System.Net;
+using System.Text;
 
 namespace Hotel_App.Service
 {
@@ -51,14 +55,48 @@ namespace Hotel_App.Service
         
     }
 
-        public Task<T> SaveAsync(string requestUri, T obj)
+        public async Task<T> SaveAsync(string requestUri, T obj)
         {
-            throw new NotImplementedException();
-        }
+            string serializedUser = JsonConvert.SerializeObject(obj);
+            var jsonWithRoot = "{\"entity\":" + serializedUser + "}";
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, requestUri);
 
-        public Task<T> UpdateAsync(string requestUri, int Id, T obj)
+           
+
+            requestMessage.Content = new StringContent(jsonWithRoot);
+
+            requestMessage.Content.Headers.ContentType
+                = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+
+            var response = await _httpClient.SendAsync(requestMessage);
+
+            var responseStatusCode = response.EnsureSuccessStatusCode;
+            var responseBody = await response.Content.ReadAsStringAsync();
+
+            var returnedObj = JsonConvert.DeserializeObject<T>(responseBody);
+
+            return await Task.FromResult(returnedObj);
+        }
+        public async Task<T> UpdateAsync(string requestUri, int Id, T obj)
         {
-            throw new NotImplementedException();
+            string serializedUser = JsonConvert.SerializeObject(obj);
+
+            var requestMessage = new HttpRequestMessage(HttpMethod.Put, requestUri + Id);
+          
+         
+            requestMessage.Content = new StringContent(serializedUser);
+
+            requestMessage.Content.Headers.ContentType
+                = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+
+            var response = await _httpClient.SendAsync(requestMessage);
+
+            var responseStatusCode = response.StatusCode;
+            var responseBody = await response.Content.ReadAsStringAsync();
+
+            var returnedObj = JsonConvert.DeserializeObject<T>(responseBody);
+
+            return await Task.FromResult(returnedObj);
         }
     }
 }
