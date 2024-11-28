@@ -66,33 +66,243 @@
             }
             else
             {
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Mã Nhân Viên</th>
-                            <th>Tên Nhân Viên</th>
-                            <th>Số điện thoại</th>
-                            <th>Email</th>
-                            <th>Địa Chỉ</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var nv in employees)
-                        {
-                            <tr>
-                                <td>@nv.MaNhanVien</td>
-                                <td>@nv.HoTen</td>
-                                <td>@nv.SoDienThoai</td>
-                                <td>@nv.Email</td>
-                                <td>@nv.DiaChi</td>
-                                <td>
-                                    <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => EditEmployees(nv))">Edit</a> |
-                                    <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => DeleteEmployees(nv.MaNhanVien))">Delete</a>
-                                </td>
-                            </tr>
+
+                <style>
+                    /* Table styling */
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin: 20px 0;
+                        font-size: 16px;
+                        text-align: left;
+                    }
+
+                    thead tr {
+                        background-color: #06163C;
+                        color: white;
+                    }
+
+                    th, td {
+                        padding: 12px 15px;
+                        border: 1px solid #ddd;
+                    }
+
+                    tbody tr:nth-child(even) {
+                        background-color: #f2f2f2;
+                    }
+
+                    tbody tr:hover {
+                        background-color: #f1f1f1;
+                    }
+
+                    a {
+                        text-decoration: none;
+                        color: blue;
+                        font-weight: bold;
+                    }
+
+                        a:hover {
+                            text-decoration: underline;
+                            color: darkblue;
                         }
-                    </tbody>
-                </table>
+
+                    .action-links {
+                        display: flex;
+                        gap: 10px;
+                    }
+
+                    /* Search bar styling */
+                    .search-bar {
+                        margin-bottom: 20px;
+                        display: flex;
+                        gap: 10px;
+                        align-items: center;
+                    }
+
+                        .search-bar input[type="text"] {
+                            width: 300px;
+                            padding: 8px;
+                            font-size: 16px;
+                            border: 1px solid #ddd;
+                            border-radius: 4px;
+                        }
+
+                        .search-bar button {
+                            padding: 8px 15px;
+                            font-size: 16px;
+                            color: white;
+                            background-color: #4CAF50;
+                            border: none;
+                            border-radius: 4px;
+                            cursor: pointer;
+                        }
+
+                            .search-bar button:hover {
+                                background-color: #45a049;
+                            }
+                </style>
+
+                @if (filteredEmployees != null)
+                {
+                    <GridView Items="filteredEmployees" ReloadList="IsGridViewFiltered">
+                        <GridColumns>
+                            <!-- Search Column for Employee ID -->
+                            <GridColumn ColumnTitle="Mã Nhân Viên"
+                                        OnSearchTextChanged="@(e => OnEmployeeSearchTextChanged(e, "MaNhanVien"))">
+                            </GridColumn>
+
+                            <!-- Search Column for Employee Name -->
+                            <GridColumn ColumnTitle="Tên Nhân Viên"
+                                        OnSearchTextChanged="@(e => OnEmployeeSearchTextChanged(e, "HoTen"))">
+                            </GridColumn>
+
+                            <!-- Search Column for Phone Number -->
+                            <GridColumn ColumnTitle="Số Điện Thoại"
+                                        OnSearchTextChanged="@(e => OnEmployeeSearchTextChanged(e, "SoDienThoai"))">
+                            </GridColumn>
+
+                            <!-- Search Column for Email -->
+                            <GridColumn ColumnTitle="Email"
+                                        OnSearchTextChanged="@(e => OnEmployeeSearchTextChanged(e, "Email"))">
+                            </GridColumn>
+
+                            <!-- Search Column for Address -->
+                            <GridColumn ColumnTitle="Địa Chỉ"
+                                        OnSearchTextChanged="@(e => OnEmployeeSearchTextChanged(e, "DiaChi"))">
+                            </GridColumn>
+
+                            <GridColumn ColumnTitle="Thao tác"
+                                       >
+                            </GridColumn>
+                        </GridColumns>
+
+                        <!-- Display Employee Data Rows -->
+                        <GridRow Context="employee">
+                            <td>
+                                <NavLink href="@string.Format("/employees/employeedetail/{0}", employee.MaNhanVien)">
+                                    @employee.MaNhanVien
+                                </NavLink>
+                            </td>
+                            <td>@employee.HoTen</td>
+                            <td>@employee.SoDienThoai</td>
+                            <td>@employee.Email</td>
+                            <td>@employee.DiaChi</td>
+
+                            <th class="action-links">
+                                <a class="edit-link" @onclick="(() => EditEmployees(employee))">Sửa</a> |
+                                <a class="delete-link" @onclick="(() => DeleteEmployees(employee.MaNhanVien))">Xóa</a>
+                            </th>
+                        </GridRow>
+                    </GridView>
+                }
+                else
+                {
+                    <p>No employees found.</p>
+                }
+
+                <style>
+                    /* Style the entire grid view */
+                    .grid-view {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin: 20px 0;
+                        font-size: 16px;
+                        background-color: #fff;
+                        border-radius: 8px;
+                        overflow: hidden;
+                    }
+
+                        /* Style for each header cell */
+                        .grid-view thead tr {
+                            background-color: #06163C;
+                            color: white;
+                        }
+
+                        /* Style the table cells */
+                        .grid-view th, .grid-view td {
+                            padding: 12px 15px;
+                            border: 1px solid #ddd;
+                        }
+
+                        /* Style for every alternate row */
+                        .grid-view tbody tr:nth-child(even) {
+                            background-color: #f2f2f2;
+                        }
+
+                        /* Hover effect for rows */
+                        .grid-view tbody tr:hover {
+                            background-color: #f1f1f1;
+                        }
+
+                        /* Link styling */
+                        .grid-view a {
+                            text-decoration: none;
+                            color: blue;
+                            font-weight: bold;
+                        }
+
+                            .grid-view a:hover {
+                                text-decoration: underline;
+                                color: darkblue;
+                            }
+
+                    /* Action links style */
+                    .action-links {
+                        display: flex;
+                        gap: 10px;
+                    }
+
+                    /* Style for the search bar */
+                    .search-bar {
+                        margin-bottom: 20px;
+                        display: flex;
+                        gap: 10px;
+                        align-items: center;
+                    }
+
+                        .search-bar input[type="text"] {
+                            width: 300px;
+                            padding: 8px;
+                            font-size: 16px;
+                            border: 1px solid #ddd;
+                            border-radius: 4px;
+                        }
+
+                        .search-bar button {
+                            padding: 8px 15px;
+                            font-size: 16px;
+                            color: white;
+                            background-color: #4CAF50;
+                            border: none;
+                            border-radius: 4px;
+                            cursor: pointer;
+                        }
+
+                            .search-bar button:hover {
+                                background-color: #45a049;
+                            }
+
+                    /* Action link color changes */
+                    .edit-link {
+                        color: blue;
+                        cursor: pointer;
+                    }
+
+                        .edit-link:hover {
+                            text-decoration: underline;
+                        }
+
+                    .delete-link {
+                        color: red;
+                        cursor: pointer;
+                    }
+
+                        .delete-link:hover {
+                            text-decoration: underline;
+                        }
+                </style>
+
+
             }
         </ContentTemplate>
     </SpinLoader>
@@ -103,105 +313,104 @@
     private IEnumerable<NhanVien> employees;
     private IEnumerable<PhuongThucThanhToan> methods;
     public NhanVien employee { get; set; }
-    public IEnumerable<HoaDon> filteredAuthorList { get; set; }
+    public IEnumerable<NhanVien> filteredEmployees { get; set; }
     public bool IsVisible { get; set; }
     public bool Result { get; set; }
     public string RecordName { get; set; }
     public bool IsGridViewFiltered { get; set; }
     bool isLoading = true;
+    private string searchQuery = "";
+    private List<Employees> lemployees = new List<Employees>();
 
+    // Tải danh sách nhân viên từ API
     protected async Task LoadEmployees()
     {
         employees = await nvservice.GetAllAsync("https://localhost:44359/api/NhanVien/GetNhanVien");
-    }
-    protected override void OnInitialized()
-    {
-        Console.WriteLine("Authors - OnInitialized");
-        base.OnInitialized();
+        filteredEmployees = employees.ToList(); // Hiển thị danh sách đầy đủ ban đầu
     }
 
+    // Phương thức tìm kiếm nhân viên
+    private void OnEmployeeSearchTextChanged(ChangeEventArgs changeEventArgs, string columnTitle)
+    {
+        string searchText = changeEventArgs.Value.ToString();
+        IsGridViewFiltered = true; // Đánh dấu là đang lọc dữ liệu
+
+        switch (columnTitle)
+        {
+            case "MaNhanVien":
+                // Tìm kiếm theo Mã Nhân Viên
+                filteredEmployees = employees.Where(emp => emp.MaNhanVien.ToString().Contains(searchText)).ToList();
+                break;
+            case "HoTen":
+                // Tìm kiếm theo Tên Nhân Viên
+                filteredEmployees = employees.Where(emp => emp.HoTen.ToLower().Contains(searchText.ToLower())).ToList();
+                break;
+            case "SoDienThoai":
+                // Tìm kiếm theo Số Điện Thoại
+                filteredEmployees = employees.Where(emp => emp.SoDienThoai.Contains(searchText)).ToList();
+                break;
+            case "Email":
+                // Tìm kiếm theo Email
+                filteredEmployees = employees.Where(emp => emp.Email.ToLower().Contains(searchText.ToLower())).ToList();
+                break;
+            case "DiaChi":
+                // Tìm kiếm theo Địa Chỉ
+                filteredEmployees = employees.Where(emp => emp.DiaChi.ToLower().Contains(searchText.ToLower())).ToList();
+                break;
+            default:
+                Console.WriteLine("Invalid columnTitle");
+                break;
+        }
+
+        // Cập nhật giao diện sau khi lọc dữ liệu
+        StateHasChanged();
+    }
+
+
+
+
+    // Phương thức xóa nhân viên
+    private async Task DeleteEmployees(int id)
+    {
+        // bool result = await nvservice.DeleteAsync($"https:localhost:44359/api/NhanVien/Delete/{id}");
+        // if (result)
+        // {
+        //     await LoadEmployees(); Tải lại danh sách sau khi xóa thành công
+        //     StateHasChanged();
+        // }
+    }
+
+    // Phương thức chỉnh sửa nhân viên
+    private void EditEmployees(NhanVien nv)
+    {
+        
+    }
+
+    // Khởi tạo dữ liệu khi tải trang
     protected override async Task OnInitializedAsync()
     {
-        Console.WriteLine("Authors - OnInitializedAsync");
-
-        employee = new NhanVien();
-        //authorList = await authorService.GetAuthors();
-
+        Console.WriteLine("OnInitializedAsync - Start loading employees.");
+        await LoadEmployees();
+        isLoading = false;
         await base.OnInitializedAsync();
     }
 
-    protected override void OnParametersSet()
-    {
-        Console.WriteLine("Authors - OnParametersSet");
-        base.OnParametersSet();
-    }
-
-    protected override async Task OnParametersSetAsync()
-    {
-        Console.WriteLine("Authors - OnParametersSetAsync");
-        await base.OnParametersSetAsync();
-    }
-
-    protected override bool ShouldRender()
-    {
-        base.ShouldRender();
-        Console.WriteLine("Authors - ShouldRender");
-
-        return true;
-    }
-
-    protected override void OnAfterRender(bool firstRender)
-    {
-        Console.WriteLine("Authors - OnAfterRender - firstRender = " + firstRender);
-        base.OnAfterRender(firstRender);
-    }
-
+    // Xử lý khi render lần đầu
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        Console.WriteLine("Authors - OnAfterRenderAsync - firstRender = " + firstRender);
-
         if (firstRender)
         {
-            
             await LoadEmployees();
-
             isLoading = false;
             StateHasChanged();
         }
-
         await base.OnAfterRenderAsync(firstRender);
     }
 
     public void Dispose()
     {
-        Console.WriteLine("Authors - Dispose");
+        Console.WriteLine("Dispose - Component is being disposed.");
     }
-    private async Task DeleteEmployees(int Id)
-    {
-        // await BillService.DeleteAsync("authors/DeleteAuthor/", Id);
-        // await LoadEmployees();
-
-        // throw new Exception("DeleteAuthor");
-    }
-
-    private void EditEmployees(NhanVien argAuthor)
-    {
-       // employees = argAuthor;
-    }
-    private void SaveBill(HoaDon bill)
-    {
-
-    }
-   /* protected async Task LoadReservations()
-    {
-        reservations = await dpservice.GetAllAsync("https:localhost:44359/api/DatPhong/GetDatPhong");
-    }
-    protected async Task LoadEmployees()
-    {
-        employees = await nvservice.GetAllAsync("https:localhost:44359/api/NhanVien/GetNhanVien");
-    }
-    protected async Task LoadMethods()
-    {
-        methods = await ptservice.GetAllAsync("https:localhost:44359/api/PTTT/GetPTTT");
-    }*/
 }
+
+
