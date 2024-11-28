@@ -1,6 +1,8 @@
 ﻿@page "/bills/details/{billId:int}"
 @using Hotel_App.Service
 @using Hotel_App.Data
+@using Blazored.LocalStorage
+@using Hotel_App.Shared
 @inject HotelService<HoaDon> BillService
 @inject HoaDonService CTHoaDonService
 <div class="col-12">
@@ -39,7 +41,7 @@
                             <td>@bill.MaPhuongThuc</td>
                         </tr>
                         <br />
-                <table>
+                <table table table-bordered table-striped table-responsive-md>
                     <thead>
                         <tr>
                             <th>MaDichVu</th>
