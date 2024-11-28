@@ -11,20 +11,22 @@
 
 
 <div class="col-12">
-    <h3><b>Enter Author Information</b></h3>
+    <h3><b>Thông tin hóa đơn</b></h3>
     <hr />
-
-
-    <form>
+    <EditForm Model="@bill" OnValidSubmit="@SaveBill">
         <div class="form-group">
             <label for="MaHoaDon">Mã Hóa Đơn:</label>
-            <input type="text" class="form-control" id="MaHoaDon" name="MaHoaDon" readonly>
+            <input type="text" class="form-control" @bind="bill.MaHoaDon" name="MaHoaDon" readonly>
         </div>
 
         <div class="form-group">
-            1
+            <label for="NgayTao">Ngày tạo</label>
+            <input  type="datetime-local" class="form-control" @bind="bill.NgayTao" />
+
+        </div>
+        <div class="form-group">
             <label for="MaDatPhong">Mã Đặt Phòng:</label>
-            <select class="form-control" id="MaDatPhong" name="MaDatPhong">
+            <select class="form-control" id="MaDatPhong" @bind="bill.MaDatPhong" name="MaDatPhong">
                 <option value="">Chọn Mã Đặt Phòng</option>
                 @if (reservations != null){
                 @foreach (var datPhong in reservations)
@@ -37,7 +39,7 @@
 
         <div class="form-group">
             <label for="MaNhanVien">Nhân Viên:</label>
-            <select class="form-control" id="MaNhanVien" name="MaNhanVien">
+            <select class="form-control" id="MaNhanVien" @bind="bill.MaNhanVien" name="MaNhanVien">
                 <option value="">Chọn Nhân Viên</option>
                 @if(employees !=null){
                 @foreach (var nhanVien in employees)
@@ -51,19 +53,25 @@
 
         <div class="form-group">
             <label for="MaPhuongThuc">Phương Thức Thanh Toán:</label>
-            <select class="form-control" id="MaPhuongThuc" name="MaPhuongThuc">
+            <select class="form-control" id="MaPhuongThuc"  @bind="bill.MaPhuongThuc" name="MaPhuongThuc">
                 <option value="">Chọn Phương Thức</option>
-                
+                @if (methods != null)
+                {
+                    @foreach (var pt in methods)
+                    {
+                        <option value="@pt.MaPhuongThuc">@pt.TenPhuongThuc</option>
+                    }
+                }
             </select>
         </div>
 
         <button type="submit" class="btn btn-primary">Lưu Hóa Đơn</button>
-    </form>
+    </EditForm>
 </div>
 <br />
     <div class="col-12">
 
-<h3>Bills</h3>
+    <h3>Bills <button class="btn btn-primary" @onclick="LoadBills">Refresh</button></h3>
  <SpinLoader IsLoading="isLoading">
         <LoadingTemplate>
             <div class="col-12" style="background-color: lightgray; height:400px; vertical-align:middle">
@@ -78,7 +86,7 @@
 }
 else
 {
-    <table>
+                <table class="table table-bordered table-striped table-responsive-md">
         <thead>
             <tr>
                 <th>Mã hóa đơn</th>
@@ -89,6 +97,7 @@ else
         </thead>
         <tbody>
             @foreach (var bill in bills)
+           
             {
                 <tr>
                     <td>@bill.MaHoaDon</td>
@@ -126,7 +135,10 @@ else
 
     protected async Task LoadBills()
     {
+        isLoading = true;
+
         bills = await BillService.GetAllAsync("https://localhost:44359/api/Bills/GetBills");
+        isLoading = false;
     }
     protected override void OnInitialized()
     {
@@ -140,7 +152,7 @@ else
 
         bill = new HoaDon();
         //authorList = await authorService.GetAuthors();
-       
+
         await base.OnInitializedAsync();
     }
 
@@ -178,6 +190,7 @@ else
         {
             LoadReservations();
             LoadEmployees();
+            LoadMethods();
             await LoadBills();
 
             isLoading = false;
@@ -193,18 +206,56 @@ else
     }
     private async Task DeleteBill(int Id)
     {
-        await BillService.DeleteAsync("authors/DeleteAuthor/",Id);
-        await LoadBills();
-
+        await BillService.DeleteAsync("https://localhost:44359/api/Bills/DeleteBill/", Id);
+        LoadBills();
+        StateHasChanged();
         //throw new Exception("DeleteAuthor");
     }
 
-    private void EditBill(HoaDon argAuthor)
+    private void EditBill(HoaDon savedbill)
     {
-       bill = argAuthor;
+        bill = savedbill;
+        StateHasChanged();
+
     }
-    private void SaveBill(HoaDon bill)
+    private async Task SaveBill()
     {
+        // Call the service to save the bill
+        try
+        {
+            if (bill.CTHoaDon == null) bill.CTHoaDon = [];
+            if (bill.MaHoaDon == 0)
+            {
+                //  bill.CTHoaDon = null;
+                HoaDon savedBill = await BillService.SaveAsync("https://localhost:44359/api/Bills/CreateBill", bill);
+                if (savedBill != null)
+                {
+                    // Display success message using a modal or dialog
+                    //  await _modalService.Show<SuccessMessage>("Bill created successfully!");
+
+                    // Update the bill list
+                    StateHasChanged();
+
+                    // Clear the form
+                    bill = new HoaDon();
+                }
+            }else
+            {
+                HoaDon savedBill = await BillService.UpdateAsync("https://localhost:44359/api/Bills/UpdateBill/",bill.MaHoaDon, bill);
+                // Update the bill list
+                StateHasChanged();
+
+                // Clear the form
+                bill = new HoaDon();
+
+            }
+            // Handle successful save, e.g., display success message, clear form, etc.
+        }
+        catch (Exception ex)
+        {
+            // Handle errors, e.g., display error message to the user
+            Console.Error.WriteLine("Error saving bill: " + ex.Message);
+        }
 
     }
     protected async Task LoadReservations()
