@@ -41,25 +41,25 @@ namespace WebAPI.Controllers.V1
             return Ok(employees);
         }
 
-        //[HttpGet("GetByIDorName")]
-        //public async Task<IActionResult> GetById(int id, string name)
-        //{
-        //    var employees = await _context.nhanvien
-        //        .Include(h => h.MaNhanVien == id || h.HoTen == name);
-        //        //.ThenInclude(ct => ct.dv)// Include related CTHoaDon entities
-        //        //.FirstOrDefaultAsync(h => h.MaHoaDon == id);
+        [HttpGet("GetByID/{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var employees = await _context.nhanvien
+                .FirstOrDefaultAsync(h => h.MaNhanVien == id);
+            //.ThenInclude(ct => ct.dv)// Include related CTHoaDon entities
+            //.FirstOrDefaultAsync(h => h.MaHoaDon == id);
 
-        //    if (employees == null)
-        //    {
-        //        return NotFound("Employees not found");
-        //    }
-        //    var options = new JsonSerializerOptions
-        //    {
-        //        ReferenceHandler = ReferenceHandler.IgnoreCycles
-        //    };
+            if (employees == null)
+            {
+                return NotFound("Employees not found");
+            }
+            var options = new JsonSerializerOptions
+            {
+                ReferenceHandler = ReferenceHandler.IgnoreCycles
+            };
 
-        //    return Ok(JsonSerializer.Serialize(employees, options));
-        //}
+            return Ok(JsonSerializer.Serialize(employees, options));
+        }
 
         [HttpPost("CreateNhanVien")]
         public async Task<IActionResult> CreateNhanVien([FromBody] CreateCommand<NhanVien> command)
