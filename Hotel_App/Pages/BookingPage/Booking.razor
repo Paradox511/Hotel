@@ -2,8 +2,9 @@
 @using Hotel_App.Data
 @using Hotel_App.Service
 @inject NavigationManager NavigationManager
-@inject RoomService<Phong> RoomService
-@inject RoomService<LoaiPhong> RoomTypesService
+@inject RoomService RoomService
+@inject HttpClient Http
+@using System.Net.Http.Json
 <header class="px-2 py-3" style="background-color: #2549ff">
 	<div class="">
 		<div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
@@ -109,20 +110,48 @@
 						<th scope="col">Số phòng</th>
 						<th scope="col">Mô tả</th>
 						<th scope="col">Số lượng</th>
-						<th scope="col"></th>
 					</tr>
 				</thead>
 				<tbody>
-					@* @foreach (var item in Phong) *@
-					@* { *@
-					@* 	<tr> *@
-					@* 		<td>@item.LoaiPhong.TenLoaiPhong</td> *@
-					@* 		<td>@item.LoaiPhong.Gia</td> *@
-					@* 		<td>@item.SoPhong</td> *@
-					@* 		<td>@item.LoaiPhong.Mota</td> *@
-					@* 		<td>@item.LoaiPhong.SoLuongPhong</td> *@
-					@* 	</tr> *@
-					@* } *@
+					@if (phongs != null && phongs.Any())
+					{
+						@foreach (var phong in phongs.Where(p => p.TrangThaiPhong == 1))
+						{
+							<tr>
+								<td scope="col">
+									<div class="d-flex align-baseline">
+										<div class="flex-md-row me-3">
+											<div class="mb-1" style="max-width: 204px; height: 114px;">
+												<img src="https://cf.bstatic.com/xdata/images/hotel/max500/274543815.jpg?k=f6c0dc4d0d1d175a8de643d6e23c80b620147156fb01a220938577872782d384&o=" class="img-fluid rounded-3 w-100 h-100" alt="Hình ảnh 1">
+											</div>
+											<div class="flex-row d-flex align-items-center justify-content-between">
+												<div class="me-1" style="max-width: 100px; height: 56px;">
+													<img src="https://cf.bstatic.com/xdata/images/hotel/max500/274543645.jpg?k=f0d023c8f640749669e2e69005a47d154b45a8b914a165ab877bb458dd782ac1&o=" class="img-fluid rounded-3 w-100 h-100" alt="Hình ảnh 2">
+												</div>
+												<div class="" style="max-width: 100px; height: 56px;">
+													<img src="https://cf.bstatic.com/xdata/images/hotel/max1024x768/274543555.jpg?k=94e5eecc58931591e05c6e65bef9bc878820145cf008a28bf586f40946d228cd&o=" class="img-fluid rounded-3 w-100 h-100" alt="Hình ảnh 3">
+												</div>
+											</div>
+										</div>
+										<span>
+											@phong.LoaiPhong.TenLoaiPhong
+										</span>
+									</div>
+
+								</td>
+								<td scope="col">@phong.LoaiPhong.Gia</td>
+								<td scope="col">@phong.SoPhong</td>
+								<td scope="col">@phong.LoaiPhong.Mota</td>
+								<td scope="col">@phong.LoaiPhong.SoLuongPhong</td>
+							</tr>
+						}
+					}
+					else
+					{
+						<tr>
+							<td colspan="5">Không có dữ liệu phòng</td>
+						</tr>
+					}
 				</tbody>
 			</table>
 		</div>
@@ -132,23 +161,10 @@
 <footer></footer>
 
 @code {
-	public List<Phong> Phong { get; set; }
-	public List<LoaiPhong> LoaiPhong { get; set; }
+	List<Phong> phongs;
 
 	protected override async Task OnInitializedAsync()
 	{
-		// var roomInfo = await Http.GetFromJsonAsync<RoomInfo>("https:localhost:44359/api/Room/GetRoomInfo");
-		// Phong = roomInfo.Phong;
-		// LoaiPhong = roomInfo.LoaiPhong;
-
-		var phong = RoomService.GetAllRooms("https:localhost:44359/api/Room/GetRoomInfo");
-		var loaiPhong = RoomTypesService.GetAllRoomTypes("https:localhost:44359/api/Room/GetRoomInfo");
-		Phong = await phong;
+		phongs = await Http.GetFromJsonAsync<List<Phong>>("https://localhost:44359/api/Room/GetRoomInfo");
 	}
-
-	// public class RoomInfo
-	// {
-	// 	public List<Phong> Phong { get; set; }
-	// 	public List<LoaiPhong> LoaiPhong { get; set; }
-		// }
 }

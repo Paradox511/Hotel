@@ -23,8 +23,7 @@ namespace Hotel_App
 			services.AddHttpClient<HotelService<NhanVien>>();
 			services.AddHttpClient<HotelService<PhuongThucThanhToan>>();
 			services.AddHttpClient<HotelService<DatPhong>>();
-			services.AddHttpClient<RoomService<LoaiPhong>>();
-			services.AddHttpClient<RoomService<Phong>>();
+			services.AddHttpClient<RoomService>();
 
 			services.AddHttpClient<HoaDonService>();
 			services.AddSingleton<WeatherForecastService>();

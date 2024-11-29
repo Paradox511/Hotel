@@ -1,5 +1,4 @@
 ﻿using Application.Interfaces;
-using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,28 +7,44 @@ namespace WebAPI.Controllers.V1
 	public class RoomController : BaseApiController
 	{
 		private readonly IHotelDBContext _context;
-		private readonly IMediator _mediator;
-		private readonly ISender _sender;
 
 		public RoomController(IHotelDBContext context)
 		{
 			_context = context;
 		}
 		[HttpGet("GetRoomInfo")]
-		public async Task<IActionResult> GetRoomInfo()
+		public async Task<ActionResult<IEnumerable<object>>> GetRoomInfo()
 		{
 			if (_context == null)
 			{
 				return StatusCode(500, "Internal Server Error: DbContext not injected");
 			}
-			var loaiPhong = await _context.loaiphong.ToListAsync();
-			var phong = await _context.phong.Include(p => p.LoaiPhong).ToListAsync();
 
-			if (phong == null || loaiPhong == null)
+			var roomInfo = await _context.phong
+				.Include(p => p.LoaiPhong)
+				.Select(p => new
+				{
+					p.MaPhong,
+					p.TrangThaiPhong,
+					p.SoPhong,
+					LoaiPhong = new
+					{
+						p.LoaiPhong.MaLoaiPhong,
+						p.LoaiPhong.TenLoaiPhong,
+						p.LoaiPhong.SoLuongPhong,
+						p.LoaiPhong.Mota,
+						p.LoaiPhong.Gia
+					}
+				})
+				.ToListAsync();
+
+			if (roomInfo == null || !roomInfo.Any())
 			{
-				return NotFound("No Phong types or LoaiPhong found");
+				return NotFound("Không tìm thấy dữ liệu phòng");
 			}
-			return Ok(new { Phong = phong, LoaiPhong = loaiPhong });
+
+			return roomInfo;
+
 		}
 	}
 }
