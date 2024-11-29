@@ -1,53 +1,154 @@
 ﻿@page "/booking"
 @using Hotel_App.Data
+@using Hotel_App.Service
 @inject NavigationManager NavigationManager
-<header>
-	<!-- header inner -->
-	<div class="header">
-		<div class="container">
-			<div class="row">
-				<div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col logo_section">
-					<div class="full">
-						<div class="center-desk">
-							<div class="logo">
-								<a href="index.html"><img src="images/logo.png" alt="#" /></a>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="col-xl-9 col-lg-9 col-md-9 col-sm-9">
-					<nav class="navigation navbar navbar-expand-md navbar-dark ">
-						<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample04" aria-controls="navbarsExample04" aria-expanded="false" aria-label="Toggle navigation">
-							<span class="navbar-toggler-icon"></span>
-						</button>
-						<div class="collapse navbar-collapse" id="navbarsExample04">
-							<ul class="navbar-nav mr-auto">
-								<li class="nav-item active">
-									<a class="nav-link" href="index.html">Home</a>
-								</li>
-								<li class="nav-item">
-									<a class="nav-link" href="about.html">About</a>
-								</li>
-								<li class="nav-item">
-									<a class="nav-link" href="room.html">Our room</a>
-								</li>
-								<li class="nav-item">
-									<a class="nav-link" href="gallery.html">Gallery</a>
-								</li>
-								<li class="nav-item">
-									<a class="nav-link" href="blog.html">Blog</a>
-								</li>
-								<li class="nav-item">
-									<a class="nav-link" href="contact.html">Contact Us</a>
-								</li>
-							</ul>
-						</div>
-					</nav>
-				</div>
+@inject RoomService<Phong> RoomService
+@inject RoomService<LoaiPhong> RoomTypesService
+<header class="px-2 py-3" style="background-color: #2549ff">
+	<div class="">
+		<div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+			<a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-dark text-decoration-none">
+				<img src="/img/logoSGU.png" width="50" height="50" />
+			</a>
+
+			<ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+				<li><a href="#" class="nav-link px-2 link-secondary">Overview</a></li>
+				<li><a href="#" class="nav-link px-2 link-dark">Inventory</a></li>
+				<li><a href="#" class="nav-link px-2 link-dark">Customers</a></li>
+				<li><a href="#" class="nav-link px-2 link-dark">Products</a></li>
+			</ul>
+
+			<form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3">
+				<input type="search" class="form-control" placeholder="Search..." aria-label="Search">
+			</form>
+
+			@* kiểm tra khi khôgn có user sẽ hiển thị  *@
+			<div class="d-none">
+				<button type="button" class="btn btn-outline-primary me-2"><a href="#" class="nav-link">Đăng nhập</a></button>
+				<button type="button" class="btn btn-primary"><a href="#" class="nav-link link-dark text-white">Đăng ký</a></button>
+			</div>
+
+			<div class="dropdown text-end">
+				<a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+					<img src="https://github.com/mdo.png" alt="mdo" width="32" height="32" class="rounded-circle">
+				</a>
+				<ul class="dropdown-menu text-small" aria-labelledby="dropdownUser1">
+					<li><a class="dropdown-item" href="#">New project...</a></li>
+					<li><a class="dropdown-item" href="#">Settings</a></li>
+					<li><a class="dropdown-item" href="#">Profile</a></li>
+					<li><hr class="dropdown-divider"></li>
+					<li><a class="dropdown-item" href="#">Sign out</a></li>
+				</ul>
 			</div>
 		</div>
 	</div>
 </header>
-@code {
 
+<section class="h-auto" style="background-color: #f0f2f5">
+	<div>
+		<h1>Booking Hotel</h1>
+	</div>
+	<div class="px-2">
+
+		<h2 class="mt-2 border-top d-block">Phòng trống</h2>
+		<div class="d-flex justify-content-start my-2">
+			<div class="datepicker">
+				<label for="start-date" class="form-label">Check-in Date:</label>
+				<input type="text" id="start-date" class="form-control" placeholder="Select check-in date">
+			</div>
+			<div class="datepicker">
+				<label for="end-date" class="form-label">Check-out Date:</label>
+				<input type="text" id="end-date" class="form-control" placeholder="Select check-out date">
+			</div>
+		</div>
+
+		<script>
+			$(document).ready(function () {
+			var startDate = $('#start-date');
+			var endDate = $('#end-date');
+
+			startDate.datepicker({
+			format: 'dd/mm/yyyy',
+			autoclose: true,
+			todayHighlight: true
+			});
+
+			endDate.datepicker({
+			format: 'dd/mm/yyyy',
+			autoclose: true,
+			todayHighlight: true
+			});
+
+			// Xử lý khi chọn ngày cho startDate
+			startDate.on('changeDate', function (selected) {
+			var currentDate = new Date();
+			currentDate.setHours(0, 0, 0, 0); // Đặt giờ về 0 để so sánh ngày
+			var selectedDate = new Date(selected.date.valueOf());
+			selectedDate.setHours(0, 0, 0, 0);
+
+			if (selectedDate < currentDate) {
+			startDate.datepicker('setDate', currentDate);
+			}
+
+			var minDate = new Date(selected.date.valueOf());
+			minDate.setDate(minDate.getDate() + 1);
+			endDate.datepicker('setStartDate', minDate);
+
+			if (endDate.val() === '') {
+			endDate.datepicker('setDate', minDate);
+			}
+			});
+			});
+		</script>
+		<div class="">
+			<table class="table table-bordered table-striped table-responsive-md">
+				<thead class="table-dark">
+					<tr>
+						<th scope="col">Loại phòng</th>
+						<th scope="col">Giá</th>
+						<th scope="col">Số phòng</th>
+						<th scope="col">Mô tả</th>
+						<th scope="col">Số lượng</th>
+						<th scope="col"></th>
+					</tr>
+				</thead>
+				<tbody>
+					@* @foreach (var item in Phong) *@
+					@* { *@
+					@* 	<tr> *@
+					@* 		<td>@item.LoaiPhong.TenLoaiPhong</td> *@
+					@* 		<td>@item.LoaiPhong.Gia</td> *@
+					@* 		<td>@item.SoPhong</td> *@
+					@* 		<td>@item.LoaiPhong.Mota</td> *@
+					@* 		<td>@item.LoaiPhong.SoLuongPhong</td> *@
+					@* 	</tr> *@
+					@* } *@
+				</tbody>
+			</table>
+		</div>
+	</div>
+</section>
+
+<footer></footer>
+
+@code {
+	public List<Phong> Phong { get; set; }
+	public List<LoaiPhong> LoaiPhong { get; set; }
+
+	protected override async Task OnInitializedAsync()
+	{
+		// var roomInfo = await Http.GetFromJsonAsync<RoomInfo>("https:localhost:44359/api/Room/GetRoomInfo");
+		// Phong = roomInfo.Phong;
+		// LoaiPhong = roomInfo.LoaiPhong;
+
+		var phong = RoomService.GetAllRooms("https:localhost:44359/api/Room/GetRoomInfo");
+		var loaiPhong = RoomTypesService.GetAllRoomTypes("https:localhost:44359/api/Room/GetRoomInfo");
+		Phong = await phong;
+	}
+
+	// public class RoomInfo
+	// {
+	// 	public List<Phong> Phong { get; set; }
+	// 	public List<LoaiPhong> LoaiPhong { get; set; }
+		// }
 }
