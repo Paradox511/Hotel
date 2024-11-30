@@ -79,14 +79,13 @@ namespace WebAPI.Controllers.V1
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpDelete("DeleteNhanVien")]
-        public async Task<IActionResult> Delete([FromBody] DeleteCommand<NhanVien> command)
-        {
-            if (command == null || command.Id == null)
+        [HttpDelete("DeleteNhanVien/{id}")]
+        public async Task<IActionResult> Delete(int id) { 
+            if (id == null)
             {
                 return BadRequest("Invalid command data");
             }
-            var entity = _context.nhanvien.Find(command.Id);
+            var entity = _context.nhanvien.Find(id);
             _context.nhanvien.Remove(entity);
             await _context.SaveChangesAsync();
             return Ok("Nhan vien deleted."); // No content to return on successful deletion
@@ -97,16 +96,30 @@ namespace WebAPI.Controllers.V1
         /// <param name="id"></param>
         /// <param name="command"></param>
         /// <returns></returns>
-        [HttpPut("[action]")]
-        public async Task<IActionResult> Update([FromBody] UpdateCommand<NhanVien> command)
+        [HttpPut("UpdateNhanVien/{id}")]
+        public async Task<IActionResult> Update(int id, NhanVien employee)
         {
-            if (command == null || command.Entity == null)
+            if (id != employee.MaNhanVien)
             {
                 return BadRequest("Invalid command data");
             }
-
-            await _mediator.Send(command);
-            return NoContent(); // No content to return on successful update
+            _context.nhanvien.Entry(employee).State = EntityState.Modified;
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (employee == null)
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return Ok(employee); // No content to return on successful update
         }
 
     }
