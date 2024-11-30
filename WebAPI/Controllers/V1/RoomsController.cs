@@ -67,7 +67,7 @@ namespace WebAPI.Controllers.V1
 				}
 				_context.phong.Add(command.Entity);
 				await _context.SaveChangesAsync();
-				return Ok("Bill created successfully");
+				return Ok("Room created successfully");
 			}
 
 			// Similar methods for updating and deleting KhachHang

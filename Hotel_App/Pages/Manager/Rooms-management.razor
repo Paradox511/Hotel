@@ -17,8 +17,8 @@
 <div class="col-12">
     <h3><b>Enter Room Information</b></h3>
     <hr />
-
-    <form>
+    <EditForm Model="@png" OnValidSubmit="@SaveRoom">
+    
         <div class="form-group">
             <label for="MaPhong">Mã Phòng :</label>
             <input type="text" class="form-control" id="MaPhong" name="MaPhong" readonly>
@@ -45,17 +45,20 @@
                 {
                     @foreach (var type in loaiphong)
                     {
-                        <option value="@type.MaLoaiPhong">@type.TenLoaiPhong</option>
+                        <option value="Maloai">@type.MaLoaiPhong
+                            @* -@type.TenLoaiPhong-@type.SoLuongPhong-@type.Mota-@type.Gia *@
+                            </option>
                     }
                 }
             </select>
         </div>
+        <button type="submit" class="btn btn-primary">Tạo</button>
+    </EditForm>
 
-    </form>
 </div>
 <br />
 
-<button type="submit" class="btn btn-primary">Tạo</button>
+
 
 <div class="col-12">
 
@@ -68,7 +71,7 @@
             </div>
         </LoadingTemplate>
         <ContentTemplate>
-            @if (Room == null)
+            @if (Rooms == null)
             {
                 <p>Loading...</p>
             }
@@ -84,7 +87,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var room in Room)
+                        @foreach (var room in Rooms)
                         {
                             <tr>
                                 <td>@room.MaPhong</td>
@@ -105,14 +108,14 @@
 </div>
 
 @code {
-    private IEnumerable<Phong> Room;
+    private IEnumerable<Phong> Rooms;
     private IEnumerable<LoaiPhong> loaiphong;
     private IEnumerable<HoaDon> bills;
     private IEnumerable<DatPhong> reservations;
     private IEnumerable<NhanVien> employees;
     private IEnumerable<PhuongThucThanhToan> methods;
-    public Phong a { get; set; }
-    public LoaiPhong b { get; set; }
+    public Phong png { get; set; }
+    public LoaiPhong Type { get; set; }
     public bool IsVisible { get; set; }
     public bool Result { get; set; }
     public string RecordName { get; set; }
@@ -122,7 +125,7 @@
 
     protected async Task LoadRooms()
     {
-        Room = await RoomService.GetAllAsync("https://localhost:44359/api/Rooms/GetRooms");
+        Rooms = await RoomService.GetAllAsync("https://localhost:44359/api/Rooms/GetRooms");
     }
 
     protected override void OnInitialized()
@@ -135,8 +138,8 @@
     {
         Console.WriteLine("Room - OnInitializedAsync");
 
-        a = new Phong();
-        b = new LoaiPhong();
+        png = new Phong();
+        Type = new LoaiPhong();
         //authorList = await authorService.GetAuthors();
 
         await base.OnInitializedAsync();
@@ -200,9 +203,45 @@
     {
         // employees = argAuthor;
     }
-    private void SaveBill(HoaDon bill)
+    private async Task SaveRoom()
     {
+        // Call the service to save the bill
+        try
+        {
+            //if (png.MaLoaiPhong == null) png.MaLoaiPhong = [];
+            if (png.MaPhong == 0)
+            {
+                //  bill.CTHoaDon = null;
+                Phong TPhong = await RoomService.SaveAsync("https://localhost:44359/api/Rooms/CreateRoom", png);
+                if (TPhong != null)
+                {
+                    // Display success message using a modal or dialog
+                    //  await _modalService.Show<SuccessMessage>("Bill created successfully!");
 
+                    // Update the bill list
+                    StateHasChanged();
+
+                    // Clear the form
+                    png = new Phong();
+                }
+            }
+            else
+            {
+                Phong TPhong = await RoomService.UpdateAsync("https://localhost:44359/api/Rooms/UpdateRoom/", png.MaPhong, png);
+                // Update the bill list
+                StateHasChanged();
+
+                // Clear the form
+                png = new Phong();
+
+            }
+            // Handle successful save, e.g., display success message, clear form, etc.
+        }
+        catch (Exception ex)
+        {
+            // Handle errors, e.g., display error message to the user
+            Console.Error.WriteLine("Error saving bill: " + ex.Message);
+        }
     }
      // protected async Task LoadReservations()
      //     {
