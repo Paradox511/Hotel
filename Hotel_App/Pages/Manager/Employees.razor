@@ -14,39 +14,43 @@
 <div class="col-12">
     <h3><b>Enter Author Information</b></h3>
     <hr />
-
-
-    <form>
+     <EditForm Model="@employee" OnValidSubmit="@CreateEmployees"> 
         <div class="form-group">
             <label for="MaNhanVien">Mã Nhân Viên:</label>
-            <input type="text" class="form-control" id="MaNhanVien" name="MaNhanVien" readonly>
+            <input type="text" class="form-control" id="MaNhanVien" @bind="employee.MaNhanVien" name="MaNhanVien" readonly>
         </div>
 
         <div class="form-group">
             <label for="TenNhanVien">Tên Nhân Viên:</label>
-            <input type="text" class="form-control" id="TenNhanVien" name="TenNhanVien">
-            
+            <input type="text" class="form-control" id="TenNhanVien" @bind="employee.HoTen" name="TenNhanVien">
+
         </div>
 
         <div class="form-group">
             <label for="SoDienThoai">Số Điện Thoại:</label>
-            <input type="text" class="form-control" id="SoDienThoai" name="SoDienThoai">
+            <input type="text" class="form-control" id="SoDienThoai" @bind="employee.SoDienThoai" name="SoDienThoai">
         </div>
 
         <div class="form-group">
             <label for="Email">Email:</label>
-            <input type="text" class="form-control" id="Email" name="Email">
+            <input type="text" class="form-control" id="Email" @bind="employee.Email" name="Email">
         </div>
 
         <div class="form-group">
             <label for="DiaChi">Địa Chỉ:</label>
-            <input type="text" class="form-control" id="DiaChi" name="DiaChi">
+            <input type="text" class="form-control" id="DiaChi" @bind="employee.DiaChi" name="DiaChi">
         </div>
 
-        
-
+        <div class="form-group">
+            <label for="MaTaiKhoan">Loại Tài Khoản:</label>
+            <select class="form-control" id="MaTaiKhoan" @bind="employee.MaTaiKhoan" name="MaTaiKhoan">
+                <option value="">Chọn Loại Tài Khoản</option>
+                <option value="1">Quản Lý</option>
+                <option value="2">Nhân Viên</option>                   
+            </select>
+        </div>
         <button type="submit" class="btn btn-primary">Tạo</button>
-    </form>
+     </EditForm> 
 </div>
 <br />
 <div class="col-12">
@@ -65,55 +69,293 @@
                 <p>Loading...</p>
             }
             else
-            {
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Mã Nhân Viên</th>
-                            <th>Tên Nhân Viên</th>
-                            <th>Số điện thoại</th>
-                            <th>Email</th>
-                            <th>Địa Chỉ</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var nv in employees)
-                        {
+            {               
+                @if (filteredEmployees != null)
+                {
+                    <!-- Search Box -->
+                    <div class="search-box">
+                        <label class="col-2 font-weight-bold">Search:</label>
+                        <input type="text" class="form-control col-3" @bind="searchText" @oninput="OnSearchTextChanged" placeholder="Search employees" />
+                    </div>                  
+                    <table class="table table-bordered table-striped table-responsive-md">
+                        <thead>
                             <tr>
-                                <td>@nv.MaNhanVien</td>
-                                <td>@nv.HoTen</td>
-                                <td>@nv.SoDienThoai</td>
-                                <td>@nv.Email</td>
-                                <td>@nv.DiaChi</td>
-                                <td>
-                                    <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => EditEmployees(nv))">Edit</a> |
-                                    <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => DeleteEmployees(nv.MaNhanVien))">Delete</a>
-                                </td>
+                                <th>Mã Nhân Viên</th>
+                                <th>Tên Nhân Viên</th>
+                                <th>Số điện thoại</th>
+                                <th>Email</th>
+                                <th>Địa Chỉ</th>
+                                <th>Loại tài khoản</th>
+                                <th>Thao Tác</th>
                             </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var nv in filteredEmployees)
+                            {
+                                <tr>
+                                    <td>@nv.MaNhanVien</td>
+                                    <td>@nv.HoTen</td>
+                                    <td>@nv.SoDienThoai</td>
+                                    <td>@nv.Email</td>
+                                    <td>@nv.DiaChi</td>
+                                    <td>
+                                        @if (nv.MaTaiKhoan == 1)
+                                        {
+                                            <span>Quản lý</span>
+                                        }
+                                        else
+                                        {
+                                            <span>Nhân Viên</span>
+                                        }
+                                    </td>
+                                    <td class="action-links">
+                                        <a class="edit-link" @onclick="(() => EditEmployees(nv))">Edit</a> |
+                                        <a class="delete-link" @onclick="(() => DeleteEmployees(nv.MaNhanVien))">Delete</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <p>No employees found.</p>
+                }
+
+
+                <style>                   
+                    /* Action links style */
+                    .action-links {
+                        display: flex;
+                        gap: 10px;
+                    }
+
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin: 20px 0;
+                        font-size: 16px;
+                        text-align: left;
+                    }
+
+                    thead tr {
+                        background-color: #06163C;
+                        color: white;
+                    }
+
+                    th, td {
+                        padding: 12px 15px;
+                        border: 1px solid #ddd;
+                    }
+
+                    tbody tr:nth-child(even) {
+                        background-color: #f2f2f2;
+                    }
+
+                    tbody tr:hover {
+                        background-color: #f1f1f1;
+                    }
+
+                    a {
+                        text-decoration: none;
+                        color: blue;
+                        font-weight: bold;
+                    }
+
+                        a:hover {
+                            text-decoration: underline;
+                            color: darkblue;
                         }
-                    </tbody>
-                </table>
+
+                    /* Search bar styling */
+                    .search-bar {
+                        margin-bottom: 20px;
+                        display: flex;
+                        gap: 10px;
+                        align-items: center;
+                    }
+
+                        .search-bar input[type="text"] {
+                            width: 300px;
+                            padding: 8px;
+                            font-size: 16px;
+                            border: 1px solid #ddd;
+                            border-radius: 4px;
+                        }
+
+                        .search-bar button {
+                            padding: 8px 15px;
+                            font-size: 16px;
+                            color: white;
+                            background-color: #4CAF50;
+                            border: none;
+                            border-radius: 4px;
+                            cursor: pointer;
+                        }
+
+                            .search-bar button:hover {
+                                background-color: #45a049;
+                            }
+
+                    /* Style for the search bar */
+                    .search-bar {
+                        margin-bottom: 20px;
+                        display: flex;
+                        gap: 10px;
+                        align-items: center;
+                    }
+
+                        .search-bar input[type="text"] {
+                            width: 300px;
+                            padding: 8px;
+                            font-size: 16px;
+                            border: 1px solid #ddd;
+                            border-radius: 4px;
+                        }
+
+                        .search-bar button {
+                            padding: 8px 15px;
+                            font-size: 16px;
+                            color: white;
+                            background-color: #4CAF50;
+                            border: none;
+                            border-radius: 4px;
+                            cursor: pointer;
+                        }
+
+                            .search-bar button:hover {
+                                background-color: #45a049;
+                            }
+
+                    /* Action link color changes */
+                    .edit-link {
+                        color: blue;
+                        cursor: pointer;
+                    }
+
+                        .edit-link:hover {
+                            text-decoration: underline;
+                        }
+
+                    .delete-link {
+                        color: red;
+                        cursor: pointer;
+                    }
+
+                        .delete-link:hover {
+                            text-decoration: underline;
+                        }
+                </style>
+
+
             }
         </ContentTemplate>
     </SpinLoader>
 </div>
 @code {
-    private IEnumerable<HoaDon> bills;
-    private IEnumerable<DatPhong> reservations;
+
     private IEnumerable<NhanVien> employees;
-    private IEnumerable<PhuongThucThanhToan> methods;
     public NhanVien employee { get; set; }
-    public IEnumerable<HoaDon> filteredAuthorList { get; set; }
+    public IEnumerable<NhanVien> filteredEmployees { get; set; }
     public bool IsVisible { get; set; }
     public bool Result { get; set; }
     public string RecordName { get; set; }
     public bool IsGridViewFiltered { get; set; }
     bool isLoading = true;
+    private string searchText = string.Empty;
+    private List<Employees> lemployees = new List<Employees>();
 
+    // Tải danh sách nhân viên từ API
     protected async Task LoadEmployees()
     {
-        employees = await nvservice.GetAllAsync("https://localhost:44359/api/NhanVien/GetNhanVien");
+        isLoading = true;
+
+        // Gọi API để lấy danh sách nhân viên
+        try
+        {
+            employees = await nvservice.GetAllAsync("https://localhost:44359/api/NhanVien/GetNhanVien");
+            filteredEmployees = employees.ToList(); // Gán dữ liệu ban đầu cho filteredEmployees
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine("Error loading employees: " + ex.Message);
+        }
+
+        isLoading = false;
+        StateHasChanged(); // Cập nhật giao diện
     }
+
+    // Phương thức tìm kiếm
+    private void OnSearchTextChanged(ChangeEventArgs e)
+    {
+        string searchValue = e.Value.ToString().ToLower();
+
+        // Lọc danh sách theo tất cả các trường dữ liệu
+        filteredEmployees = employees.Where(emp =>
+            emp.MaNhanVien.ToString().Contains(searchValue) ||
+            emp.HoTen.ToLower().Contains(searchValue) 
+            
+        ).ToList();
+
+        StateHasChanged();
+    }
+
+    private async Task CreateEmployees()
+    {
+        // Call the service to save the bill
+        try
+        {
+            if (employee.MaNhanVien == 0)
+            {
+                NhanVien CreateEmployee = await nvservice.SaveAsync("https://localhost:44359/api/NhanVien/CreateNhanVien", employee);
+                if (CreateEmployee != null)
+                {
+                    // Clear the form
+                    employee = new NhanVien();
+                    await LoadEmployees();
+
+                    // Update the bill list
+                    StateHasChanged();
+                }
+            }
+            else
+            {
+                NhanVien CreateEmployee = await nvservice.UpdateAsync("https://localhost:44359/api/NhanVien/UpdateNhanVien/", employee.MaNhanVien, employee);               
+                // Clear the form
+                employee = new NhanVien();
+                await LoadEmployees();
+
+                // Update the bill list
+                StateHasChanged();
+            }
+            // Handle successful save, e.g., display success message, clear form, etc.
+        }
+        catch (Exception ex)
+        {
+            // Handle errors, e.g., display error message to the user
+            Console.Error.WriteLine("Error saving employees: " + ex.Message);
+        }
+
+    }
+
+
+    // Phương thức xóa nhân viên
+    private async Task DeleteEmployees(int id)
+    {
+
+        await nvservice.DeleteAsync("https://localhost:44359/api/NhanVien/DeleteNhanVien/", id);
+        await LoadEmployees();
+        StateHasChanged();
+        
+    }
+
+    // Phương thức chỉnh sửa nhân viên
+    private void EditEmployees(NhanVien nv)
+    {
+        employee = nv;
+        StateHasChanged();
+    }
+
     protected override void OnInitialized()
     {
         Console.WriteLine("Authors - OnInitialized");
@@ -125,6 +367,7 @@
         Console.WriteLine("Authors - OnInitializedAsync");
 
         employee = new NhanVien();
+        await LoadEmployees();
         //authorList = await authorService.GetAuthors();
 
         await base.OnInitializedAsync();
@@ -162,7 +405,9 @@
 
         if (firstRender)
         {
-            
+            //LoadReservations();
+            //LoadEmployees();
+            //LoadMethods();
             await LoadEmployees();
 
             isLoading = false;
@@ -176,32 +421,6 @@
     {
         Console.WriteLine("Authors - Dispose");
     }
-    private async Task DeleteEmployees(int Id)
-    {
-        // await BillService.DeleteAsync("authors/DeleteAuthor/", Id);
-        // await LoadEmployees();
-
-        // throw new Exception("DeleteAuthor");
-    }
-
-    private void EditEmployees(NhanVien argAuthor)
-    {
-       // employees = argAuthor;
-    }
-    private void SaveBill(HoaDon bill)
-    {
-
-    }
-   /* protected async Task LoadReservations()
-    {
-        reservations = await dpservice.GetAllAsync("https:localhost:44359/api/DatPhong/GetDatPhong");
-    }
-    protected async Task LoadEmployees()
-    {
-        employees = await nvservice.GetAllAsync("https:localhost:44359/api/NhanVien/GetNhanVien");
-    }
-    protected async Task LoadMethods()
-    {
-        methods = await ptservice.GetAllAsync("https:localhost:44359/api/PTTT/GetPTTT");
-    }*/
 }
+
+

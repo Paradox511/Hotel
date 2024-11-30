@@ -5,6 +5,8 @@ using MediatR;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace WebAPI.Controllers.V1
 {
@@ -30,14 +32,34 @@ namespace WebAPI.Controllers.V1
                 return StatusCode(500, "Internal Server Error: DbContext not injected");
             }
 
-            var employees = await _context.nhanvien.ToListAsync(); // Assuming your bills are stored in "hoadon" DbSet
+            var employees = await _context.nhanvien.ToListAsync(); 
             if (employees == null)
             {
-                return NotFound("No bills found");
+                return NotFound("No employees found");
             }
 
             return Ok(employees);
         }
+
+        //[HttpGet("GetByIDorName")]
+        //public async Task<IActionResult> GetById(int id, string name)
+        //{
+        //    var employees = await _context.nhanvien
+        //        .Include(h => h.MaNhanVien == id || h.HoTen == name);
+        //        //.ThenInclude(ct => ct.dv)// Include related CTHoaDon entities
+        //        //.FirstOrDefaultAsync(h => h.MaHoaDon == id);
+
+        //    if (employees == null)
+        //    {
+        //        return NotFound("Employees not found");
+        //    }
+        //    var options = new JsonSerializerOptions
+        //    {
+        //        ReferenceHandler = ReferenceHandler.IgnoreCycles
+        //    };
+
+        //    return Ok(JsonSerializer.Serialize(employees, options));
+        //}
 
         [HttpPost("CreateNhanVien")]
         public async Task<IActionResult> CreateNhanVien([FromBody] CreateCommand<NhanVien> command)
@@ -57,14 +79,13 @@ namespace WebAPI.Controllers.V1
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpDelete("DeleteNhanVien")]
-        public async Task<IActionResult> Delete([FromBody] DeleteCommand<NhanVien> command)
-        {
-            if (command == null || command.Id == null)
+        [HttpDelete("DeleteNhanVien/{id}")]
+        public async Task<IActionResult> Delete(int id) { 
+            if (id == null)
             {
                 return BadRequest("Invalid command data");
             }
-            var entity = _context.nhanvien.Find(command.Id);
+            var entity = _context.nhanvien.Find(id);
             _context.nhanvien.Remove(entity);
             await _context.SaveChangesAsync();
             return Ok("Nhan vien deleted."); // No content to return on successful deletion
@@ -75,16 +96,30 @@ namespace WebAPI.Controllers.V1
         /// <param name="id"></param>
         /// <param name="command"></param>
         /// <returns></returns>
-        [HttpPut("[action]")]
-        public async Task<IActionResult> Update([FromBody] UpdateCommand<NhanVien> command)
+        [HttpPut("UpdateNhanVien/{id}")]
+        public async Task<IActionResult> Update(int id, NhanVien employee)
         {
-            if (command == null || command.Entity == null)
+            if (id != employee.MaNhanVien)
             {
                 return BadRequest("Invalid command data");
             }
-
-            await _mediator.Send(command);
-            return NoContent(); // No content to return on successful update
+            _context.nhanvien.Entry(employee).State = EntityState.Modified;
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (employee == null)
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return Ok(employee); // No content to return on successful update
         }
 
     }
