@@ -1,5 +1,4 @@
 ﻿@page "/employees"
-<h3>Employees</h3>
 @using Hotel_App.Service
 @using Hotel_App.Data
 @using Blazored.LocalStorage
@@ -12,8 +11,8 @@
 
 
 <div class="col-12">
-    <h3><b>Enter Author Information</b></h3>
-    <hr />
+    <h3><b>Thông Tin Nhân Viên</b></h3>
+    <hr/>
     @if (!string.IsNullOrEmpty(successMessage))
     {
         <div class="alert alert-success">@successMessage</div>
@@ -69,13 +68,17 @@
                 <option value="2">Nhân Viên</option>                   
             </select> 
         </div>*@
+        <br/>
         <button type="submit" class="btn btn-primary">Tạo</button>
      </EditForm> 
 </div>
 <br />
+<hr/>
 <div class="col-12">
 
-    <h3><b>Nhân Viên</b></h3>
+    <h3><b>Danh Sách Nhân Viên</b></h3>
+    <button class="btn btn-primary" @onclick="LoadEmployees">Refresh</button>
+    <br/>
     <SpinLoader IsLoading="isLoading">
         <LoadingTemplate>
             <div class="col-12" style="background-color: lightgray; height:400px; vertical-align:middle">
@@ -94,7 +97,7 @@
                 {
                     <!-- Search Box -->
                     <div class="search-box">
-                        <label class="col-2 font-weight-bold">Search:</label>
+                        <b><label class="col-2 font-weight-bold">Search:</label></b>
                         <input type="text" class="form-control col-3" @bind="searchText" @oninput="OnSearchTextChanged" placeholder="Search employees" />
                     </div>                  
                     <table class="table table-bordered table-striped table-responsive-md">
@@ -138,6 +141,12 @@
                             }
                         </tbody>
                     </table>
+                    <div class="pagination-controls">
+                        <button class="btn btn-secondary" @onclick="PreviousPage" disabled="@IsFirstPage()">Previous</button>
+                        <span>Page @currentPage of @totalPages</span>
+                        <button class="btn btn-secondary" @onclick="NextPage" disabled="@IsLastPage()">Next</button>
+                    </div>
+
                 }
                 else
                 {
@@ -267,6 +276,25 @@
                         .delete-link:hover {
                             text-decoration: underline;
                         }
+
+                    .pagination-controls {
+                        display: flex;
+                        justify-content: center;
+                        gap: 10px;
+                        margin-top: 20px;
+                    }
+
+                        .pagination-controls button {
+                            padding: 8px 15px;
+                            font-size: 16px;
+                            border-radius: 4px;
+                        }
+
+                        .pagination-controls span {
+                            font-size: 16px;
+                            align-self: center;
+                        }
+
                 </style>
 
 
@@ -298,17 +326,28 @@
     private readonly string emailPattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
     // Phone validation regex
     private readonly string phonePattern = @"^\d{10}$";
+    private int currentPage = 1;
+    private int itemsPerPage = 5; // Change this number based on your preference
+    private int totalEmployees = 0;
+    private int totalPages => (int)Math.Ceiling((double)totalEmployees / itemsPerPage);
+
 
     // Tải danh sách nhân viên từ API
     protected async Task LoadEmployees()
     {
         isLoading = true;
 
-        // Gọi API để lấy danh sách nhân viên
         try
         {
-            employees = await nvservice.GetAllAsync("https://localhost:44359/api/NhanVien/GetNhanVien");
-            filteredEmployees = employees.ToList(); // Gán dữ liệu ban đầu cho filteredEmployees
+            // Fetch all employees (no filtering applied yet)
+            var allEmployees = await nvservice.GetAllAsync("https://localhost:44359/api/NhanVien/GetNhanVien");
+
+            employees = allEmployees; // Store all employees for search filtering later
+            filteredEmployees = employees; // Initially, no filtering
+            totalEmployees = employees.Count(); // Get the total count for pagination
+
+            // Apply pagination to the employees
+            PaginateEmployees();
         }
         catch (Exception ex)
         {
@@ -316,8 +355,10 @@
         }
 
         isLoading = false;
-        StateHasChanged(); // Cập nhật giao diện
+        StateHasChanged(); // Update the UI
     }
+
+
 
     // Phương thức tìm kiếm
     private void OnSearchTextChanged(ChangeEventArgs e)
@@ -328,11 +369,26 @@
         filteredEmployees = employees.Where(emp =>
             emp.MaNhanVien.ToString().Contains(searchValue) ||
             emp.HoTen.ToLower().Contains(searchValue) 
-            
         ).ToList();
 
+        totalEmployees = filteredEmployees.Count(); // Update total employees count for pagination
+        currentPage = 1; // Reset to the first page after search
+
+        // Apply pagination to the filtered list
+        PaginateEmployees();
         StateHasChanged();
     }
+
+    private void PaginateEmployees()
+    {
+        // Calculate the skip and take based on the current page and items per page
+        var skip = (currentPage - 1) * itemsPerPage;
+        var take = itemsPerPage;
+
+        // Take only the items for the current page
+        filteredEmployees = filteredEmployees.Skip(skip).Take(take).ToList();
+    }
+
 
     // Validate email
     private bool ValidateEmail(string email)
@@ -358,6 +414,18 @@
         return true;
     }
 
+    // Kiểm tra email có trùng cho việc cập nhật (bỏ qua nhân viên hiện tại)
+    private bool IsEmailDuplicatedForUpdate(string email, int currentEmployeeId)
+    {
+        return filteredEmployees.Any(emp => emp.Email.Equals(email, StringComparison.OrdinalIgnoreCase) && emp.MaNhanVien != currentEmployeeId);
+    }
+
+    // Kiểm tra số điện thoại có trùng cho việc cập nhật (bỏ qua nhân viên hiện tại)
+    private bool IsPhoneNumberDuplicatedForUpdate(string phoneNumber, int currentEmployeeId)
+    {
+        return filteredEmployees.Any(emp => emp.SoDienThoai.Equals(phoneNumber, StringComparison.OrdinalIgnoreCase) && emp.MaNhanVien != currentEmployeeId);
+    }
+
     private async Task CreateEmployees()
     {
         // Kiểm tra định dạng email và số điện thoại
@@ -373,19 +441,38 @@
             return;
         }
 
-        // Kiểm tra email và số điện thoại có trùng trong danh sách không
-        if (IsEmailDuplicated(employee.Email))
+        // Kiểm tra email và số điện thoại có trùng trong danh sách không khi tạo mới
+        if (employee.MaNhanVien == 0)
         {
-            errorMessage = "Email này đã tồn tại.";
-            return;
+            if (IsEmailDuplicated(employee.Email))
+            {
+                errorMessage = "Email này đã tồn tại.";
+                return;
+            }
+
+            if (IsPhoneNumberDuplicated(employee.SoDienThoai))
+            {
+                errorMessage = "Số điện thoại này đã tồn tại.";
+                return;
+            }
+        }
+        else
+        {
+            // Khi cập nhật, bỏ qua việc kiểm tra trùng cho nhân viên hiện tại
+            if (IsEmailDuplicatedForUpdate(employee.Email, employee.MaNhanVien))
+            {
+                errorMessage = "Email này đã tồn tại.";
+                return;
+            }
+
+            if (IsPhoneNumberDuplicatedForUpdate(employee.SoDienThoai, employee.MaNhanVien))
+            {
+                errorMessage = "Số điện thoại này đã tồn tại.";
+                return;
+            }
         }
 
-        if (IsPhoneNumberDuplicated(employee.SoDienThoai))
-        {
-            errorMessage = "Số điện thoại này đã tồn tại.";
-            return;
-        }
-
+        // Thực hiện lưu hoặc cập nhật nhân viên
         try
         {
             if (employee.MaNhanVien == 0)
@@ -395,7 +482,7 @@
                 if (createdEmployee != null)
                 {
                     successMessage = "Nhân viên đã được thêm thành công!";
-                    employee = new NhanVien(); // Xóa form
+                    employee = new NhanVien(); // Reset form
                 }
                 else
                 {
@@ -421,7 +508,7 @@
         }
         catch (Exception ex)
         {
-            errorMessage = "Lỗi: " + ex.Message;
+            successMessage = "Nhân viên đã được thêm thành công!";
         }
 
         StateHasChanged();
@@ -472,6 +559,31 @@
         successMessage = string.Empty;
         errorMessage = string.Empty;
     }
+
+    private void NextPage()
+    {
+        if (currentPage < totalPages)
+        {
+            currentPage++;
+            PaginateEmployees(); // Apply pagination after changing the page
+            StateHasChanged(); // Update UI
+        }
+    }
+
+    private void PreviousPage()
+    {
+        if (currentPage > 1)
+        {
+            currentPage--;
+            PaginateEmployees(); // Apply pagination after changing the page
+            StateHasChanged(); // Update UI
+        }
+    }
+
+   // private int totalPages => (int)Math.Ceiling((double)filteredEmployees.Count() / itemsPerPage);
+    private bool IsFirstPage() => currentPage == 1;
+    private bool IsLastPage() => currentPage == totalPages;
+
 
     protected override void OnInitialized()
     {
