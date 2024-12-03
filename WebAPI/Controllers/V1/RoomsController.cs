@@ -37,15 +37,35 @@ namespace WebAPI.Controllers.V1
 
 				return Ok(rooms);
 			}
-		[HttpGet("/api/Rooms/{id}")]
+		//[HttpGet("/api/Rooms/{id}")]
+		//public async Task<IActionResult> GetById(int id)
+		//{
+		//	var room = await _context.phong
+		//		.Include(h => h.MaLoaiPhong)
+		//		//.ThenInclude(ct => ct.)// Include related CTHoaDon entities
+		//		.FirstOrDefaultAsync(h => h.MaPhong == id);
+
+		//	if (room == null)
+		//	{
+		//		return NotFound("Room not found");
+		//	}
+		//	var options = new JsonSerializerOptions
+		//	{
+		//		ReferenceHandler = ReferenceHandler.IgnoreCycles
+		//	};
+
+		//	return Ok(JsonSerializer.Serialize(room, options));
+		//}
+
+		[HttpGet("/api/RoomTypes/GetRoomAtIDRoomtype/{id}")]
 		public async Task<IActionResult> GetById(int id)
 		{
-			var room = await _context.phong
-				.Include(h => h.MaLoaiPhong)
+			var phong = await _context.phong
+				.Include(h => h.LoaiPhong)
 				//.ThenInclude(ct => ct.)// Include related CTHoaDon entities
 				.FirstOrDefaultAsync(h => h.MaPhong == id);
 
-			if (room == null)
+			if (phong == null)
 			{
 				return NotFound("Room not found");
 			}
@@ -54,7 +74,7 @@ namespace WebAPI.Controllers.V1
 				ReferenceHandler = ReferenceHandler.IgnoreCycles
 			};
 
-			return Ok(JsonSerializer.Serialize(room, options));
+			return Ok(JsonSerializer.Serialize(phong, options));
 		}
 
 
@@ -70,42 +90,46 @@ namespace WebAPI.Controllers.V1
 				return Ok("Room created successfully");
 			}
 
-			// Similar methods for updating and deleting KhachHang
-			/// <summary>
-			/// Deletes Product Entity based on Id.
-			/// </summary>
-			/// <param name="id"></param>
-			/// <returns></returns>
-			[HttpDelete("DeleteRoom")]
-			public async Task<IActionResult> Delete([FromBody] DeleteCommand<Phong> command)
+		
+
+		[HttpPut("UpdateRoom/{id}")]
+		public async Task<IActionResult> Update(int id, Phong rooms)
+		{
+			if (id != rooms.MaPhong)
 			{
-				if (command == null || command.Id == null)
-				{
-					return BadRequest("Invalid command data");
-				}
-				var entity = _context.phong.Find(command.Id);
-				_context.phong.Remove(entity);
+				return BadRequest("Invalid command data");
+			}
+			_context.phong.Entry(rooms).State = EntityState.Modified;
+			try
+			{
 				await _context.SaveChangesAsync();
-				return Ok("Bill deleted."); // No content to return on successful deletion
 			}
-			/// <summary>
-			/// Updates the Product Entity based on Id.   
-			/// </summary>
-			/// <param name="id"></param>
-			/// <param name="command"></param>
-			/// <returns></returns>
-			[HttpPut("[action]")]
-			public async Task<IActionResult> Update([FromBody] UpdateCommand<HoaDon> command)
+			catch (DbUpdateConcurrencyException)
 			{
-				if (command == null || command.Entity == null)
+				if (rooms == null)
 				{
-					return BadRequest("Invalid command data");
+					return NotFound();
 				}
-
-				await _mediator.Send(command);
-				return NoContent(); // No content to return on successful update
+				else
+				{
+					throw;
+				}
 			}
+			return Ok(rooms); // No content to return on successful update
+		}
 
+		[HttpDelete("DeleteRoom/{id}")]
+			public async Task<IActionResult> Delete(int id)
+			{
+			if (id == null)
+			{
+				return BadRequest("Invalid command data");
+			}
+			var entity = _context.phong.Find(id);
+			_context.phong.Remove(entity);
+			await _context.SaveChangesAsync();
+			return Ok(entity); // No content to return on successful deletion
+		}
 		}
 	
 }

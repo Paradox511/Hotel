@@ -1,5 +1,5 @@
-﻿@page "/rooms"
-<h3>Rooms_management</h3>
+﻿@page "/roomtype"
+<h3>Room_Style_Manager</h3>
 @using Hotel_App.Service
 @using Hotel_App.Data
 @using Blazored.LocalStorage
@@ -10,59 +10,46 @@
 @inject HotelService<DatPhong> dpservice;
 @inject HotelService<NhanVien> nvservice;
 @inject HotelService<PhuongThucThanhToan> ptservice;
-@implements IDisposable
-
+@implements IDisposable 
 
 
 <div class="col-12">
-    <h3><b>Enter Room Information</b></h3>
+    <h3><b>Enter Room Type Information</b></h3>
     <hr />
-
-    <button onclick="window.location.href='/Roomtype';">Đi đến quản lý loại phòng</button>
-    <EditForm Model="@png" OnValidSubmit="@SaveRoom">
+    <EditForm Model="@png" OnValidSubmit="@SaveRoomType">
 
         <div class="form-group">
-            <label for="MaPhong">Mã Phòng :</label>
-            <input type="text" class="form-control" @bind="png.MaPhong" name="MaPhong" readonly>
-        </div>
-
-        @* <div class="form-group"> *@
-        @*     <label for="TrangThai">Trạng Thái Phòng:</label> *@
-        @*     <select class="form-control" id="TrangThai" @bind="png.TrangThaiPhong" name="TrangThai" readonly> *@
-        @*         <option value="0" hidden>Đã đặt</option> *@
-        @*         <option value="1" >Trống</option> *@
-        @*     </select> *@
-        @* </div> *@
-
-        <div class="form-group">
-            <label for="SoLuong">Nhập số phòng:</label>
-            <input type="text" class="form-control" id="SoLuong" @bind=png.SoPhong name="SoLuong" >
+            <label for="MaPhong">Mã Loại Phòng :</label>
+            <input type="text" class="form-control" @bind="Type.MaLoaiPhong" name="MaLoaiPhong" readonly>
         </div>
 
         <div class="form-group">
-            <label for="MaLoaiPhong">Mã Loại Phòng :</label>
-            <select class="form-control" id="MaLoaiPhong" @bind="png.MaLoaiPhong" name="MaLoaiPhong">
-                @* <option value="">Chọn mã loại phòng</option> *@
-                @if (loaiphong != null)
-                {
-                    @foreach (var type in loaiphong)
-                    {
-                        <option value=@type.MaLoaiPhong>@type.MaLoaiPhong-@type.TenLoaiPhong-@type.SoLuongPhong-@type.Mota-@type.Gia                         </option>
-                    }
-                }
-            </select>
+            <label for="TenLoaiPhong">Tên Loại Phòng:</label>
+            <input type="text" class="form-control" id="TenLoaiPhong" @bind="Type.TenLoaiPhong" name="TenLoaiPhong" >
+        </div>
+
+        <div class="form-group">
+            <label for="SoLuong">Nhập số lượng phòng:</label>
+            <input type="text" class="form-control" id="SoLuongPhong" @bind=Type.SoLuongPhong name="SoLuongPhong">
+        </div>
+
+        <div class="form-group">
+            <label for="MoTa">Nhập Mô Tả:</label>
+            <input type="text" class="form-control" id="Mô Tả" @bind=Type.Mota name="MoTa">
+        </div>
+
+        <div class="form-group">
+            <label for="Gia">Nhập Giá Phòng:</label>
+            <input type="text" class="form-control" id="Gia" @bind=Type.Gia name="Gia">
         </div>
         <button type="submit" class="btn btn-primary">Tạo</button>
     </EditForm>
 
 </div>
-<br />
-
-
 
 <div class="col-12">
 
-    <h3>Phòng</h3>
+    <h3>Loại Phòng</h3>
     <SpinLoader IsLoading="isLoading">
         <LoadingTemplate>
             <div class="col-12" style="background-color: lightgray; height:400px; vertical-align:middle">
@@ -71,7 +58,7 @@
             </div>
         </LoadingTemplate>
         <ContentTemplate>
-            @if (Rooms == null)
+            @if (loaiphong == null)
             {
                 <p>Loading...</p>
             }
@@ -80,32 +67,25 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>Mã Phòng</th>
-                            <th>Trạng Thái Phòng</th>
-                            <th>Số Phòng</th>
-                            <th>Mã Loại Phòng</th>                            
+                            <th>Mã Loại Phòng</th>
+                            <th>Tên Loại Phòng</th>
+                            <th>Số Lượng Phòng</th>
+                            <th>Mô Tả</th>
+                            <th>Giá</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var room in Rooms)
+                        @foreach (var TypeRoom in loaiphong)
                         {
                             <tr>
-                                <td>@room.MaPhong</td>
+                                <td>@TypeRoom.MaLoaiPhong</td>
+                                <td>@TypeRoom.TenLoaiPhong</td>
+                                <td>@TypeRoom.SoLuongPhong</td>
+                                <td>@TypeRoom.Mota</td
+                                <td>@TypeRoom.Gia</td>
                                 <td>
-                                    @if (@room.TrangThaiPhong == 0)
-                                    {
-                                        <span>Đã đặt</span>
-                                    }
-                                    else
-                                    {
-                                        <span>Trống</span>
-                                    }
-                                </td>
-                                <td>@room.SoPhong</td>
-                                <td>@room.MaLoaiPhong</td> 
-                                <td>
-                                    <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => EditRoom(room))">Edit</a> |
-                                    <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => DeleteRoom(room.MaPhong))">Delete</a>
+                                    <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => EditRoomType(TypeRoom))">Edit</a> |
+                                    <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => DeleteRoomType(TypeRoom.MaLoaiPhong))">Delete</a>
                                 </td>
                             </tr>
                         }
@@ -131,18 +111,17 @@
     public bool IsGridViewFiltered { get; set; }
     bool isLoading = true;
 
-
-    protected async Task LoadRooms()
+     protected async Task LoadRoomTypes()
     {
         isLoading = true;
         try
         {
-            Rooms = await RoomService.GetAllAsync("https://localhost:44359/api/Rooms/GetRooms");
-            IEnumerable<Phong> filterRoom = Rooms.ToList(); // Gán dữ liệu ban đầu cho filteredRoom
+            loaiphong = await RoomTypeService.GetAllAsync("https://localhost:44359/api/RoomTypes/GetRoomTypes");
+            IEnumerable<LoaiPhong> filterRoomType = loaiphong.ToList(); // Gán dữ liệu ban đầu cho filteredRoom
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine("Error loading employees: " + ex.Message);
+            Console.Error.WriteLine("Error loading RoomType: " + ex.Message);
         }
 
         isLoading = false;
@@ -152,13 +131,13 @@
 
     protected override void OnInitialized()
     {
-        Console.WriteLine("Room - OnInitialized");
+        Console.WriteLine("RoomType - OnInitialized");
         base.OnInitialized();
     }
 
     protected override async Task OnInitializedAsync()
     {
-        Console.WriteLine("Room - OnInitializedAsync");
+        Console.WriteLine("RoomType - OnInitializedAsync");
 
         png = new Phong();
         Type = new LoaiPhong();
@@ -169,27 +148,27 @@
 
     protected override void OnParametersSet()
     {
-        Console.WriteLine("Rooms - OnParametersSet");
+        Console.WriteLine("RoomTypes - OnParametersSet");
         base.OnParametersSet();
     }
 
     protected override async Task OnParametersSetAsync()
     {
-        Console.WriteLine("Rooms - OnParametersSetAsync");
+        Console.WriteLine("RoomTypes - OnParametersSetAsync");
         await base.OnParametersSetAsync();
     }
 
     protected override bool ShouldRender()
     {
         base.ShouldRender();
-        Console.WriteLine("Rooms - ShouldRender");
+        Console.WriteLine("RoomTypes - ShouldRender");
 
         return true;
     }
 
     protected override void OnAfterRender(bool firstRender)
     {
-        Console.WriteLine("Rooms - OnAfterRender - firstRender = " + firstRender);
+        Console.WriteLine("RoomTypes - OnAfterRender - firstRender = " + firstRender);
         base.OnAfterRender(firstRender);
     }
 
@@ -199,8 +178,6 @@
 
         if (firstRender)
         {
-
-            await LoadRooms();
             await Loadloaiphong();
             isLoading = false;
             StateHasChanged();
@@ -213,35 +190,36 @@
     {
         Console.WriteLine("Rooms - Dispose");
     }
-    private async Task DeleteRoom(int id)
+    private async Task DeleteRoomType(int id)
     {
-        await RoomService.DeleteAsync("https://localhost:44359/api/Rooms/DeleteRoom/", id);
-        LoadRooms();
+
+        await RoomTypeService.DeleteAsync("https://localhost:44359/api/RoomTypes/DeleteRoomType/", id);
+        LoadRoomTypes();
         StateHasChanged();
     }
 
-    private void EditRoom(Phong editroom)
+    private void EditRoomType(LoaiPhong editroomtype)
     {
-        png = editroom;
+        Type = editroomtype;
         StateHasChanged();
     }
 
-    private async Task SaveRoom()
+    private async Task SaveRoomType()
     {
         // Call the service to save the bill
         try
         {
             //if (png.MaLoaiPhong == null) png.MaLoaiPhong = [];
-            if (png.MaPhong == 0)
+            if (Type.MaLoaiPhong == 0)
             {
                 //  bill.CTHoaDon = null;
-                Phong TPhong = await RoomService.SaveAsync("https://localhost:44359/api/Rooms/CreateRoom", png);
-                if (TPhong != null)
+                 LoaiPhong loaiPhong = await RoomTypeService.SaveAsync("https://localhost:44359/api/RoomTypes/CreateRoomType", Type);
+                if (loaiPhong != null)
                 {
                     // Display success message using a modal or dialog
                     //  await _modalService.Show<SuccessMessage>("Bill created successfully!");
-                    png = new Phong();
-                    await LoadRooms();
+                    Type = new LoaiPhong();
+                    await LoadRoomTypes();
                     // Update the bill list
                     StateHasChanged();
 
@@ -251,10 +229,10 @@
             }
             else
             {
-                Phong TPhong = await RoomService.UpdateAsync("https://localhost:44359/api/Rooms/UpdateRoom/", png.MaPhong, png);
+                LoaiPhong loaiPhong = await RoomTypeService.UpdateAsync("https://localhost:44359/api/RoomTypes/UpdateRoomType/", Type.MaLoaiPhong, Type);
                 // Update the bill list
-                png = new Phong();
-                await LoadRooms();
+                Type = new LoaiPhong();
+                await LoadRoomTypes();
                 StateHasChanged();
 
                 // Clear the form

@@ -34,35 +34,5 @@
             <param name="command"></param>
             <returns></returns>
         </member>
-        <member name="M:WebAPI.Controllers.V1.RoomsController.Delete(DeleteCommand{Domain.Entities.Phong})">
-            <summary>
-            Deletes Product Entity based on Id.
-            </summary>
-            <param name="id"></param>
-            <returns></returns>
-        </member>
-        <member name="M:WebAPI.Controllers.V1.RoomsController.Update(Application.Features.Commands.UpdateCommand{Domain.Entities.HoaDon})">
-            <summary>
-            Updates the Product Entity based on Id.   
-            </summary>
-            <param name="id"></param>
-            <param name="command"></param>
-            <returns></returns>
-        </member>
-        <member name="M:WebAPI.Controllers.V1.RoomTypesController.Delete(DeleteCommand{Domain.Entities.LoaiPhong})">
-            <summary>
-            Deletes Product Entity based on Id.
-            </summary>
-            <param name="id"></param>
-            <returns></returns>
-        </member>
-        <member name="M:WebAPI.Controllers.V1.RoomTypesController.Update(Application.Features.Commands.UpdateCommand{Domain.Entities.LoaiPhong})">
-            <summary>
-            Updates the Product Entity based on Id.   
-            </summary>
-            <param name="id"></param>
-            <param name="command"></param>
-            <returns></returns>
-        </member>
     </members>
 </doc>
