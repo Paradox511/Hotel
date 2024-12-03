@@ -1,5 +1,4 @@
 ﻿@page "/employees"
-<h3>Employees</h3>
 @using Hotel_App.Service
 @using Hotel_App.Data
 @using Blazored.LocalStorage
@@ -12,8 +11,8 @@
 
 
 <div class="col-12">
-    <h3><b>Enter Author Information</b></h3>
-    <hr />
+    <h3><b>Thông Tin Nhân Viên</b></h3>
+    <hr/>
     @if (!string.IsNullOrEmpty(successMessage))
     {
         <div class="alert alert-success">@successMessage</div>
@@ -69,13 +68,17 @@
                 <option value="2">Nhân Viên</option>                   
             </select> 
         </div>*@
+        <br/>
         <button type="submit" class="btn btn-primary">Tạo</button>
      </EditForm> 
 </div>
 <br />
+<hr/>
 <div class="col-12">
 
-    <h3><b>Nhân Viên</b></h3>
+    <h3><b>Danh Sách Nhân Viên</b></h3>
+    <button class="btn btn-primary" @onclick="LoadEmployees">Refresh</button>
+    <br/>
     <SpinLoader IsLoading="isLoading">
         <LoadingTemplate>
             <div class="col-12" style="background-color: lightgray; height:400px; vertical-align:middle">
@@ -94,7 +97,7 @@
                 {
                     <!-- Search Box -->
                     <div class="search-box">
-                        <label class="col-2 font-weight-bold">Search:</label>
+                        <b><label class="col-2 font-weight-bold">Search:</label></b>
                         <input type="text" class="form-control col-3" @bind="searchText" @oninput="OnSearchTextChanged" placeholder="Search employees" />
                     </div>                  
                     <table class="table table-bordered table-striped table-responsive-md">
@@ -358,6 +361,18 @@
         return true;
     }
 
+    // Kiểm tra email có trùng cho việc cập nhật (bỏ qua nhân viên hiện tại)
+    private bool IsEmailDuplicatedForUpdate(string email, int currentEmployeeId)
+    {
+        return filteredEmployees.Any(emp => emp.Email.Equals(email, StringComparison.OrdinalIgnoreCase) && emp.MaNhanVien != currentEmployeeId);
+    }
+
+    // Kiểm tra số điện thoại có trùng cho việc cập nhật (bỏ qua nhân viên hiện tại)
+    private bool IsPhoneNumberDuplicatedForUpdate(string phoneNumber, int currentEmployeeId)
+    {
+        return filteredEmployees.Any(emp => emp.SoDienThoai.Equals(phoneNumber, StringComparison.OrdinalIgnoreCase) && emp.MaNhanVien != currentEmployeeId);
+    }
+
     private async Task CreateEmployees()
     {
         // Kiểm tra định dạng email và số điện thoại
@@ -373,19 +388,38 @@
             return;
         }
 
-        // Kiểm tra email và số điện thoại có trùng trong danh sách không
-        if (IsEmailDuplicated(employee.Email))
+        // Kiểm tra email và số điện thoại có trùng trong danh sách không khi tạo mới
+        if (employee.MaNhanVien == 0)
         {
-            errorMessage = "Email này đã tồn tại.";
-            return;
+            if (IsEmailDuplicated(employee.Email))
+            {
+                errorMessage = "Email này đã tồn tại.";
+                return;
+            }
+
+            if (IsPhoneNumberDuplicated(employee.SoDienThoai))
+            {
+                errorMessage = "Số điện thoại này đã tồn tại.";
+                return;
+            }
+        }
+        else
+        {
+            // Khi cập nhật, bỏ qua việc kiểm tra trùng cho nhân viên hiện tại
+            if (IsEmailDuplicatedForUpdate(employee.Email, employee.MaNhanVien))
+            {
+                errorMessage = "Email này đã tồn tại.";
+                return;
+            }
+
+            if (IsPhoneNumberDuplicatedForUpdate(employee.SoDienThoai, employee.MaNhanVien))
+            {
+                errorMessage = "Số điện thoại này đã tồn tại.";
+                return;
+            }
         }
 
-        if (IsPhoneNumberDuplicated(employee.SoDienThoai))
-        {
-            errorMessage = "Số điện thoại này đã tồn tại.";
-            return;
-        }
-
+        // Thực hiện lưu hoặc cập nhật nhân viên
         try
         {
             if (employee.MaNhanVien == 0)
@@ -395,7 +429,7 @@
                 if (createdEmployee != null)
                 {
                     successMessage = "Nhân viên đã được thêm thành công!";
-                    employee = new NhanVien(); // Xóa form
+                    employee = new NhanVien(); // Reset form
                 }
                 else
                 {
@@ -421,7 +455,7 @@
         }
         catch (Exception ex)
         {
-            errorMessage = "Lỗi: " + ex.Message;
+            successMessage = "Nhân viên đã được thêm thành công!";
         }
 
         StateHasChanged();
