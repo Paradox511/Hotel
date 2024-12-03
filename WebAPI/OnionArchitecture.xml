@@ -19,14 +19,14 @@
             <param name="command"></param>
             <returns></returns>
         </member>
-        <member name="M:WebAPI.Controllers.V1.NhanVienController.Delete(DeleteCommand{Domain.Entities.NhanVien})">
+        <member name="M:WebAPI.Controllers.V1.NhanVienController.Delete(System.Int32)">
             <summary>
             Deletes Product Entity based on Id.
             </summary>
             <param name="id"></param>
             <returns></returns>
         </member>
-        <member name="M:WebAPI.Controllers.V1.NhanVienController.Update(Application.Features.Commands.UpdateCommand{Domain.Entities.NhanVien})">
+        <member name="M:WebAPI.Controllers.V1.NhanVienController.Update(System.Int32,Domain.Entities.NhanVien)">
             <summary>
             Updates the Product Entity based on Id.   
             </summary>
