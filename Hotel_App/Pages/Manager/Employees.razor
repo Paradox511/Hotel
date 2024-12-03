@@ -141,6 +141,12 @@
                             }
                         </tbody>
                     </table>
+                    <div class="pagination-controls">
+                        <button class="btn btn-secondary" @onclick="PreviousPage" disabled="@IsFirstPage()">Previous</button>
+                        <span>Page @currentPage of @totalPages</span>
+                        <button class="btn btn-secondary" @onclick="NextPage" disabled="@IsLastPage()">Next</button>
+                    </div>
+
                 }
                 else
                 {
@@ -270,6 +276,25 @@
                         .delete-link:hover {
                             text-decoration: underline;
                         }
+
+                    .pagination-controls {
+                        display: flex;
+                        justify-content: center;
+                        gap: 10px;
+                        margin-top: 20px;
+                    }
+
+                        .pagination-controls button {
+                            padding: 8px 15px;
+                            font-size: 16px;
+                            border-radius: 4px;
+                        }
+
+                        .pagination-controls span {
+                            font-size: 16px;
+                            align-self: center;
+                        }
+
                 </style>
 
 
@@ -301,17 +326,28 @@
     private readonly string emailPattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
     // Phone validation regex
     private readonly string phonePattern = @"^\d{10}$";
+    private int currentPage = 1;
+    private int itemsPerPage = 5; // Change this number based on your preference
+    private int totalEmployees = 0;
+    private int totalPages => (int)Math.Ceiling((double)totalEmployees / itemsPerPage);
+
 
     // Tải danh sách nhân viên từ API
     protected async Task LoadEmployees()
     {
         isLoading = true;
 
-        // Gọi API để lấy danh sách nhân viên
         try
         {
-            employees = await nvservice.GetAllAsync("https://localhost:44359/api/NhanVien/GetNhanVien");
-            filteredEmployees = employees.ToList(); // Gán dữ liệu ban đầu cho filteredEmployees
+            // Fetch all employees (no filtering applied yet)
+            var allEmployees = await nvservice.GetAllAsync("https://localhost:44359/api/NhanVien/GetNhanVien");
+
+            employees = allEmployees; // Store all employees for search filtering later
+            filteredEmployees = employees; // Initially, no filtering
+            totalEmployees = employees.Count(); // Get the total count for pagination
+
+            // Apply pagination to the employees
+            PaginateEmployees();
         }
         catch (Exception ex)
         {
@@ -319,8 +355,10 @@
         }
 
         isLoading = false;
-        StateHasChanged(); // Cập nhật giao diện
+        StateHasChanged(); // Update the UI
     }
+
+
 
     // Phương thức tìm kiếm
     private void OnSearchTextChanged(ChangeEventArgs e)
@@ -331,11 +369,26 @@
         filteredEmployees = employees.Where(emp =>
             emp.MaNhanVien.ToString().Contains(searchValue) ||
             emp.HoTen.ToLower().Contains(searchValue) 
-            
         ).ToList();
 
+        totalEmployees = filteredEmployees.Count(); // Update total employees count for pagination
+        currentPage = 1; // Reset to the first page after search
+
+        // Apply pagination to the filtered list
+        PaginateEmployees();
         StateHasChanged();
     }
+
+    private void PaginateEmployees()
+    {
+        // Calculate the skip and take based on the current page and items per page
+        var skip = (currentPage - 1) * itemsPerPage;
+        var take = itemsPerPage;
+
+        // Take only the items for the current page
+        filteredEmployees = filteredEmployees.Skip(skip).Take(take).ToList();
+    }
+
 
     // Validate email
     private bool ValidateEmail(string email)
@@ -506,6 +559,31 @@
         successMessage = string.Empty;
         errorMessage = string.Empty;
     }
+
+    private void NextPage()
+    {
+        if (currentPage < totalPages)
+        {
+            currentPage++;
+            PaginateEmployees(); // Apply pagination after changing the page
+            StateHasChanged(); // Update UI
+        }
+    }
+
+    private void PreviousPage()
+    {
+        if (currentPage > 1)
+        {
+            currentPage--;
+            PaginateEmployees(); // Apply pagination after changing the page
+            StateHasChanged(); // Update UI
+        }
+    }
+
+   // private int totalPages => (int)Math.Ceiling((double)filteredEmployees.Count() / itemsPerPage);
+    private bool IsFirstPage() => currentPage == 1;
+    private bool IsLastPage() => currentPage == totalPages;
+
 
     protected override void OnInitialized()
     {
