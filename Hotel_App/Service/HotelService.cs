@@ -15,9 +15,16 @@ namespace Hotel_App.Service
         {
             _httpClient = httpClient;
         }
-        public Task<bool> DeleteAsync(string requestUri, int Id)
+        public async Task<bool> DeleteAsync(string requestUri, int Id)
         {
-            throw new NotImplementedException();
+            var requestMessage = new HttpRequestMessage(HttpMethod.Delete, requestUri + Id);
+            string url = requestUri + Id;
+           
+            var response = await _httpClient.SendAsync(requestMessage);
+
+            var responseStatusCode = response.StatusCode;
+
+            return await Task.FromResult(true);
         }
 
         public async Task<IEnumerable<T>> GetAllAsync(string requestUri)
@@ -77,11 +84,11 @@ namespace Hotel_App.Service
 
             return await Task.FromResult(returnedObj);
         }
-        public async Task<T> UpdateAsync(string requestUri, int Id, T obj)
+        public async Task<T> UpdateAsync(string requestUri,int id, T obj)
         {
             string serializedUser = JsonConvert.SerializeObject(obj);
 
-            var requestMessage = new HttpRequestMessage(HttpMethod.Put, requestUri + Id);
+            var requestMessage = new HttpRequestMessage(HttpMethod.Put, requestUri + id);
           
          
             requestMessage.Content = new StringContent(serializedUser);

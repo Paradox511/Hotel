@@ -5,6 +5,10 @@
 @using Hotel_App.Shared
 @inject HotelService<HoaDon> BillService
 @inject HoaDonService CTHoaDonService
+@inject HotelService<NhanVien> nvservice;
+@inject HotelService<DatPhong> dpservice;
+@inject HotelService<PhuongThucThanhToan> ptservice;
+
 <div class="col-12">
 
     <h3>Bill details</h3>
@@ -16,7 +20,7 @@
             </div>
         </LoadingTemplate>
         <ContentTemplate>
-            @if (bill == null)
+            @if (bill == null || nhanVien ==null)
             {
                 <p>No bill found.</p>
             }
@@ -34,14 +38,14 @@
                         </tr>
                         <tr>
                             <th>Nhân viên</th>
-                            <td>@bill.MaNhanVien</td>
+                            <td>@nhanVien.HoTen</td>
                         </tr>
                         <tr>
                             <th>Mã phương thức</th>
-                            <td>@bill.MaPhuongThuc</td>
+                            <td>@pt.TenPhuongThuc</td>
                         </tr>
                         <br />
-                <table table table-bordered table-striped table-responsive-md>
+                <table class ="table table-bordered table-striped table-responsive-md">
                     <thead>
                         <tr>
                             <th>MaDichVu</th>
@@ -69,8 +73,10 @@
 @code {
     [Parameter]
     public int BillId { get; set; }
-
+    public NhanVien nhanVien { get; set; }
+    public DatPhong datPhong { get; set; }
     public HoaDon bill { get; set; }
+    public PhuongThucThanhToan pt{ get; set; }
     public IEnumerable<CTHoaDon> cthdlist { get; set; }
     public bool IsVisible { get; set; }
     public bool Result { get; set; }
@@ -82,6 +88,9 @@
     {
         isLoading = true;
         var task = BillService.GetByIdAsync("https://localhost:44359/api/Bills/details/{0}", BillId);
+
+        GetNhanVien();
+        GetPhuongThuc();
         bill = await task;
 
         if (bill != null)
@@ -90,5 +99,22 @@
         }
 
         isLoading = false; // Set loading indicator to false
+    }
+
+    protected async Task GetDatPhong()
+    {
+        datPhong = await dpservice.GetByIdAsync("https://localhost:44359/api/NhanVien/GetByID/{0}")
+    }
+    protected async Task GetNhanVien()
+    {
+        nhanVien = await nvservice.GetByIdAsync("https://localhost:44359/api/NhanVien/GetByID/{0}",BillId);
+    }
+    protected async Task GetPhuongThuc()
+    {
+        pt = await ptservice.GetByIdAsync("https://localhost:44359/api/PTTT/GetByID/{0}", BillId);
+    }
+    protected async Task UpdateTongTien()
+    {
+        bill.
     }
 }

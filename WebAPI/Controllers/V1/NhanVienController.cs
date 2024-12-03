@@ -5,6 +5,8 @@ using MediatR;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace WebAPI.Controllers.V1
 {
@@ -30,13 +32,33 @@ namespace WebAPI.Controllers.V1
                 return StatusCode(500, "Internal Server Error: DbContext not injected");
             }
 
-            var employees = await _context.nhanvien.ToListAsync(); // Assuming your bills are stored in "hoadon" DbSet
+            var employees = await _context.nhanvien.ToListAsync(); 
             if (employees == null)
             {
-                return NotFound("No bills found");
+                return NotFound("No employees found");
             }
 
             return Ok(employees);
+        }
+
+        [HttpGet("GetByID/{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var employees = await _context.nhanvien
+                .FirstOrDefaultAsync(h => h.MaNhanVien == id);
+            //.ThenInclude(ct => ct.dv)// Include related CTHoaDon entities
+            //.FirstOrDefaultAsync(h => h.MaHoaDon == id);
+
+            if (employees == null)
+            {
+                return NotFound("Employees not found");
+            }
+            var options = new JsonSerializerOptions
+            {
+                ReferenceHandler = ReferenceHandler.IgnoreCycles
+            };
+
+            return Ok(JsonSerializer.Serialize(employees, options));
         }
 
         [HttpPost("CreateNhanVien")]

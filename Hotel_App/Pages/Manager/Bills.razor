@@ -71,7 +71,7 @@
 <br />
     <div class="col-12">
 
-<h3>Bills</h3>
+    <h3>Bills <button class="btn btn-primary" @onclick="LoadBills">Refresh</button></h3>
  <SpinLoader IsLoading="isLoading">
         <LoadingTemplate>
             <div class="col-12" style="background-color: lightgray; height:400px; vertical-align:middle">
@@ -135,7 +135,10 @@ else
 
     protected async Task LoadBills()
     {
+        isLoading = true;
+
         bills = await BillService.GetAllAsync("https://localhost:44359/api/Bills/GetBills");
+        isLoading = false;
     }
     protected override void OnInitialized()
     {
@@ -203,9 +206,9 @@ else
     }
     private async Task DeleteBill(int Id)
     {
-        await BillService.DeleteAsync("authors/DeleteAuthor/",Id);
-        await LoadBills();
-
+        await BillService.DeleteAsync("https://localhost:44359/api/Bills/DeleteBill/", Id);
+        LoadBills();
+        StateHasChanged();
         //throw new Exception("DeleteAuthor");
     }
 
@@ -220,6 +223,7 @@ else
         // Call the service to save the bill
         try
         {
+            if (bill.CTHoaDon == null) bill.CTHoaDon = [];
             if (bill.MaHoaDon == 0)
             {
                 //  bill.CTHoaDon = null;
@@ -237,7 +241,12 @@ else
                 }
             }else
             {
-                HoaDon savedBill = await BillService.UpdateAsync("https://localhost:44359/api/Bills/CreateBill",bill.MaHoaDon, bill);
+                HoaDon savedBill = await BillService.UpdateAsync("https://localhost:44359/api/Bills/UpdateBill/",bill.MaHoaDon, bill);
+                // Update the bill list
+                StateHasChanged();
+
+                // Clear the form
+                bill = new HoaDon();
 
             }
             // Handle successful save, e.g., display success message, clear form, etc.

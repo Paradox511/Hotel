@@ -100,20 +100,20 @@ namespace WebAPI.Controllers.V1
         /// <param name="command"></param>
         /// <returns></returns>
         [HttpPut("UpdateBill/{id}")]
-        public async Task<IActionResult> Update([FromBody] UpdateCommand<HoaDon> command)
+        public async Task<IActionResult> Update(int id , HoaDon bill)
         {
-            if (command == null || command.Entity == null)
+            if (id != bill.MaHoaDon)
             {
                 return BadRequest("Invalid command data");
             }
-            _context.hoadon.Entry(command.Entity).State = EntityState.Modified;
+            _context.hoadon.Entry(bill).State = EntityState.Modified;
             try
             {
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (command.Entity==null)
+                if (bill==null)
                 {
                     return NotFound();
                 }
@@ -122,7 +122,7 @@ namespace WebAPI.Controllers.V1
                     throw;
                 }
             }
-            return NoContent(); // No content to return on successful update
+            return Ok(bill); // No content to return on successful update
         }
 
     }
