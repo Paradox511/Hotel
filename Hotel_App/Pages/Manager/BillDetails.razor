@@ -54,6 +54,9 @@
                         </tr>
                     </thead>
                     <tbody>
+                        <tr>
+
+                        </tr>
                         @foreach (var cthd in bill.CTHoaDon)
                         {
                             <tr>
@@ -64,6 +67,9 @@
                         }
                     </tbody>
                 </table>
+                <br />
+                <div>
+                   <b>Tổng tiền: </b>@bill.TongSoTien </div>
             }
         </ContentTemplate>
     </SpinLoader>
@@ -88,33 +94,46 @@
     {
         isLoading = true;
         var task = BillService.GetByIdAsync("https://localhost:44359/api/Bills/details/{0}", BillId);
-
+        bill = await task;
         GetNhanVien();
         GetPhuongThuc();
-        bill = await task;
+        GetDatPhong();
+
 
         if (bill != null)
         {
             cthdlist = await CTHoaDonService.GetCTHoaDonByMaHoaDon(bill.MaHoaDon);
         }
-
+        UpdateTongTien();
         isLoading = false; // Set loading indicator to false
     }
 
     protected async Task GetDatPhong()
     {
-        datPhong = await dpservice.GetByIdAsync("https://localhost:44359/api/NhanVien/GetByID/{0}")
+        datPhong = await dpservice.GetByIdAsync("https://localhost:44359/api/DatPhong/GetByID/{0}", bill.MaDatPhong);
     }
     protected async Task GetNhanVien()
     {
-        nhanVien = await nvservice.GetByIdAsync("https://localhost:44359/api/NhanVien/GetByID/{0}",BillId);
+        nhanVien = await nvservice.GetByIdAsync("https://localhost:44359/api/NhanVien/GetByID/{0}",bill.MaNhanVien);
     }
     protected async Task GetPhuongThuc()
     {
-        pt = await ptservice.GetByIdAsync("https://localhost:44359/api/PTTT/GetByID/{0}", BillId);
+        pt = await ptservice.GetByIdAsync("https://localhost:44359/api/PTTT/GetByID/{0}", bill.MaPhuongThuc);
     }
     protected async Task UpdateTongTien()
     {
-        bill.
+        decimal sum = 0;
+        foreach(var cTHoaDon in bill.CTHoaDon)
+        {
+            sum += cTHoaDon.dv.Gia;
+            cTHoaDon.MaHoaDon = bill.MaHoaDon;
+        }
+        datPhong = await dpservice.GetByIdAsync("https://localhost:44359/api/DatPhong/GetByID/{0}", bill.MaDatPhong);
+        sum += datPhong.TongTien;
+        bill.TongSoTien = sum;
+
+        await CTHoaDonService.UpdateTotal(bill.MaHoaDon, sum);
+        StateHasChanged();
+
     }
 }
