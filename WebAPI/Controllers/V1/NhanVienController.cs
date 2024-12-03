@@ -41,7 +41,6 @@ namespace WebAPI.Controllers.V1
             return Ok(employees);
         }
 
-<<<<<<< HEAD
         [HttpGet("GetByID/{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -49,17 +48,7 @@ namespace WebAPI.Controllers.V1
                 .FirstOrDefaultAsync(h => h.MaNhanVien == id);
             //.ThenInclude(ct => ct.dv)// Include related CTHoaDon entities
             //.FirstOrDefaultAsync(h => h.MaHoaDon == id);
-=======
 
-
-        //[HttpGet("GetByIDorName")]
-        //public async Task<IActionResult> GetById(int id, string name)
-        //{
-        //    var employees = await _context.nhanvien
-        //        .Include(h => h.MaNhanVien == id || h.HoTen == name);
-        //        //.ThenInclude(ct => ct.dv)// Include related CTHoaDon entities
-        //        //.FirstOrDefaultAsync(h => h.MaHoaDon == id);
->>>>>>> an
 
             if (employees == null)
             {

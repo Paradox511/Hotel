@@ -8,6 +8,7 @@
 @inject HotelService<NhanVien> nvservice;
 @inject HotelService<DatPhong> dpservice;
 @inject HotelService<PhuongThucThanhToan> ptservice;
+@inject HotelService<DichVu> dvservice;
 
 <div class="col-12">
 
@@ -71,6 +72,19 @@
                 <div>
                    <b>Tổng tiền: </b>@bill.TongSoTien </div>
             }
+            <div class="form-group">
+                <label for="MaDichVu">Dịch vụ:</label>
+                <select class="form-control" id="MaDichVu" @bind="bill.MaDatPhong" name="MaDatPhong">
+                    <option value="">Chọn Mã Đặt Phòng</option>
+                    @if (reservations != null)
+                    {
+                        @foreach (var datPhong in reservations)
+                        {
+                            <option value="@datPhong.MaDatPhong">@datPhong.MaDatPhong</option>
+                        }
+                    }
+                </select>
+            </div>
         </ContentTemplate>
     </SpinLoader>
 </div>
@@ -83,6 +97,7 @@
     public DatPhong datPhong { get; set; }
     public HoaDon bill { get; set; }
     public PhuongThucThanhToan pt{ get; set; }
+    public ICollection<DichVu> dsdv { get; set; }
     public IEnumerable<CTHoaDon> cthdlist { get; set; }
     public bool IsVisible { get; set; }
     public bool Result { get; set; }
@@ -120,6 +135,7 @@
     {
         pt = await ptservice.GetByIdAsync("https://localhost:44359/api/PTTT/GetByID/{0}", bill.MaPhuongThuc);
     }
+    protected async Task
     protected async Task UpdateTongTien()
     {
         decimal sum = 0;
