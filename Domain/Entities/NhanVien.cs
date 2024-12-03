@@ -16,8 +16,10 @@ namespace Domain.Entities
         public string Email { get; set; }
         [Required]
         public string DiaChi { get; set; }
+        //[Required]
+        //public int MaTaiKhoan { get; set; }
         [Required]
-        public int MaTaiKhoan { get; set; }
+        public string Password { get; set; }
 
 
         public NhanVien() { }
