@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 namespace WebAPI.Controllers.V1
 {
     [ApiVersion("1.0")]
-    public class DichVuController : Controller
+    public class DichVuController : BaseApiController
     {
         private readonly IHotelDBContext _context;
         private readonly IMediator _mediator;
@@ -73,7 +73,7 @@ namespace WebAPI.Controllers.V1
         /// <param name="id"></param>
         /// <param name="command"></param>
         /// <returns></returns>
-        [HttpPut("UpdateBill/{id}")]
+        [HttpPut("UpdateDichVu/{id}")]
         public async Task<IActionResult> Update(int id, DichVu dichVu)
         {
             if (id != dichVu.MaDichVu)

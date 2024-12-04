@@ -12,7 +12,7 @@
 
 <div class="col-12">
     <h3><b>Thông Tin Nhân Viên</b></h3>
-    <hr/>
+    <hr />
     @if (!string.IsNullOrEmpty(successMessage))
     {
         <div class="alert alert-success">@successMessage</div>
@@ -21,7 +21,7 @@
     {
         <div class="alert alert-danger">@errorMessage</div>
     }
-     <EditForm Model="@employee" OnValidSubmit="@CreateEmployees"> 
+    <EditForm Model="@employee" OnValidSubmit="@CreateEmployees">
         <div class="form-group">
             <label for="MaNhanVien">Mã Nhân Viên:</label>
             <input type="text" class="form-control" id="MaNhanVien" @bind="employee.MaNhanVien" name="MaNhanVien" readonly>
@@ -62,23 +62,23 @@
         </div>
 
         @* <div class="form-group">
-            <label for="MaTaiKhoan">Loại Tài Khoản:</label>
-            <select class="form-control" id="MaTaiKhoan" @bind="employee.MaTaiKhoan" name="MaTaiKhoan" readonly>
-                <option value="1">Quản Lý</option>
-                <option value="2">Nhân Viên</option>                   
-            </select> 
+        <label for="MaTaiKhoan">Loại Tài Khoản:</label>
+        <select class="form-control" id="MaTaiKhoan" @bind="employee.MaTaiKhoan" name="MaTaiKhoan" readonly>
+        <option value="1">Quản Lý</option>
+        <option value="2">Nhân Viên</option>
+        </select>
         </div>*@
-        <br/>
+        <br />
         <button type="submit" class="btn btn-primary">Tạo</button>
-     </EditForm> 
+    </EditForm>
 </div>
 <br />
-<hr/>
+<hr />
 <div class="col-12">
 
     <h3><b>Danh Sách Nhân Viên</b></h3>
     <button class="btn btn-primary" @onclick="LoadEmployees">Refresh</button>
-    <br/>
+    <br />
     <SpinLoader IsLoading="isLoading">
         <LoadingTemplate>
             <div class="col-12" style="background-color: lightgray; height:400px; vertical-align:middle">
@@ -92,14 +92,14 @@
                 <p>Loading...</p>
             }
             else
-            {               
+            {
                 @if (filteredEmployees != null)
                 {
                     <!-- Search Box -->
                     <div class="search-box">
                         <b><label class="col-2 font-weight-bold">Search:</label></b>
                         <input type="text" class="form-control col-3" @bind="searchText" @oninput="OnSearchTextChanged" placeholder="Search employees" />
-                    </div>                  
+                    </div>
                     <table class="table table-bordered table-striped table-responsive-md">
                         <thead>
                             <tr>
@@ -109,7 +109,7 @@
                                 <th>Email</th>
                                 <th>Địa Chỉ</th>
                                 <th>Password</th>
-                               
+
                                 <th>Thao Tác</th>
                             </tr>
                         </thead>
@@ -124,15 +124,15 @@
                                     <td>@nv.DiaChi</td>
                                     <td>@nv.Password</td>
                                     @* <td>
-                                        @if (nv.MaTaiKhoan == 1)
-                                        {
-                                            <span>Quản lý</span>
-                                        }
-                                        else
-                                        {
-                                            <span>Nhân Viên</span>
-                                        }
-                                    </td> *@
+                        @if (nv.MaTaiKhoan == 1)
+                        {
+                        <span>Quản lý</span>
+                        }
+                        else
+                        {
+                        <span>Nhân Viên</span>
+                        }
+                        </td> *@
                                     <td class="action-links">
                                         <a class="edit-link" @onclick="(() => EditEmployees(nv))">Edit</a> |
                                         <a class="delete-link" @onclick="(() => DeleteEmployees(nv.MaNhanVien))">Delete</a>
@@ -154,7 +154,7 @@
                 }
 
 
-                <style>                   
+                <style>
                     /* Action links style */
                     .action-links {
                         display: flex;
@@ -329,7 +329,8 @@
     private int currentPage = 1;
     private int itemsPerPage = 5; // Change this number based on your preference
     private int totalEmployees = 0;
-    private int totalPages => (int)Math.Ceiling((double)totalEmployees / itemsPerPage);
+    private int totalPages => (int)Math.Ceiling((double)employees.Count() / itemsPerPage);
+
 
 
     // Tải danh sách nhân viên từ API
@@ -368,26 +369,31 @@
         // Lọc danh sách theo tất cả các trường dữ liệu
         filteredEmployees = employees.Where(emp =>
             emp.MaNhanVien.ToString().Contains(searchValue) ||
-            emp.HoTen.ToLower().Contains(searchValue) 
+            emp.HoTen.ToLower().Contains(searchValue)
         ).ToList();
 
-        totalEmployees = filteredEmployees.Count(); // Update total employees count for pagination
-        currentPage = 1; // Reset to the first page after search
+        totalEmployees = filteredEmployees.Count(); // Cập nhật tổng số lượng nhân viên sau khi lọc
+        currentPage = 1; // Reset về trang đầu tiên
 
-        // Apply pagination to the filtered list
-        PaginateEmployees();
-        StateHasChanged();
+        // Áp dụng phân trang cho danh sách đã lọc
+        filteredEmployees = filteredEmployees
+        .Skip((currentPage - 1) * itemsPerPage)
+        .Take(itemsPerPage)
+        .ToList();
+        StateHasChanged(); // Cập nhật lại giao diện
     }
+
+
 
     private void PaginateEmployees()
     {
-        // Calculate the skip and take based on the current page and items per page
-        var skip = (currentPage - 1) * itemsPerPage;
-        var take = itemsPerPage;
-
-        // Take only the items for the current page
-        filteredEmployees = filteredEmployees.Skip(skip).Take(take).ToList();
+        // Sử dụng danh sách gốc employees cho việc phân trang
+        filteredEmployees = employees
+            .Skip((currentPage - 1) * itemsPerPage)
+            .Take(itemsPerPage)
+            .ToList();
     }
+
 
 
     // Validate email
@@ -565,22 +571,24 @@
         if (currentPage < totalPages)
         {
             currentPage++;
-            PaginateEmployees(); // Apply pagination after changing the page
-            StateHasChanged(); // Update UI
+            PaginateEmployees();
+            StateHasChanged(); // Cập nhật UI
         }
     }
+
 
     private void PreviousPage()
     {
         if (currentPage > 1)
         {
             currentPage--;
-            PaginateEmployees(); // Apply pagination after changing the page
-            StateHasChanged(); // Update UI
+            PaginateEmployees();
+            StateHasChanged(); // Cập nhật UI
         }
     }
 
-   // private int totalPages => (int)Math.Ceiling((double)filteredEmployees.Count() / itemsPerPage);
+
+    // private int totalPages => (int)Math.Ceiling((double)filteredEmployees.Count() / itemsPerPage);
     private bool IsFirstPage() => currentPage == 1;
     private bool IsLastPage() => currentPage == totalPages;
 
