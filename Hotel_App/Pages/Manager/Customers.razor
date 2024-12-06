@@ -1,65 +1,89 @@
 ﻿@page "/customers"
+<h3>Customers</h3>
 @using Hotel_App.Service
 @using Hotel_App.Data
 @using Blazored.LocalStorage
 @using Hotel_App.Shared
-@inject HotelService<KhachHang> khservice;
+@inject HotelService<HoaDon> BillService
 @inject HotelService<DatPhong> dpservice;
+@inject HotelService<NhanVien> nvservice;
+@inject HotelService<PhuongThucThanhToan> ptservice;
+@inject HotelService<KhachHang> khservice;
+@inject HotelService<TaiKhoan> tkservice;
+@implements IDisposable
 
 
 <div class="col-12">
     <h3><b>Enter Author Information</b></h3>
     <hr />
-
-
-    <form>
-        <div class="form-group">
-            <label for="MaKhachHang">Mã Khách Hàng:</label>
-            <input type="text" class="form-control" id="MaKhachHang" name="MaKhachHang" readonly>
-        </div>
-
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger">@errorMessage</div>
+    }
+    @if (!string.IsNullOrEmpty(successMessage))
+    {
+        <div class="alert alert-success">@successMessage</div>
+    }
+    <EditForm Model="@customer" OnValidSubmit="@CreateCustomers">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
         <div class="form-group">
             <label for="HoTen">Tên Khách Hàng:</label>
-            <input type="text" class="form-control" id="HoTen" name="HoTen">
-
+            <input type="text" class="form-control" id="HoTen" @bind="customer.HoTen" name="HoTen" />
+            <ValidationMessage For="@(() => customer.HoTen)" />
         </div>
 
         <div class="form-group">
             <label for="SoDienThoai">Số Điện Thoại:</label>
-            <input type="text" class="form-control" id="SoDienThoai" name="SoDienThoai">
+            <input type="text" class="form-control" id="SoDienThoai" @bind="customer.SoDienThoai" name="SoDienThoai" />
+            <ValidationMessage For="@(() => customer.SoDienThoai)" />
+        </div>
+
+        <div class="form-group">
+            <label for="Email">Email:</label>
+            <input type="text" class="form-control" id="Email" @bind="customer.Email" name="Email" />
+            <ValidationMessage For="@(() => customer.Email)" />
         </div>
 
         <div class="form-group">
             <label for="NgaySinh">Ngày Sinh:</label>
-            <input type="text" class="form-control" id="NgaySinh" name="NgaySinh">
+            <input type="datetime-local" class="form-control" id="NgaySinh" @bind="customer.NgaySinh" name="NgaySinh" />
+            <ValidationMessage For="@(() => customer.NgaySinh)" />
         </div>
 
         <div class="form-group">
             <label for="CCCD">CCCD:</label>
-            <input type="text" class="form-control" id="CCCD" name="CCCD">
+            <input type="text" class="form-control" id="CCCD" @bind="customer.CCCD" name="CCCD" />
+            <ValidationMessage For="@(() => customer.CCCD)" />
         </div>
 
         <div class="form-group">
-            <label for="STK">Địa Chỉ:</label>
-            <input type="text" class="form-control" id="STK" name="STK">
+            <label for="STK">STK:</label>
+            <input type="text" class="form-control" id="STK" @bind="customer.STK" name="STK" />
+            <ValidationMessage For="@(() => customer.STK)" />
         </div>
+
         <div class="form-group">
-            <label for="MaTaiKhoan">Mã Tài Khoản:</label>
-            <input type="text" class="form-control" id="MaTaiKhoan" name="MaTaiKhoan" readonly>
+            <label for="Password">Password:</label>
+            <input type="text" class="form-control" id="Password" @bind="customer.Password" name="Password" />
+            <ValidationMessage For="@(() => customer.Password)" />
         </div>
 
-
-        <button type="submit" class="btn btn-primary">Tạo</button>
-    </form>
+        <button type="submit" class="btn btn-primary">Save Info</button>
+    </EditForm>
+    <button class="btn btn-primary" @onclick="LoadCustomers">Refresh</button>
+    <input type="text" class="form-control" placeholder="Tìm kiếm theo ID hoặc Tên" @bind="searchText" />
+    <button class="btn btn-primary mt-2" @onclick="SearchCustomers">Tìm kiếm</button>
 </div>
 <br />
 <div class="col-12">
 
     <h3>Khách Hàng</h3>
+
     <SpinLoader IsLoading="isLoading">
         <LoadingTemplate>
             <div class="col-12" style="background-color: lightgray; height:400px; vertical-align:middle">
-                <br /><br />
+                <br /><br />s
                 <Chase Center="true" Color="#c21f13" Size="70px"></Chase>
             </div>
         </LoadingTemplate>
@@ -70,62 +94,216 @@
             }
             else
             {
-                <table class="styled-table">
-                    <thead>
-                        <tr style="background-color: #e0f7fa; color: #0077b6; text-align: center; border: 1px solid #dddddd;">
-                            <th style="border: 1px solid #dddddd;">Mã Khách Hàng</th>
-                            <th style="border: 1px solid #dddddd;">Tên Khách Hàng</th>
-                            <th style="border: 1px solid #dddddd;">Số điện thoại</th>
-                            <th style="border: 1px solid #dddddd;">Email</th>
-                            <th style="border: 1px solid #dddddd;">Ngày Sinh</th>
-                            <th style="border: 1px solid #dddddd;">CCCD</th>
-                            <th style="border: 1px solid #dddddd;">Số Tài Khoản</th>
-                            <th style="border: 1px solid #dddddd;">Mã Tài Khoản</th>
-                            <th style="border: 1px solid #dddddd;"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var kh in customers)
-                        {
-                            <tr style="border: 1px solid #dddddd;">
-                                <td style="border: 1px solid #dddddd;">@kh.MaKhachHang</td>
-                                <td style="border: 1px solid #dddddd;">@kh.HoTen</td>
-                                <td style="border: 1px solid #dddddd;">@kh.SoDienThoai</td>
-                                <td style="border: 1px solid #dddddd;">@kh.Email</td>
-                                <td style="border: 1px solid #dddddd;">@kh.NgaySinh</td>
-                                <td style="border: 1px solid #dddddd;">@kh.CCCD</td>
-                                <td style="border: 1px solid #dddddd;">@kh.STK</td>
-                                <td style="border: 1px solid #dddddd;">@kh.MaTaiKhoan</td>
-                                <td style="border: 1px solid #dddddd;">
-                                    <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => EditCustomers(kh))">Edit</a> |
-                                    <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => DeleteCustomers(kh.MaKhachHang))">Delete</a>
-                                </td>
+                @if (filteredCustomersList != null)
+                {
+                    
+                    <table class="table table-bordered table-striped table-responsive-md">
+                        <thead>
+                            <tr>
+                                <th>Mã Khách Hàng</th>
+                                <th>Tên Khách Hàng</th>
+                                <th>Số điện thoại</th>
+                                <th>Email</th>
+                                <th>Ngày Sinh</th>
+                                <th>CCCD</th>
+                                <th>STK</th>
+                                <th>Password</th>
+                                
                             </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var kh in filteredCustomersList)
+                            {
+                                <tr>
+                                    <td>@kh.MaKhachHang</td>
+                                    <td>@kh.HoTen</td>
+                                    <td>@kh.SoDienThoai</td>
+                                    <td>@kh.Email</td>
+                                    <td>@kh.NgaySinh</td>
+                                    <td>@kh.CCCD</td>
+                                    <td>@kh.STK</td>
+                                    <td>@kh.Password</td>
+                                    <td>
+                                        <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => EditCustomers(kh))">Edit</a> |
+                                        <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => DeleteCustomers(kh.MaKhachHang))">Delete</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <p>No customers found.</p>
+                }
 
-                        }
-                    </tbody>
-                </table>
+
+
+
             }
         </ContentTemplate>
     </SpinLoader>
 </div>
 @code {
-    private IEnumerable<HoaDon> bills;
-    private IEnumerable<DatPhong> reservations;
+    private IEnumerable<TaiKhoan> accounts;
+    private IEnumerable<NhanVien> employees;
+    public NhanVien employee { get; set; }
+    public IEnumerable<NhanVien> filteredEmployees { get; set; }
     private IEnumerable<KhachHang> customers;
-    private IEnumerable<PhuongThucThanhToan> methods;
     public KhachHang customer { get; set; }
-    public IEnumerable<HoaDon> filteredAuthorList { get; set; }
+    public TaiKhoan account { get; set; }
+    public IEnumerable<KhachHang> filteredCustomersList { get; set; }
     public bool IsVisible { get; set; }
     public bool Result { get; set; }
     public string RecordName { get; set; }
     public bool IsGridViewFiltered { get; set; }
     bool isLoading = true;
+    private string searchText = string.Empty;
+    private string errorMessage;
+    private string successMessage;
 
+    // Tải danh sách nhân viên từ API
     protected async Task LoadCustomers()
     {
-        customers = await khservice.GetAllAsync("https://localhost:44359/api/Customers/GetCustomers");
+        isLoading = true;
+
+        try
+        {
+            customers = await khservice.GetAllAsync("https://localhost:44359/api/Customers/GetCustomers");
+            filteredCustomersList = customers.ToList();
+            customer = new KhachHang();
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine("Error loading customers: " + ex.Message);
+        }
+
+        isLoading = false;
+        successMessage = null;
+        StateHasChanged(); // Cập nhật giao diện
     }
+
+    private async Task SearchCustomers()
+    {
+        isLoading = true;
+        try
+        {
+            if (string.IsNullOrEmpty(searchText))
+            {
+                filteredCustomersList = customers.ToList();
+            }
+            else
+            {
+                if (int.TryParse(searchText, out int id))
+                {
+                    filteredCustomersList = customers
+                        .Where(c => c.MaKhachHang == id)
+                        .ToList();
+                }
+                else
+                {
+                    filteredCustomersList = customers
+                        .Where(c => c.HoTen.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+                        .ToList();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine("Error searching customers: " + ex.Message);
+            errorMessage = "Có lỗi xảy ra khi tìm kiếm.";
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+
+    private async Task CreateCustomers()    
+    {
+        try
+        {
+            if (!ValidateCustomer())
+            {
+                return; // Ngừng thực thi nếu không hợp lệ
+            }
+            if (customer.MaKhachHang == 0)
+            {
+                KhachHang CreateCustomer = await khservice.SaveAsync("https://localhost:44359/api/Customers/CreateCustomer", customer);
+                if (CreateCustomer != null)
+                {
+                    customer = new KhachHang();
+                    await LoadCustomers(); // Làm mới dữ liệu bảng
+                    StateHasChanged();
+                }
+            }
+            else
+            {
+                KhachHang CreateCustomer = await khservice.UpdateAsync("https://localhost:44359/api/Customers/UpdateCustomer/", customer.MaKhachHang, customer);
+                if (CreateCustomer != null)
+                {
+                    customer = new KhachHang();
+                    await LoadCustomers(); // Làm mới dữ liệu bảng
+                    successMessage = "Save Info success";
+                    StateHasChanged();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine("Error saving customers: " + ex.Message);
+        }
+
+    }
+
+    private bool ValidateCustomer()
+    {
+        // Kiểm tra email trùng lặp
+        if (IsEmailDuplicated(customer.Email))
+        {
+            errorMessage = "Email này đã tồn tại.";
+            successMessage = null; // Xóa thông báo thành công nếu có lỗi
+            return false;
+        }
+
+        // Kiểm tra số điện thoại trùng lặp
+        if (IsPhoneDuplicated(customer.SoDienThoai))
+        {
+            errorMessage = "Số điện thoại này đã tồn tại.";
+            successMessage = null; // Xóa thông báo thành công nếu có lỗi
+            return false;
+        }
+
+        successMessage = "Save Info success";
+        errorMessage = null; // Xóa thông báo lỗi nếu không có lỗi
+        return true; // Dữ liệu hợp lệ
+    }
+
+
+    // Phương thức xóa nhân viên
+    private async Task DeleteCustomers(int id)
+    {
+
+
+        await khservice.DeleteAsync("https://localhost:44359/api/Customers/DeleteCustomer/", id);
+        await LoadCustomers();
+        StateHasChanged();
+        
+    }
+
+    // Phương thức chỉnh sửa nhân viên
+    private void EditCustomers(KhachHang kh)
+    {
+        customer = kh;
+        StateHasChanged();
+    }
+
+   
+    
+
+
     protected override void OnInitialized()
     {
         Console.WriteLine("Authors - OnInitialized");
@@ -137,7 +315,9 @@
         Console.WriteLine("Authors - OnInitializedAsync");
 
         customer = new KhachHang();
-        //authorList = await authorService.GetAuthors();
+        await LoadCustomers();
+
+        
 
         await base.OnInitializedAsync();
     }
@@ -174,7 +354,6 @@
 
         if (firstRender)
         {
-
             await LoadCustomers();
 
             isLoading = false;
@@ -188,33 +367,18 @@
     {
         Console.WriteLine("Authors - Dispose");
     }
-    private async Task DeleteCustomers(int Id)
+    protected async Task LoadAccounts()
     {
-        // await BillService.DeleteAsync("authors/DeleteAuthor/", Id);
-        // await LoadEmployees();
-
-        // throw new Exception("DeleteAuthor");
+        accounts = await tkservice.GetAllAsync("https://localhost:44359/api/TaiKhoan/GetTaiKhoan");
     }
-
-    private void EditCustomers(KhachHang argAuthor)
+    private bool IsEmailDuplicated(string email)
     {
-        // employees = argAuthor;
+        return filteredCustomersList.Any(cus => cus.Email.Equals(email, StringComparison.OrdinalIgnoreCase) &&
+        cus.MaKhachHang != customer.MaKhachHang);
     }
-    private void SaveBill(HoaDon bill)
+    private bool IsPhoneDuplicated(string phoneNumber)
     {
-
+        return filteredCustomersList.Any(cus => cus.SoDienThoai.Equals(phoneNumber, StringComparison.OrdinalIgnoreCase) &&
+        cus.MaKhachHang != customer.MaKhachHang);
     }
-    /* protected async Task LoadReservations()
-         {
-         reservations = await dpservice.GetAllAsync("https:localhost:44359/api/DatPhong/GetDatPhong");
-     }
-     protected async Task LoadEmployees()
-         {
-         employees = await nvservice.GetAllAsync("https:localhost:44359/api/NhanVien/GetNhanVien");
-     }
-     protected async Task LoadMethods()
-         {
-         methods = await ptservice.GetAllAsync("https:localhost:44359/api/PTTT/GetPTTT");
-    }*/
 }
-

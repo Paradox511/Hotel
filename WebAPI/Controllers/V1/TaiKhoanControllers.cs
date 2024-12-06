@@ -1,30 +1,27 @@
 ﻿using Application.Features.Commands;
 using Application.Interfaces;
 using Domain.Entities;
-using Hotel_App.Pages.Manager;
 using MediatR;
-using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Text.Json.Serialization;
-using System.Text.Json;
+
 namespace WebAPI.Controllers.V1
 {
     [ApiVersion("1.0")]
-    public class CustomersController : BaseApiController
+    public class TaiKhoanController : BaseApiController
     {
         private readonly IHotelDBContext _context;
         private readonly IMediator _mediator;
         private readonly ISender _sender;
 
-        public CustomersController(IHotelDBContext context, IMediator mediator, ISender sender)
+        public TaiKhoanController(IHotelDBContext context, IMediator mediator, ISender sender)
         {
             _context = context;
             _mediator = mediator;
             _sender = sender;
 
         }
-        [HttpGet("GetCustomers")]
+        [HttpGet("GetTaiKhoan")]
         public async Task<IActionResult> GetAll()
         {
             if (_context == null)
@@ -32,56 +29,39 @@ namespace WebAPI.Controllers.V1
                 return StatusCode(500, "Internal Server Error: DbContext not injected");
             }
 
-            var customers = await _context.khachhang.ToListAsync(); // Assuming your bills are stored in "hoadon" DbSet
+            var customers = await _context.taikhoan.ToListAsync(); // Assuming your bills are stored in "hoadon" DbSet
             if (customers == null)
             {
-                return NotFound("No Customers found");
+                return NotFound("No Accounts found");
             }
 
             return Ok(customers);
         }
 
-        [HttpGet("GetByID/{id}")]
-        public async Task<IActionResult> GetById(int id)
-        {
-            var customers = await _context.khachhang
-                .FirstOrDefaultAsync(h => h.MaKhachHang == id);
-            
-            if (customers == null)
-            {
-                return NotFound("Customer not found");
-            }
-            var options = new JsonSerializerOptions
-            {
-                ReferenceHandler = ReferenceHandler.IgnoreCycles
-            };
 
-            return Ok(JsonSerializer.Serialize(customers, options));
-        }
-
-        [HttpPost("CreateCustomer")]
-        public async Task<IActionResult> CreateCustomer([FromBody] CreateCommand<KhachHang> command)
+        [HttpPost("CreateAccount")]
+        public async Task<IActionResult> CreateAccount([FromBody] CreateCommand<TaiKhoan> command)
         {
             if (command == null || command.Entity == null)
             {
                 return BadRequest("Invalid command data");
             }
-            _context.khachhang.Add(command.Entity);
+            _context.taikhoan.Add(command.Entity);
             await _context.SaveChangesAsync();
-            return Ok("Customer created successfully");
+            return Ok("Account created successfully");
         }
 
 
 
-        [HttpDelete("DeleteCustomer/{id}")]
-        public async Task<IActionResult> DeleteCustomer(int id)
+        [HttpDelete("DeleteCustomer")]
+        public async Task<IActionResult> Delete(int id)
         {
             if (id == null)
             {
                 return BadRequest("Invalid command data");
             }
-            var entity = _context.khachhang.Find(id);
-            _context.khachhang.Remove(entity);
+            var entity = _context.taikhoan.Find(id);
+            _context.taikhoan.Remove(entity);
             await _context.SaveChangesAsync();
             return Ok(entity); // No content to return on successful deletion
         }
@@ -92,21 +72,20 @@ namespace WebAPI.Controllers.V1
         /// <param name="command"></param>
         /// <returns></returns>
         [HttpPut("UpdateCustomer/{id}")]
-
-        public async Task<IActionResult> Update(int id, KhachHang customer)
+        public async Task<IActionResult> Update([FromBody] UpdateCommand<TaiKhoan> command)
         {
-            if (id != customer.MaKhachHang)
+            if (command == null || command.Entity == null)
             {
                 return BadRequest("Invalid command data");
             }
-            _context.khachhang.Entry(customer).State = EntityState.Modified;
+            _context.taikhoan.Entry(command.Entity).State = EntityState.Modified;
             try
             {
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (customer == null)
+                if (command.Entity == null)
                 {
                     return NotFound();
                 }
@@ -115,11 +94,8 @@ namespace WebAPI.Controllers.V1
                     throw;
                 }
             }
-            return Ok(customer); // No content to return on successful update
+            return NoContent(); // No content to return on successful update
         }
 
-
     }
-
 }
-

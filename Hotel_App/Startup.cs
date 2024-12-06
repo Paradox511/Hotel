@@ -43,6 +43,7 @@ namespace Hotel_App
             services.AddHttpClient<HotelService<KhachHang>>();
             services.AddHttpClient<HotelService<PhuongThucThanhToan>>();
             services.AddHttpClient<HotelService<DatPhong>>();
+            services.AddHttpClient<HotelService<TaiKhoan>>();
 			services.AddHttpClient<HoaDonService>();
             services.AddSingleton<WeatherForecastService>();
 

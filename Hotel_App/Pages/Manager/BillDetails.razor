@@ -84,7 +84,7 @@
     public bool IsGridViewFiltered { get; set; }
     bool isLoading = true;
 
-    protected async override Task OnInitializedAsync()
+    /*protected async override Task OnInitializedAsync()
     {
         isLoading = true;
         var task = BillService.GetByIdAsync("https://localhost:44359/api/Bills/details/{0}", BillId);
@@ -116,5 +116,5 @@
     protected async Task UpdateTongTien()
     {
         bill.
-    }
+    }*/
 }
