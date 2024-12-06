@@ -24,6 +24,34 @@
     {
         <div class="alert alert-success">@successMessage</div>
     }
+    @if (!string.IsNullOrEmpty(deleteMessage))
+    {
+        <div class="alert alert-danger">
+            @deleteMessage
+        </div>
+    }
+    @if (showDeleteConfirmation)
+    {
+        <div class="modal" style="display:block; background-color: rgba(0, 0, 0, 0.5);">
+            <div class="modal-dialog" style="max-width: 400px; margin-top: 150px;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirm Deletion</h5>
+                        <button type="button" class="close" @onclick="CancelDelete">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to delete this customer?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" @onclick="CancelDelete">No</button>
+                        <button class="btn btn-danger" @onclick="DeleteCustomers">Yes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
     <EditForm Model="@customer" OnValidSubmit="@CreateCustomers">
         <DataAnnotationsValidator />
         <ValidationSummary />
@@ -47,7 +75,7 @@
 
         <div class="form-group">
             <label for="NgaySinh">Ngày Sinh:</label>
-            <input type="datetime-local" class="form-control" id="NgaySinh" @bind="customer.NgaySinh" name="NgaySinh" />
+            <input type="date" class="form-control" id="NgaySinh" @bind="customer.NgaySinh" name="NgaySinh" />
             <ValidationMessage For="@(() => customer.NgaySinh)" />
         </div>
 
@@ -125,7 +153,7 @@
                                     <td>@kh.Password</td>
                                     <td>
                                         <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => EditCustomers(kh))">Edit</a> |
-                                        <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => DeleteCustomers(kh.MaKhachHang))">Delete</a>
+                                        <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => ShowDeleteConfirmation(kh.MaKhachHang))">Delete</a>
                                     </td>
                                 </tr>
                             }
@@ -147,6 +175,7 @@
 @code {
     private IEnumerable<TaiKhoan> accounts;
     private IEnumerable<NhanVien> employees;
+    private IEnumerable<DatPhong> reservations;
     public NhanVien employee { get; set; }
     public IEnumerable<NhanVien> filteredEmployees { get; set; }
     private IEnumerable<KhachHang> customers;
@@ -161,6 +190,53 @@
     private string searchText = string.Empty;
     private string errorMessage;
     private string successMessage;
+    private string deleteMessage;
+    private bool showDeleteConfirmation = false;
+    private int customerIdToDelete;
+
+    private void ShowDeleteConfirmation(int id)
+    {
+        customerIdToDelete = id; // Lưu lại ID khách hàng cần xóa
+        showDeleteConfirmation = true; // Hiển thị bảng xác nhận
+    }
+
+    private async Task DeleteCustomers()
+    {
+        try
+        {
+            // Kiểm tra xem khách hàng có đặt phòng hay không
+            var customerReservations = reservations.Where(r => r.MaKhachHang == customerIdToDelete);
+            if (customerReservations.Any())
+            {
+                // Nếu khách hàng có đặt phòng, hiển thị thông báo không thể xóa
+                errorMessage = "không xóa được khách hàng khi đang đặt phòng.";
+                successMessage = null; // Xóa thông báo thành công nếu có lỗi
+                showDeleteConfirmation = false; // Ẩn bảng xác nhận
+                StateHasChanged(); // Cập nhật giao diện
+                return; // Dừng việc xóa khách hàng
+            }
+
+            // Nếu không có đặt phòng, tiến hành xóa khách hàng
+            await khservice.DeleteAsync("https://localhost:44359/api/Customers/DeleteCustomer/", customerIdToDelete);
+            await LoadCustomers(); // Làm mới danh sách khách hàng
+            showDeleteConfirmation = false; // Ẩn bảng xác nhận
+            successMessage = "Xóa khách hàng thành công."; // Thông báo thành công
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Không thể xóa khách hàng: " + ex.Message; // Hiển thị thông báo lỗi
+            showDeleteConfirmation = false; // Ẩn bảng xác nhận
+            StateHasChanged();
+        }
+    }
+
+    private void CancelDelete()
+    {
+        showDeleteConfirmation = false; // Ẩn bảng xác nhận
+        StateHasChanged();
+    }
+
 
     // Tải danh sách nhân viên từ API
     protected async Task LoadCustomers()
@@ -171,6 +247,22 @@
         {
             customers = await khservice.GetAllAsync("https://localhost:44359/api/Customers/GetCustomers");
             filteredCustomersList = customers.ToList();
+            LoadReservations();
+            /*foreach (var customer in filteredCustomersList)
+            {
+                var customerReservations = reservations.Where(r => r.MaKhachHang == customer.MaKhachHang);
+                if (customerReservations.Any())
+                {
+                    // Nếu mã khách hàng tồn tại trong bảng đặt phòng
+                    // Thực hiện hành động bạn muốn (ví dụ: đánh dấu hoặc thông báo)
+                    customer.HasReservation = true;  // Thêm thuộc tính `HasReservation` vào lớp `KhachHang`
+                }
+                else
+                {
+                    customer.HasReservation = false;
+                }
+            
+            }*/
             customer = new KhachHang();
         }
         catch (Exception ex)
@@ -180,6 +272,7 @@
 
         isLoading = false;
         successMessage = null;
+        errorMessage = null;
         StateHasChanged(); // Cập nhật giao diện
     }
 
@@ -283,7 +376,7 @@
 
 
     // Phương thức xóa nhân viên
-    private async Task DeleteCustomers(int id)
+    /*private async Task DeleteCustomers(int id)
     {
 
 
@@ -291,7 +384,7 @@
         await LoadCustomers();
         StateHasChanged();
         
-    }
+    }*/
 
     // Phương thức chỉnh sửa nhân viên
     private void EditCustomers(KhachHang kh)
@@ -354,6 +447,7 @@
 
         if (firstRender)
         {
+            LoadReservations();
             await LoadCustomers();
 
             isLoading = false;
@@ -366,6 +460,10 @@
     public void Dispose()
     {
         Console.WriteLine("Authors - Dispose");
+    }
+    protected async Task LoadReservations()
+    {
+        reservations = await dpservice.GetAllAsync("https://localhost:44359/api/DatPhong/GetDatPhong");
     }
     protected async Task LoadAccounts()
     {
