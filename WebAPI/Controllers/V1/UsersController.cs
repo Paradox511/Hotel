@@ -78,7 +78,7 @@ namespace WebAPI.Controllers.V1
         }
 
         [HttpPost("RegisterUser")]
-        public async Task<ActionResult<TaiKhoan>> RegisterUser([FromBody] TaiKhoan user)
+        public async Task<ActionResult<SignupRequest>> RegisterUser([FromBody] SignupRequest user)
         {
             if (user == null || string.IsNullOrWhiteSpace(user.Username) || string.IsNullOrWhiteSpace(user.Password))
             {

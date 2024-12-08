@@ -27,7 +27,8 @@ namespace Hotel_App.Service
             var jsonContent = JsonConvert.SerializeObject(user);
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PostAsync("api/users/login", httpContent);
+            var response = await _httpClient.PostAsync("https://localhost:44359/api/Users/Login", httpContent);
+            var responsebody = await response.Content.ReadAsStringAsync();
             if (response.IsSuccessStatusCode)
             {
                 var responseData = await response.Content.ReadAsStringAsync();
@@ -38,7 +39,7 @@ namespace Hotel_App.Service
             var errorMessage = await response.Content.ReadAsStringAsync();
             throw new Exception($"Login failed: {errorMessage}");
         }
-        public async Task<TaiKhoan> RegisterUserAsync(TaiKhoan user)
+        public async Task<TaiKhoan> RegisterUserAsync(SignupRequest user)
         {
             var jsonContent = JsonConvert.SerializeObject(user);
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");

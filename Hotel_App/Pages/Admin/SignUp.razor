@@ -11,7 +11,7 @@
         <br /><br /><br /><br /><br />
     </div>
     <div>
-        <h3 style="font-weight:bold; color:purple">Hotel Register</h3>
+        <h3 style="font-weight:bold; color:blue">Hotel Register</h3>
     </div>
     <div>
         <br />
@@ -40,7 +40,7 @@
 </EditForm>
 
 @code {
-    private TaiKhoan user = new TaiKhoan();
+    private SignupRequest user = new SignupRequest();
     public string LoginMessage { get; set; } = string.Empty;
 
     protected override Task OnInitializedAsync()
@@ -66,11 +66,10 @@
             if (returnedUser != null && !string.IsNullOrEmpty(returnedUser.Username))
             {
                 // Lưu thông tin người dùng vào Local Storage
-                await localStorageService.SetItemAsync("accessToken", returnedUser.AccessToken);
-                await localStorageService.SetItemAsync("refreshToken", returnedUser.RefreshToken);
+
 
                 // Cập nhật trạng thái xác thực
-                ((CustomAuthenticationStateProvider)AuthenticationStateProvider).NotifyUserAuthentication(returnedUser.Username);
+                // ((CustomAuthenticationStateProvider)AuthenticationStateProvider).NotifyUserAuthentication(returnedUser.Username);
 
                 // Điều hướng đến trang chính
                 NavigationManager.NavigateTo("/index");
