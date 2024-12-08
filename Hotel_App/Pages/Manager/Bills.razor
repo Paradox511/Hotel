@@ -11,7 +11,12 @@
 
 
 <div class="col-12">
+<<<<<<< Updated upstream
     <h3><b>Enter Author Information</b></h3>
+=======
+    <h3><b>Thông tin hóa đơn</b></h3>
+
+>>>>>>> Stashed changes
     <hr />
 
 
@@ -113,9 +118,11 @@ else
 
 @code {
     private IEnumerable<HoaDon> bills;
+    private IEnumerable<HoaDon> filteredbills;
     private IEnumerable<DatPhong> reservations;
     private IEnumerable<NhanVien> employees;
     private IEnumerable<PhuongThucThanhToan> methods;
+    private int totalBills;
     public HoaDon bill { get; set; }
     public IEnumerable<HoaDon> filteredAuthorList { get; set; }
     public bool IsVisible { get; set; }
@@ -123,6 +130,16 @@ else
     public string RecordName { get; set; }
     public bool IsGridViewFiltered { get; set; }
     bool isLoading = true;
+
+        // Success and error messages for operations
+        private string successMessage;
+        private string errorMessage;
+    // Phone validation regex
+    private readonly string phonePattern = @"^\d{10}$";
+    private int currentPage = 1;
+    private int itemsPerPage = 5; // Change this number based on your preference
+    private int totalEmployees = 0;
+    private int totalPages => (int)Math.Ceiling((double)totalEmployees / itemsPerPage);
 
     protected async Task LoadBills()
     {
@@ -139,7 +156,10 @@ else
         Console.WriteLine("Authors - OnInitializedAsync");
 
         bill = new HoaDon();
+<<<<<<< Updated upstream
         //authorList = await authorService.GetAuthors();
+=======
+>>>>>>> Stashed changes
        
         await base.OnInitializedAsync();
     }
@@ -203,7 +223,21 @@ else
     {
        bill = argAuthor;
     }
+<<<<<<< Updated upstream
     private void SaveBill(HoaDon bill)
+=======
+    private void PaginateBills()
+    {
+        // Calculate the skip and take based on the current page and items per page
+        var skip = (currentPage - 1) * itemsPerPage;
+        var take = itemsPerPage;
+
+        // Take only the items for the current page
+        filteredbills = filteredbills.Skip(skip).Take(take).ToList();
+    }
+
+    private async Task SaveBill()
+>>>>>>> Stashed changes
     {
 
     }
