@@ -13,7 +13,6 @@ namespace Hotel_App.Data
         public string HoTen { get; set; }
 
         [Required(ErrorMessage = "Số điện thoại không được để trống.")]
-        [StringLength(10, ErrorMessage = "Số điện thoại phải có 10 chữ số.", MinimumLength = 10)]
         [RegularExpression(@"^\d{10}$", ErrorMessage = "Số điện thoại phải chứa 10 chữ số.")]
         public string SoDienThoai { get; set; }
 

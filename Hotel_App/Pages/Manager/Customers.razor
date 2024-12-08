@@ -54,7 +54,7 @@
     }
     <EditForm Model="@customer" OnValidSubmit="@CreateCustomers">
         <DataAnnotationsValidator />
-        <ValidationSummary />
+        
         <div class="form-group">
             <label for="HoTen">Tên Khách Hàng:</label>
             <input type="text" class="form-control" id="HoTen" @bind="customer.HoTen" name="HoTen" />
