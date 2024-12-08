@@ -74,7 +74,7 @@ namespace WebAPI.Controllers.V1
             await _context.SaveChangesAsync();
             return Ok("Bill created successfully");
         }
-
+        
         // Similar methods for updating and deleting KhachHang
         /// <summary>
         /// Deletes Product Entity based on Id.
@@ -124,6 +124,30 @@ namespace WebAPI.Controllers.V1
             }
             return Ok(bill); // No content to return on successful update
         }
+        
+            // ... other actions ...
+
+            [HttpPut("update-total/{id}")]
+            public async Task<IActionResult> UpdateTotal(int id, decimal newTotal)
+            {
+                // Retrieve the HoaDon entity from the database
+                var hoaDon = await _context.hoadon.FindAsync(id);
+
+                if (hoaDon == null)
+                {
+                    return NotFound();
+                }
+
+                // Update the TongSoTien property
+                hoaDon.TongSoTien = newTotal;
+
+                // Save the changes to the database
+                _context.hoadon.Entry(hoaDon).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+
+                return Ok(hoaDon);
+            }
+        
 
     }
 }

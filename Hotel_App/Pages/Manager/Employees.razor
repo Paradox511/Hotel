@@ -1,5 +1,4 @@
 ﻿@page "/employees"
-<h3>Employees</h3>
 @using Hotel_App.Service
 @using Hotel_App.Data
 @using Blazored.LocalStorage
@@ -12,9 +11,39 @@
 
 
 <div class="col-12">
-    <h3><b>Enter Author Information</b></h3>
+    <h3><b>Thông Tin Nhân Viên</b></h3>
     <hr />
-     <EditForm Model="@employee" OnValidSubmit="@CreateEmployees"> 
+    @if (!string.IsNullOrEmpty(successMessage))
+    {
+        <div class="alert alert-success">@successMessage</div>
+    }
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger">@errorMessage</div>
+    }
+    @if (showDeleteConfirmation)
+    {
+        <div class="modal" style="display:block; background-color: rgba(0, 0, 0, 0.5);">
+            <div class="modal-dialog" style="max-width: 400px; margin-top: 150px;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirm Deletion</h5>
+                        <button type="button" class="close" @onclick="CancelDelete">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to delete this customer?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" @onclick="CancelDelete">No</button>
+                        <button class="btn btn-danger" @onclick="DeleteEmployees">Yes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    <EditForm Model="@employee" OnValidSubmit="@CreateEmployees">
         <div class="form-group">
             <label for="MaNhanVien">Mã Nhân Viên:</label>
             <input type="text" class="form-control" id="MaNhanVien" @bind="employee.MaNhanVien" name="MaNhanVien" readonly>
@@ -27,13 +56,21 @@
         </div>
 
         <div class="form-group">
-            <label for="SoDienThoai">Số Điện Thoại:</label>
-            <input type="text" class="form-control" id="SoDienThoai" @bind="employee.SoDienThoai" name="SoDienThoai">
+            <label for="SoDienThoai">Phone Number:</label>
+            <input type="text" class="form-control" id="SoDienThoai" @bind="employee.SoDienThoai" name="SoDienThoai" required />
+            @if (!string.IsNullOrEmpty(phoneError))
+            {
+                <span class="text-danger">@phoneError</span>
+            }
         </div>
 
         <div class="form-group">
             <label for="Email">Email:</label>
-            <input type="text" class="form-control" id="Email" @bind="employee.Email" name="Email">
+            <input type="text" class="form-control" id="Email" @bind="employee.Email" name="Email" required />
+            @if (!string.IsNullOrEmpty(emailError))
+            {
+                <span class="text-danger">@emailError</span>
+            }
         </div>
 
         <div class="form-group">
@@ -42,20 +79,20 @@
         </div>
 
         <div class="form-group">
-            <label for="MaTaiKhoan">Loại Tài Khoản:</label>
-            <select class="form-control" id="MaTaiKhoan" @bind="employee.MaTaiKhoan" name="MaTaiKhoan">
-                <option value="">Chọn Loại Tài Khoản</option>
-                <option value="1">Quản Lý</option>
-                <option value="2">Nhân Viên</option>                   
-            </select>
+            <label for="Password">Password:</label>
+            <input type="text" class="form-control" id="Password" @bind="employee.Password" name="Password">
         </div>
+        <br />
         <button type="submit" class="btn btn-primary">Tạo</button>
-     </EditForm> 
+    </EditForm>
 </div>
 <br />
+<hr />
 <div class="col-12">
 
-    <h3>Nhân Viên</h3>
+    <h3><b>Danh Sách Nhân Viên</b></h3>
+    <button class="btn btn-primary" @onclick="LoadEmployees">Refresh</button>
+    <br />
     <SpinLoader IsLoading="isLoading">
         <LoadingTemplate>
             <div class="col-12" style="background-color: lightgray; height:400px; vertical-align:middle">
@@ -69,14 +106,14 @@
                 <p>Loading...</p>
             }
             else
-            {               
+            {
                 @if (filteredEmployees != null)
                 {
                     <!-- Search Box -->
                     <div class="search-box">
-                        <label class="col-2 font-weight-bold">Search:</label>
+                        <b><label class="col-2 font-weight-bold">Search:</label></b>
                         <input type="text" class="form-control col-3" @bind="searchText" @oninput="OnSearchTextChanged" placeholder="Search employees" />
-                    </div>                  
+                    </div>
                     <table class="table table-bordered table-striped table-responsive-md">
                         <thead>
                             <tr>
@@ -85,7 +122,7 @@
                                 <th>Số điện thoại</th>
                                 <th>Email</th>
                                 <th>Địa Chỉ</th>
-                                <th>Loại tài khoản</th>
+                                <th>Password</th>
                                 <th>Thao Tác</th>
                             </tr>
                         </thead>
@@ -98,24 +135,21 @@
                                     <td>@nv.SoDienThoai</td>
                                     <td>@nv.Email</td>
                                     <td>@nv.DiaChi</td>
-                                    <td>
-                                        @if (nv.MaTaiKhoan == 1)
-                                        {
-                                            <span>Quản lý</span>
-                                        }
-                                        else
-                                        {
-                                            <span>Nhân Viên</span>
-                                        }
-                                    </td>
+                                    <td>@nv.Password</td>
                                     <td class="action-links">
                                         <a class="edit-link" @onclick="(() => EditEmployees(nv))">Edit</a> |
-                                        <a class="delete-link" @onclick="(() => DeleteEmployees(nv.MaNhanVien))">Delete</a>
+                                        <a class="delete-link" @onclick="(() => ShowDeleteConfirmation(nv.MaNhanVien))">Delete</a>
                                     </td>
                                 </tr>
                             }
                         </tbody>
                     </table>
+                    <div class="pagination-controls">
+                        <button class="btn btn-secondary" @onclick="PreviousPage" disabled="@IsFirstPage()">Previous</button>
+                        <span>Page @currentPage of @totalPages</span>
+                        <button class="btn btn-secondary" @onclick="NextPage" disabled="@IsLastPage()">Next</button>
+                    </div>
+
                 }
                 else
                 {
@@ -123,7 +157,7 @@
                 }
 
 
-                <style>                   
+                <style>
                     /* Action links style */
                     .action-links {
                         display: flex;
@@ -245,6 +279,25 @@
                         .delete-link:hover {
                             text-decoration: underline;
                         }
+
+                    .pagination-controls {
+                        display: flex;
+                        justify-content: center;
+                        gap: 10px;
+                        margin-top: 20px;
+                    }
+
+                        .pagination-controls button {
+                            padding: 8px 15px;
+                            font-size: 16px;
+                            border-radius: 4px;
+                        }
+
+                        .pagination-controls span {
+                            font-size: 16px;
+                            align-self: center;
+                        }
+
                 </style>
 
 
@@ -255,6 +308,8 @@
 @code {
 
     private IEnumerable<NhanVien> employees;
+    private IEnumerable<HoaDon> bills;
+    public HoaDon hd { get; set; }
     public NhanVien employee { get; set; }
     public IEnumerable<NhanVien> filteredEmployees { get; set; }
     public bool IsVisible { get; set; }
@@ -264,17 +319,44 @@
     bool isLoading = true;
     private string searchText = string.Empty;
     private List<Employees> lemployees = new List<Employees>();
+    // Error messages for validation
+    private string emailError;
+    private string phoneError;
+    // Success and error messages for operations
+    private string successMessage;
+    private string errorMessage;
+    // Email validation regex
+    private readonly string emailPattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
+    // Phone validation regex
+    private readonly string phonePattern = @"^\d{10}$";
+    private int currentPage = 1;
+    private int itemsPerPage = 5; // Change this number based on your preference
+    private int totalEmployees = 0;
+    private int totalPages => (int)Math.Ceiling((double)employees.Count() / itemsPerPage);
+    // private int totalPages => (int)Math.Ceiling((double)filteredEmployees.Count() / itemsPerPage);
+    private bool IsFirstPage() => currentPage == 1;
+    private bool IsLastPage() => currentPage == totalPages;
+    private string deleteMessage;
+    private bool showDeleteConfirmation = false;
+    private int employeesIdToDelete;
 
     // Tải danh sách nhân viên từ API
     protected async Task LoadEmployees()
     {
         isLoading = true;
+        LoadBills();
 
-        // Gọi API để lấy danh sách nhân viên
         try
         {
-            employees = await nvservice.GetAllAsync("https://localhost:44359/api/NhanVien/GetNhanVien");
-            filteredEmployees = employees.ToList(); // Gán dữ liệu ban đầu cho filteredEmployees
+            // Fetch all employees (no filtering applied yet)
+            var allEmployees = await nvservice.GetAllAsync("https://localhost:44359/api/NhanVien/GetNhanVien");
+
+            employees = allEmployees; // Store all employees for search filtering later
+            filteredEmployees = employees; // Initially, no filtering
+            totalEmployees = employees.Count(); // Get the total count for pagination
+
+            // Apply pagination to the employees
+            PaginateEmployees();
         }
         catch (Exception ex)
         {
@@ -282,8 +364,10 @@
         }
 
         isLoading = false;
-        StateHasChanged(); // Cập nhật giao diện
+        StateHasChanged(); // Update the UI
     }
+
+
 
     // Phương thức tìm kiếm
     private void OnSearchTextChanged(ChangeEventArgs e)
@@ -293,67 +377,251 @@
         // Lọc danh sách theo tất cả các trường dữ liệu
         filteredEmployees = employees.Where(emp =>
             emp.MaNhanVien.ToString().Contains(searchValue) ||
-            emp.HoTen.ToLower().Contains(searchValue) 
-            
+            emp.HoTen.ToLower().Contains(searchValue)
         ).ToList();
 
-        StateHasChanged();
+        totalEmployees = filteredEmployees.Count(); // Cập nhật tổng số lượng nhân viên sau khi lọc
+        currentPage = 1; // Reset về trang đầu tiên
+
+        // Áp dụng phân trang cho danh sách đã lọc
+        filteredEmployees = filteredEmployees
+        .Skip((currentPage - 1) * itemsPerPage)
+        .Take(itemsPerPage)
+        .ToList();
+        StateHasChanged(); // Cập nhật lại giao diện
     }
 
     private async Task CreateEmployees()
     {
-        // Call the service to save the bill
+        // Kiểm tra định dạng email và số điện thoại
+        if (!ValidateEmail(employee.Email))
+        {
+            errorMessage = "Email không hợp lệ.";
+            return;
+        }
+
+        if (!ValidatePhone(employee.SoDienThoai))
+        {
+            errorMessage = "Số điện thoại không hợp lệ.";
+            return;
+        }
+
+        // Kiểm tra email và số điện thoại có trùng trong danh sách không khi tạo mới
+        if (employee.MaNhanVien == 0)
+        {
+            if (IsEmailDuplicated(employee.Email))
+            {
+                errorMessage = "Email này đã tồn tại.";
+                return;
+            }
+
+            if (IsPhoneNumberDuplicated(employee.SoDienThoai))
+            {
+                errorMessage = "Số điện thoại này đã tồn tại.";
+                return;
+            }
+        }
+        else
+        {
+            // Khi cập nhật, bỏ qua việc kiểm tra trùng cho nhân viên hiện tại
+            if (IsEmailDuplicatedForUpdate(employee.Email, employee.MaNhanVien))
+            {
+                errorMessage = "Email này đã tồn tại.";
+                return;
+            }
+
+            if (IsPhoneNumberDuplicatedForUpdate(employee.SoDienThoai, employee.MaNhanVien))
+            {
+                errorMessage = "Số điện thoại này đã tồn tại.";
+                return;
+            }
+        }
+
+        // Thực hiện lưu hoặc cập nhật nhân viên
         try
         {
             if (employee.MaNhanVien == 0)
             {
-                NhanVien CreateEmployee = await nvservice.SaveAsync("https://localhost:44359/api/NhanVien/CreateNhanVien", employee);
-                if (CreateEmployee != null)
+                // Thêm nhân viên mới
+                var createdEmployee = await nvservice.SaveAsync("https://localhost:44359/api/NhanVien/CreateNhanVien", employee);
+                if (createdEmployee != null)
                 {
-                    // Clear the form
-                    employee = new NhanVien();
-                    await LoadEmployees();
-
-                    // Update the bill list
-                    StateHasChanged();
+                    successMessage = "Nhân viên đã được thêm thành công!";
+                    employee = new NhanVien(); // Reset form
+                }
+                else
+                {
+                    errorMessage = "Lỗi khi thêm nhân viên.";
                 }
             }
             else
             {
-                NhanVien CreateEmployee = await nvservice.UpdateAsync("https://localhost:44359/api/NhanVien/UpdateNhanVien/", employee.MaNhanVien, employee);               
-                // Clear the form
-                employee = new NhanVien();
-                await LoadEmployees();
-
-                // Update the bill list
-                StateHasChanged();
+                // Cập nhật nhân viên
+                var updatedEmployee = await nvservice.UpdateAsync("https://localhost:44359/api/NhanVien/UpdateNhanVien/", employee.MaNhanVien, employee);
+                if (updatedEmployee != null)
+                {
+                    successMessage = "Nhân viên đã được cập nhật thành công!";
+                }
+                else
+                {
+                    errorMessage = "Lỗi khi cập nhật nhân viên.";
+                }
             }
-            // Handle successful save, e.g., display success message, clear form, etc.
+
+            // Tải lại danh sách nhân viên sau khi thêm hoặc cập nhật thành công
+            await LoadEmployees();
         }
         catch (Exception ex)
         {
-            // Handle errors, e.g., display error message to the user
-            Console.Error.WriteLine("Error saving employees: " + ex.Message);
+            successMessage = "Nhân viên đã được thêm thành công!";
         }
 
+        StateHasChanged();
+    }
+
+    // Delete employee
+    private async Task DeleteEmployees()
+    {
+        try
+        {
+            var employeesReservations = bills.Where(h => h.MaNhanVien == employeesIdToDelete);
+            if (employeesReservations.Any())
+            {
+                // Nếu khách hàng có đặt phòng, hiển thị thông báo không thể xóa
+                errorMessage = "không xóa được nhân viên";
+                successMessage = null; // Xóa thông báo thành công nếu có lỗi
+                showDeleteConfirmation = false; // Ẩn bảng xác nhận
+                StateHasChanged(); // Cập nhật giao diện
+                return; // Dừng việc xóa khách hàng
+            }
+            await nvservice.DeleteAsync("https://localhost:44359/api/NhanVien/DeleteNhanVien/", employeesIdToDelete);
+            await LoadEmployees();
+            showDeleteConfirmation = false; // Ẩn bảng xác nhận
+            successMessage = "Xóa nhân viên thành công."; // Thông báo thành công
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Không thể xóa nhân viên: " + ex.Message; // Hiển thị thông báo lỗi
+            showDeleteConfirmation = false; // Ẩn bảng xác nhận
+            StateHasChanged();
+        }
+    }
+
+    private void ShowDeleteConfirmation(int id)
+    {
+        employeesIdToDelete = id; // Lưu lại ID khách hàng cần xóa
+        showDeleteConfirmation = true; // Hiển thị bảng xác nhận
+    }
+
+    private void CancelDelete()
+    {
+        showDeleteConfirmation = false; // Ẩn bảng xác nhận
+        StateHasChanged();
     }
 
 
-    // Phương thức xóa nhân viên
-    private async Task DeleteEmployees(int id)
+    // Edit employee
+    private void EditEmployees(NhanVien employeeToEdit)
     {
+        employee = new NhanVien
+            {
+                MaNhanVien = employeeToEdit.MaNhanVien,
+                HoTen = employeeToEdit.HoTen,
+                SoDienThoai = employeeToEdit.SoDienThoai,
+                Email = employeeToEdit.Email,
+                DiaChi = employeeToEdit.DiaChi,
+                Password = employeeToEdit.Password
+            };
+        successMessage = string.Empty;
+        errorMessage = string.Empty;
+    }
 
-        await nvservice.DeleteAsync("https://localhost:44359/api/NhanVien/DeleteNhanVien/", id);
-        await LoadEmployees();
-        StateHasChanged();
+    private void PaginateEmployees()
+    {
+        // Sử dụng danh sách gốc employees cho việc phân trang
+        filteredEmployees = employees
+            .Skip((currentPage - 1) * itemsPerPage)
+            .Take(itemsPerPage)
+            .ToList();
+    }
+
+    // Validate email
+    private bool ValidateEmail(string email)
+    {
+        if (string.IsNullOrEmpty(email) || !System.Text.RegularExpressions.Regex.IsMatch(email, emailPattern))
+        {
+            emailError = "Invalid email format.";
+            return false;
+        }
+        emailError = null;
+        return true;
+    }
+
+    // Validate phone number
+    private bool ValidatePhone(string phone)
+    {
+        if (string.IsNullOrEmpty(phone) || !System.Text.RegularExpressions.Regex.IsMatch(phone, phonePattern))
+        {
+            phoneError = "Phone number must be 10 digits.";
+            return false;
+        }
+        phoneError = null;
+        return true;
+    }
+
+    // Kiểm tra email có trùng cho việc cập nhật (bỏ qua nhân viên hiện tại)
+    private bool IsEmailDuplicatedForUpdate(string email, int currentEmployeeId)
+    {
+        return filteredEmployees.Any(emp => emp.Email.Equals(email, StringComparison.OrdinalIgnoreCase) && emp.MaNhanVien != currentEmployeeId);
+    }
+
+    // Kiểm tra số điện thoại có trùng cho việc cập nhật (bỏ qua nhân viên hiện tại)
+    private bool IsPhoneNumberDuplicatedForUpdate(string phoneNumber, int currentEmployeeId)
+    {
+        return filteredEmployees.Any(emp => emp.SoDienThoai.Equals(phoneNumber, StringComparison.OrdinalIgnoreCase) && emp.MaNhanVien != currentEmployeeId);
+    }
+
+
+    // Kiểm tra email có trùng trong danh sách hay không
+    private bool IsEmailDuplicated(string email)
+    {
+        return filteredEmployees.Any(emp => emp.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+    }
+
+    // Kiểm tra số điện thoại có trùng trong danh sách hay không
+    private bool IsPhoneNumberDuplicated(string phoneNumber)
+    {
+        return filteredEmployees.Any(emp => emp.SoDienThoai.Equals(phoneNumber, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private void NextPage()
+    {
+        if (currentPage < totalPages)
+        {
+            currentPage++;
+            PaginateEmployees();
+            StateHasChanged(); // Cập nhật UI
+        }
+    }
+
+
+    private void PreviousPage()
+    {
+        if (currentPage > 1)
+        {
+            currentPage--;
+            PaginateEmployees();
+            StateHasChanged(); // Cập nhật UI
+        }
+    }
+
+    protected async Task LoadBills()
+    {
         
-    }
 
-    // Phương thức chỉnh sửa nhân viên
-    private void EditEmployees(NhanVien nv)
-    {
-        employee = nv;
-        StateHasChanged();
+        bills = await BillService.GetAllAsync("https://localhost:44359/api/Bills/GetBills");
+       
     }
 
     protected override void OnInitialized()
