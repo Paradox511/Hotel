@@ -21,7 +21,7 @@ namespace Hotel_App.Service
             string url = requestUri + Id;
            
             var response = await _httpClient.SendAsync(requestMessage);
-
+            var responsebody = await response.Content.ReadAsStringAsync();
             var responseStatusCode = response.StatusCode;
 
             return await Task.FromResult(true);

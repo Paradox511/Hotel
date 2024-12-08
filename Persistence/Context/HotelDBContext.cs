@@ -28,10 +28,10 @@ namespace Persistence.Context
             .WithMany(h => h.CTHoaDon)
              .HasForeignKey(ct => ct.MaHoaDon);
 
-            modelBuilder.Entity<CTHoaDon>()
+           modelBuilder.Entity<CTHoaDon>()
                 .HasOne(ct => ct.dv)
-                .WithOne(dv => dv.cthd)
-                .HasForeignKey<CTHoaDon>(ct => ct.MaDichVu);
+               .WithMany(dv => dv.cthds)
+               .HasForeignKey(ct => ct.MaDichVu);
         
             base.OnModelCreating(modelBuilder);
         }

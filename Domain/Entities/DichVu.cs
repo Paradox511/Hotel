@@ -14,7 +14,7 @@ namespace Domain.Entities
         [Required]
         public string Mota { get; set; }
 
-        public CTHoaDon cthd { get; set; }
+        public ICollection<CTHoaDon> cthds { get; set; } = [];
         public DichVu() { }
     }
 }

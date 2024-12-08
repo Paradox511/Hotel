@@ -210,8 +210,10 @@
     }
     private async Task DeleteBillDetail(int Id)
     {
-        await cthdservice.DeleteAsync("https://localhost:44359/api/BillDetails/DeleteBillDetail/{0}", Id);
+        await cthdservice.DeleteAsync("https://localhost:44359/api/BillDetails/DeleteBillDetail/", Id);
         // LoadBills();
+        await ReloadDetails();
+
         StateHasChanged();
         //throw new Exception("DeleteAuthor");
     }
@@ -233,10 +235,10 @@
     private async Task SaveDetail()
     {
         dichVu = await dvservice.GetByIdAsync("https://localhost:44359/api/DichVu/GetById/{0}", cthd.MaDichVu);
-        if (cthd.dv == null) cthd.dv = dichVu;
+       // if (cthd.dv == null) cthd.dv = dichVu;
         cthd.MaHoaDon = BillId;
-        cthd.hd = bill;
-        cthd.dv.cthd = cthd;
+    //   cthd.hd = bill;
+   //     cthd.dv.cthds = [];
         CTHoaDon savedBill = await cthdservice.SaveAsync("https://localhost:44359/api/BillDetails/CreateBillDetail", cthd);
         if (savedBill != null)
         {

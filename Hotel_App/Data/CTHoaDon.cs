@@ -12,7 +12,7 @@ namespace Hotel_App.Data
         public decimal TongTien { get; set; }
         public int MaDichVu { get; set; }
         public DichVu dv { get; set; } = null;
-        public HoaDon hd { get; set; } = null;
+     //   public HoaDon hd { get; set; } = null;
 
     }
 }
