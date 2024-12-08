@@ -4,11 +4,13 @@ using Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace WebAPI.Controllers.V1
 {
     [ApiVersion("1.0")]
-    public class DichVuController : Controller
+    public class DichVuController : BaseApiController
     {
         private readonly IHotelDBContext _context;
         private readonly IMediator _mediator;
@@ -40,7 +42,7 @@ namespace WebAPI.Controllers.V1
         [HttpPost("CreateDichVu")]
         public async Task<IActionResult> CreateBill([FromBody] CreateCommand<DichVu> command)
         {
-            if (command == null || command.Entity == null)
+            if ( command.Entity == null)
             {
                 return BadRequest("Invalid command data");
             }
@@ -98,5 +100,23 @@ namespace WebAPI.Controllers.V1
             }
             return Ok(dichVu); // No content to return on successful update
         }
+        [HttpGet("GetById/{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var bill = await _context.dichvu.FindAsync(id);
+               
+
+            if (bill == null)
+            {
+                return NotFound("Bill not found");
+            }
+            var options = new JsonSerializerOptions
+            {
+                ReferenceHandler = ReferenceHandler.IgnoreCycles
+            };
+
+            return Ok(bill);
+        }
+
     }
 }

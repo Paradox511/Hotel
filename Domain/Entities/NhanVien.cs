@@ -16,9 +16,7 @@ namespace Domain.Entities
         public string Email { get; set; }
         [Required]
         public string DiaChi { get; set; }
-        //[Required]
-        //public int MaTaiKhoan { get; set; }
-        [Required]
+         [Required]
         public string Password { get; set; }
 
 

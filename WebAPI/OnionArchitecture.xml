@@ -19,6 +19,21 @@
             <param name="command"></param>
             <returns></returns>
         </member>
+        <member name="M:WebAPI.Controllers.V1.DichVuController.Delete(System.Int32)">
+            <summary>
+            Deletes Product Entity based on Id.
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:WebAPI.Controllers.V1.DichVuController.Update(System.Int32,Domain.Entities.DichVu)">
+            <summary>
+            Updates the Product Entity based on Id.   
+            </summary>
+            <param name="id"></param>
+            <param name="command"></param>
+            <returns></returns>
+        </member>
         <member name="M:WebAPI.Controllers.V1.NhanVienController.Delete(System.Int32)">
             <summary>
             Deletes Product Entity based on Id.

@@ -11,8 +11,12 @@ namespace Hotel_App.Data
         [Required]
         [DataType(DataType.Currency)]
         public decimal Gia { get; set; }
+        public DichVu() { }
+
+
         [Required]
         public string Mota { get; set; }
-        public DichVu() { }
+        public CTHoaDon cthd { get; set; }
+
     }
 }

@@ -105,7 +105,7 @@ else
                     <td>@bill.TongSoTien</td>
                     <td>
                                     <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => EditBill(bill))">Edit</a> |
-                                    <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => DeleteBill(bill.MaHoaDon))">Delete</a>
+                                    <a style="text-underline-position:below; cursor:pointer; color:red" @onclick="(() => DeleteBill(bill.MaHoaDon))">Delete</a>
                     </td>
                     <td>
                         <NavLink href=@string.Format("/bills/details/{0}",bill.MaHoaDon)>View Details</NavLink>
@@ -207,7 +207,7 @@ else
     private async Task DeleteBill(int Id)
     {
         await BillService.DeleteAsync("https://localhost:44359/api/Bills/DeleteBill/", Id);
-        LoadBills();
+        await LoadBills();
         StateHasChanged();
         //throw new Exception("DeleteAuthor");
     }
@@ -235,7 +235,7 @@ else
 
                     // Update the bill list
                     StateHasChanged();
-
+                    await LoadBills();
                     // Clear the form
                     bill = new HoaDon();
                 }

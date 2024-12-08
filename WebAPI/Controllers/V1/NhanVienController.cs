@@ -59,7 +59,7 @@ namespace WebAPI.Controllers.V1
                 ReferenceHandler = ReferenceHandler.IgnoreCycles
             };
 
-            return Ok(JsonSerializer.Serialize(employees, options));
+            return Ok(employees);
         }
 
         [HttpPost("CreateNhanVien")]
