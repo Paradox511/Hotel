@@ -22,6 +22,7 @@ namespace Application.Interfaces
 
         DbSet<TaiKhoan> taikhoan { get; set; }
         DbSet<PhuongThucThanhToan> ptthanhtoan { get; set; }
+
         Task<int> SaveChangesAsync();
 
     }

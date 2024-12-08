@@ -42,11 +42,12 @@ namespace Hotel_App
             services.AddHttpClient<HotelService<NhanVien>>();
             services.AddHttpClient<HotelService<PhuongThucThanhToan>>();
             services.AddHttpClient<HotelService<DatPhong>>();
-
+            services.AddHttpClient<HotelService<TaiKhoan>>();
             services.AddHttpClient<HoaDonService>();
             services.AddSingleton<WeatherForecastService>();
+            services.AddSingleton<UserService>();
+            services.AddSingleton<IUserService, UserService>();
 
-          
 
             var appSettingSection = Configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettingSection);
