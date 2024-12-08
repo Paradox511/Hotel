@@ -17,4 +17,8 @@
     <PackageReference Include="Syncfusion.Blazor.Themes" Version="27.2.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Domain\Domain.csproj" />
+  </ItemGroup>
+
 </Project>
