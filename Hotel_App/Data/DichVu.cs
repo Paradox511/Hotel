@@ -13,6 +13,10 @@ namespace Hotel_App.Data
         public decimal Gia { get; set; }
         [Required]
         public string Mota { get; set; }
+
+        public ICollection<CTHoaDon> cthd { get; set; }
+
+        //public ICollection<CTHoaDon> CTHoaDon { get; set; }
         public DichVu() { }
     }
 }

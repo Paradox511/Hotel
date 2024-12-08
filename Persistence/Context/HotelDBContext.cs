@@ -30,9 +30,14 @@ namespace Persistence.Context
 
             modelBuilder.Entity<CTHoaDon>()
                 .HasOne(ct => ct.dv)
-                .WithOne(dv => dv.cthd)
-                .HasForeignKey<CTHoaDon>(ct => ct.MaDichVu);
-        
+                .WithMany(dv => dv.cthd)
+                .HasForeignKey(ct => ct.MaDichVu);
+
+            //modelBuilder.Entity<DichVu>()
+            //    .HasMany(dv => dv.CTHoaDon)
+            //    .WithOne(ct => ct.dv)
+            //    .HasForeignKey(ct => ct.MaDichVu);
+
             base.OnModelCreating(modelBuilder);
         }
         public virtual DbSet<HoaDon> hoadon { get; set; }

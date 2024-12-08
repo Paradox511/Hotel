@@ -38,7 +38,7 @@ namespace WebAPI.Controllers.V1
             return Ok(bills);
         }
         [HttpPost("CreateDichVu")]
-        public async Task<IActionResult> CreateBill([FromBody] CreateCommand<DichVu> command)
+        public async Task<IActionResult> CreateDichVu([FromBody] CreateCommand<DichVu> command)
         {
             if (command == null || command.Entity == null)
             {

@@ -74,7 +74,7 @@ namespace WebAPI.Controllers.V1
             await _context.SaveChangesAsync();
             return Ok("Bill created successfully");
         }
-
+        
         // Similar methods for updating and deleting KhachHang
         /// <summary>
         /// Deletes Product Entity based on Id.

@@ -47,7 +47,7 @@
 <br />
 <div class="col-12">
 
-    <h3>Bills <button class="btn btn-primary" @onclick="LoadServices">Refresh</button></h3>
+    <h3>DỊCH VỤ <button class="btn btn-primary" @onclick="LoadServices">Refresh</button></h3>
     <SpinLoader IsLoading="isLoading">
         <LoadingTemplate>
             <div class="col-12" style="background-color: lightgray; height:400px; vertical-align:middle">
@@ -82,8 +82,8 @@
                                 <td>@dichvu.Gia</td>
                                 <td>@dichvu.Mota</td>
                                 <td>
-                                    <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => EditService(dichVu))">Edit</a> |
-                                    <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => DeleteService(dichVu.MaDichVu))">Delete</a>
+                                    <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => EditService(dichvu))">Edit</a> |
+                                    <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => DeleteService(dichvu.MaDichVu))">Delete</a>
                                 </td>
                                 
                             </tr>
@@ -208,10 +208,11 @@
         // Call the service to save the bill
         try
         {
+            if (dichVu.cthd == null) dichVu.cthd = [];
             if (dichVu.MaDichVu == 0)
             {
                 //  bill.CTHoaDon = null;
-                DichVu savedService = await dvservice.SaveAsync("https://localhost:44359/api/DichVu/CreateDichVu", dichVu);
+                var savedService = await dvservice.SaveAsync("https://localhost:44359/api/DichVu/CreateDichVu", dichVu);
                 if (savedService != null)
                 {
                     // Display success message using a modal or dialog
@@ -222,16 +223,18 @@
 
                     // Clear the form
                     dichVu = new DichVu();
+                    successMessage = "Service create successfully!";
                 }
             }
             else
             {
-                DichVu savedService = await dvservice.UpdateAsync("https://localhost:44359/api/DichVu/UpdateDichVu/", dichVu.MaDichVu, dichVu);
+                var savedService = await dvservice.UpdateAsync("https://localhost:44359/api/DichVu/UpdateDichVu/", dichVu.MaDichVu, dichVu);
                 // Update the bill list
                 StateHasChanged();
 
                 // Clear the form
                 dichVu = new DichVu();
+                successMessage = "Service update successfully!";
 
             }
             // Handle successful save, e.g., display success message, clear form, etc.
