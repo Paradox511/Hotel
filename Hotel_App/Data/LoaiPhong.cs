@@ -16,5 +16,7 @@ namespace Hotel_App.Data
         [DataType(DataType.Currency)]
         public decimal Gia { get; set; }
         public LoaiPhong() { }
-    }
+
+		public List<Phong> phong { get; set; }
+	}
 }

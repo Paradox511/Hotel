@@ -6,12 +6,16 @@ using System.Text.Json.Serialization;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Domain.Entities;
+//using Hotel_App.Data;
 
 namespace WebAPI.Controllers.V1
 {
 		public class RoomsController : BaseApiController
 		{
 			private readonly IHotelDBContext _context;
+
+			//private readonly IRoomRepository _roomRepository;
+
 			private readonly IMediator _mediator;
 			private readonly ISender _sender;
 
@@ -37,35 +41,15 @@ namespace WebAPI.Controllers.V1
 
 				return Ok(rooms);
 			}
-		//[HttpGet("/api/Rooms/{id}")]
-		//public async Task<IActionResult> GetById(int id)
-		//{
-		//	var room = await _context.phong
-		//		.Include(h => h.MaLoaiPhong)
-		//		//.ThenInclude(ct => ct.)// Include related CTHoaDon entities
-		//		.FirstOrDefaultAsync(h => h.MaPhong == id);
-
-		//	if (room == null)
-		//	{
-		//		return NotFound("Room not found");
-		//	}
-		//	var options = new JsonSerializerOptions
-		//	{
-		//		ReferenceHandler = ReferenceHandler.IgnoreCycles
-		//	};
-
-		//	return Ok(JsonSerializer.Serialize(room, options));
-		//}
-
-		[HttpGet("/api/RoomTypes/GetRoomAtIDRoomtype/{id}")]
+		[HttpGet("/api/Rooms/{id}")]
 		public async Task<IActionResult> GetById(int id)
 		{
-			var phong = await _context.phong
-				.Include(h => h.LoaiPhong)
+			var room = await _context.phong
+				.Include(h => h.MaLoaiPhong)
 				//.ThenInclude(ct => ct.)// Include related CTHoaDon entities
 				.FirstOrDefaultAsync(h => h.MaPhong == id);
 
-			if (phong == null)
+			if (room == null)
 			{
 				return NotFound("Room not found");
 			}
@@ -74,10 +58,10 @@ namespace WebAPI.Controllers.V1
 				ReferenceHandler = ReferenceHandler.IgnoreCycles
 			};
 
-			return Ok(JsonSerializer.Serialize(phong, options));
+			return Ok(JsonSerializer.Serialize(room, options));
 		}
 
-
+		
 		[HttpPost("CreateRoom")]
 			public async Task<IActionResult> CreateRoom([FromBody] CreateCommand<Phong> command)
 			{

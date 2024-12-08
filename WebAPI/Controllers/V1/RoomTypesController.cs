@@ -38,25 +38,26 @@ namespace WebAPI.Controllers.V1
 			return Ok(roomtypes);
 		}
 
-		//[HttpGet("/api/RoomTypes/GetRoomAtIDRoomtype/{id}")]
-		//public async Task<IActionResult> GetById(int id)
-		//{
-		//	var loaiphong = await _context.loaiphong
-		//		.Include(h => h.MaLoaiPhong)
-		//		//.ThenInclude(ct => ct.)// Include related CTHoaDon entities
-		//		.FirstOrDefaultAsync(h => h.MaLoaiPhong == id);
+		[HttpGet("/api/RoomTypes/GetRoomType/{id}")]
+		public async Task<IActionResult> GetById(int id)
+		{
+			var loaiphong = await _context.loaiphong
+				.Where(h => h.MaLoaiPhong == id)
+				//.ThenInclude(ct => ct.)// Include related CTHoaDon entities
+				//.FirstOrDefaultAsync(h => h.MaLoaiPhong == id);
+			    .FirstOrDefaultAsync();
 
-		//	if (loaiphong == null)
-		//	{
-		//		return NotFound("Room not found");
-		//	}
-		//	var options = new JsonSerializerOptions
-		//	{
-		//		ReferenceHandler = ReferenceHandler.IgnoreCycles
-		//	};
+			if (loaiphong == null)
+			{
+				return NotFound("Room not found");
+			}
+			var options = new JsonSerializerOptions
+			{
+				ReferenceHandler = ReferenceHandler.IgnoreCycles
+			};
 
-		//	return Ok(JsonSerializer.Serialize(loaiphong, options));
-		//}
+			return Ok(JsonSerializer.Serialize(loaiphong, options));
+		}
 
 		[HttpPost("CreateRoomType")]
 		public async Task<IActionResult> CreateRoom([FromBody] CreateCommand<LoaiPhong> command)

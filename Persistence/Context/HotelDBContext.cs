@@ -33,10 +33,16 @@ namespace Persistence.Context
                 .HasOne(ct => ct.dv)
                 .WithOne(dv => dv.cthd)
                 .HasForeignKey<CTHoaDon>(ct => ct.MaDichVu);
-			modelBuilder.Entity<Phong>()
-				.HasOne(ct => ct.LoaiPhong)
-				.WithMany(lp => lp.phong)
-				.HasForeignKey(ct => ct.MaLoaiPhong);
+
+            modelBuilder.Entity<Phong>()
+                .HasOne(ct => ct.LoaiPhong)
+                .WithMany(lp => lp.phong)
+                .HasForeignKey(ct => ct.MaLoaiPhong);
+
+			modelBuilder.Entity<LoaiPhong>()
+		   .HasMany(h => h.phong)
+		   .WithOne(ct => ct.LoaiPhong)
+		   .HasForeignKey(ct => ct.MaLoaiPhong);
 
 			base.OnModelCreating(modelBuilder);
         }

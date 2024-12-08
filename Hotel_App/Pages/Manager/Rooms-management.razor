@@ -15,9 +15,7 @@
 
 
 <div class="col-12">
-    <h3><b>Enter Room Information</b></h3>
-    <hr />
-
+   
     <button onclick="window.location.href='/Roomtype';">Đi đến quản lý loại phòng</button>
     <EditForm Model="@png" OnValidSubmit="@SaveRoom">
 
@@ -26,23 +24,24 @@
             <input type="text" class="form-control" @bind="png.MaPhong" name="MaPhong" readonly>
         </div>
 
-        @* <div class="form-group"> *@
-        @*     <label for="TrangThai">Trạng Thái Phòng:</label> *@
-        @*     <select class="form-control" id="TrangThai" @bind="png.TrangThaiPhong" name="TrangThai" readonly> *@
-        @*         <option value="0" hidden>Đã đặt</option> *@
-        @*         <option value="1" >Trống</option> *@
+        @* <div class="form-group">  *@
+        @*     <label for="TrangThai">Trạng Thái Phòng:</label>  *@
+        @*     <select class="form-control" id="TrangThai" @bind="png.TrangThaiPhong" name="TrangThai" readonly>  *@
+        @*         <option value="0" >Đã đặt</option>  *@
+        @*         <option value="1" >Trống</option>  *@
         @*     </select> *@
         @* </div> *@
 
         <div class="form-group">
             <label for="SoLuong">Nhập số phòng:</label>
             <input type="text" class="form-control" id="SoLuong" @bind=png.SoPhong name="SoLuong" >
+            @* <ValidationMessage For="@(() => png.SoPhong)"/> *@
         </div>
 
         <div class="form-group">
             <label for="MaLoaiPhong">Mã Loại Phòng :</label>
             <select class="form-control" id="MaLoaiPhong" @bind="png.MaLoaiPhong" name="MaLoaiPhong">
-                @* <option value="">Chọn mã loại phòng</option> *@
+                <option value="">Chọn mã loại phòng</option> 
                 @if (loaiphong != null)
                 {
                     @foreach (var type in loaiphong)
@@ -231,22 +230,16 @@
         // Call the service to save the bill
         try
         {
-            //if (png.MaLoaiPhong == null) png.MaLoaiPhong = [];
+            //if (png.MaPhong == null) png.LoaiPhong = new LoaiPhong();
             if (png.MaPhong == 0)
-            {
-                //  bill.CTHoaDon = null;
-                Phong TPhong = await RoomService.SaveAsync("https://localhost:44359/api/Rooms/CreateRoom", png);
+            {                
+                Phong TPhong = await RoomService.SaveAsync("https://localhost:44359/api/Rooms/CreateRoom", png);             
                 if (TPhong != null)
-                {
-                    // Display success message using a modal or dialog
-                    //  await _modalService.Show<SuccessMessage>("Bill created successfully!");
+                {                  
                     png = new Phong();
-                    await LoadRooms();
-                    // Update the bill list
+                    await LoadRooms();                   
                     StateHasChanged();
-
                     // Clear the form
-
                 }
             }
             else

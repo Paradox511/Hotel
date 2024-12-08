@@ -26,21 +26,25 @@
         <div class="form-group">
             <label for="TenLoaiPhong">Tên Loại Phòng:</label>
             <input type="text" class="form-control" id="TenLoaiPhong" @bind="Type.TenLoaiPhong" name="TenLoaiPhong" >
+            @* <ValidationMessage For="@(() => Type.TenLoaiPhong)"/> *@
         </div>
 
         <div class="form-group">
             <label for="SoLuong">Nhập số lượng phòng:</label>
             <input type="text" class="form-control" id="SoLuongPhong" @bind=Type.SoLuongPhong name="SoLuongPhong">
+             @* <ValidationMessage For="@(() => Type.SoLuongPhong)"/> *@
         </div>
 
         <div class="form-group">
             <label for="MoTa">Nhập Mô Tả:</label>
             <input type="text" class="form-control" id="Mô Tả" @bind=Type.Mota name="MoTa">
+             @* <ValidationMessage For="@(() => Type.Mota)"/> *@
         </div>
 
         <div class="form-group">
             <label for="Gia">Nhập Giá Phòng:</label>
             <input type="text" class="form-control" id="Gia" @bind=Type.Gia name="Gia">
+             @* <ValidationMessage For="@(() => Type.Gia)"/> *@
         </div>
         <button type="submit" class="btn btn-primary">Tạo</button>
     </EditForm>
@@ -209,7 +213,7 @@
         // Call the service to save the bill
         try
         {
-            //if (png.MaLoaiPhong == null) png.MaLoaiPhong = [];
+            if (Type.phong == null) Type.phong = [];
             if (Type.MaLoaiPhong == 0)
             {
                 //  bill.CTHoaDon = null;
