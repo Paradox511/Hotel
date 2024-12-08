@@ -78,7 +78,7 @@
     public bool IsGridViewFiltered { get; set; }
     bool isLoading = true;
 
-    protected async override Task OnInitializedAsync()
+    /*protected async override Task OnInitializedAsync()
     {
         isLoading = true;
         var task = BillService.GetByIdAsync("https://localhost:44359/api/Bills/details/{0}", BillId);
@@ -91,5 +91,25 @@
 
         isLoading = false; // Set loading indicator to false
     }
+<<<<<<< HEAD
 }
+=======
+
+    protected async Task GetDatPhong()
+    {
+        datPhong = await dpservice.GetByIdAsync("https://localhost:44359/api/NhanVien/GetByID/{0}")
+    }
+    protected async Task GetNhanVien()
+    {
+        nhanVien = await nvservice.GetByIdAsync("https://localhost:44359/api/NhanVien/GetByID/{0}",BillId);
+    }
+    protected async Task GetPhuongThuc()
+    {
+        pt = await ptservice.GetByIdAsync("https://localhost:44359/api/PTTT/GetByID/{0}", BillId);
+    }
+    protected async Task UpdateTongTien()
+    {
+        bill.
+    }*/
+>>>>>>> quybruh
 }

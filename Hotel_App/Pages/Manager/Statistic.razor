@@ -1,0 +1,105 @@
+﻿@page "/statistics"
+<h3>Statistics</h3>
+@using Hotel_App.Service
+@using Hotel_App.Data
+@using Blazored.LocalStorage
+@using Hotel_App.Shared
+@inject HotelService<HoaDon> BillService
+@inject HotelService<DatPhong> dpservice;
+@inject HotelService<NhanVien> nvservice;
+@inject HotelService<PhuongThucThanhToan> ptservice;
+@inject HotelService<KhachHang> khservice;
+@inject HotelService<TaiKhoan> tkservice;
+@implements IDisposable
+
+
+
+@code {
+    private IEnumerable<TaiKhoan> accounts;
+    private IEnumerable<NhanVien> employees;
+    private IEnumerable<DatPhong> reservations;
+    public NhanVien employee { get; set; }
+    public IEnumerable<NhanVien> filteredEmployees { get; set; }
+    private IEnumerable<KhachHang> customers;
+    public KhachHang customer { get; set; }
+    public TaiKhoan account { get; set; }
+    public IEnumerable<KhachHang> filteredCustomersList { get; set; }
+    public bool IsVisible { get; set; }
+    public bool Result { get; set; }
+    public string RecordName { get; set; }
+    public bool IsGridViewFiltered { get; set; }
+    bool isLoading = true;
+    private string searchText = string.Empty;
+    private string errorMessage;
+    private string successMessage;
+    private string deleteMessage;
+    private bool showDeleteConfirmation = false;
+    private int customerIdToDelete;
+
+    
+
+    protected override void OnInitialized()
+    {
+        Console.WriteLine("Authors - OnInitialized");
+        base.OnInitialized();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Console.WriteLine("Authors - OnInitializedAsync");
+
+        
+
+        
+
+        await base.OnInitializedAsync();
+    }
+
+    protected override void OnParametersSet()
+    {
+        Console.WriteLine("Authors - OnParametersSet");
+        base.OnParametersSet();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        Console.WriteLine("Authors - OnParametersSetAsync");
+        await base.OnParametersSetAsync();
+    }
+
+    protected override bool ShouldRender()
+    {
+        base.ShouldRender();
+        Console.WriteLine("Authors - ShouldRender");
+
+        return true;
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        Console.WriteLine("Authors - OnAfterRender - firstRender = " + firstRender);
+        base.OnAfterRender(firstRender);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        Console.WriteLine("Authors - OnAfterRenderAsync - firstRender = " + firstRender);
+
+        if (firstRender)
+        {
+            
+            
+
+            isLoading = false;
+            StateHasChanged();
+        }
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    public void Dispose()
+    {
+        Console.WriteLine("Authors - Dispose");
+    }
+    
+}

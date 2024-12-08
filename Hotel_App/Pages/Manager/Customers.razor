@@ -1,6 +1,482 @@
 ﻿@page "/customers"
 <h3>Customers</h3>
+@using Hotel_App.Service
+@using Hotel_App.Data
+@using Blazored.LocalStorage
+@using Hotel_App.Shared
+@inject HotelService<HoaDon> BillService
+@inject HotelService<DatPhong> dpservice;
+@inject HotelService<NhanVien> nvservice;
+@inject HotelService<PhuongThucThanhToan> ptservice;
+@inject HotelService<KhachHang> khservice;
+@inject HotelService<TaiKhoan> tkservice;
+@implements IDisposable
 
+
+<div class="col-12">
+    <h3><b>Enter Author Information</b></h3>
+    <hr />
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger">@errorMessage</div>
+    }
+    @if (!string.IsNullOrEmpty(successMessage))
+    {
+        <div class="alert alert-success">@successMessage</div>
+    }
+    @if (!string.IsNullOrEmpty(deleteMessage))
+    {
+        <div class="alert alert-danger">
+            @deleteMessage
+        </div>
+    }
+    @if (showDeleteConfirmation)
+    {
+        <div class="modal" style="display:block; background-color: rgba(0, 0, 0, 0.5);">
+            <div class="modal-dialog" style="max-width: 400px; margin-top: 150px;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirm Deletion</h5>
+                        <button type="button" class="close" @onclick="CancelDelete">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to delete this customer?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" @onclick="CancelDelete">No</button>
+                        <button class="btn btn-danger" @onclick="DeleteCustomers">Yes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    <EditForm Model="@customer" OnValidSubmit="@CreateCustomers">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="form-group">
+            <label for="HoTen">Tên Khách Hàng:</label>
+            <input type="text" class="form-control" id="HoTen" @bind="customer.HoTen" name="HoTen" />
+            <ValidationMessage For="@(() => customer.HoTen)" />
+        </div>
+
+        <div class="form-group">
+            <label for="SoDienThoai">Số Điện Thoại:</label>
+            <input type="text" class="form-control" id="SoDienThoai" @bind="customer.SoDienThoai" name="SoDienThoai" />
+            <ValidationMessage For="@(() => customer.SoDienThoai)" />
+        </div>
+
+        <div class="form-group">
+            <label for="Email">Email:</label>
+            <input type="text" class="form-control" id="Email" @bind="customer.Email" name="Email" />
+            <ValidationMessage For="@(() => customer.Email)" />
+        </div>
+
+        <div class="form-group">
+            <label for="NgaySinh">Ngày Sinh:</label>
+            <input type="date" class="form-control" id="NgaySinh" @bind="customer.NgaySinh" name="NgaySinh" />
+            <ValidationMessage For="@(() => customer.NgaySinh)" />
+        </div>
+
+        <div class="form-group">
+            <label for="CCCD">CCCD:</label>
+            <input type="text" class="form-control" id="CCCD" @bind="customer.CCCD" name="CCCD" />
+            <ValidationMessage For="@(() => customer.CCCD)" />
+        </div>
+
+        <div class="form-group">
+            <label for="STK">STK:</label>
+            <input type="text" class="form-control" id="STK" @bind="customer.STK" name="STK" />
+            <ValidationMessage For="@(() => customer.STK)" />
+        </div>
+
+        <div class="form-group">
+            <label for="Password">Password:</label>
+            <input type="text" class="form-control" id="Password" @bind="customer.Password" name="Password" />
+            <ValidationMessage For="@(() => customer.Password)" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save Info</button>
+    </EditForm>
+    <button class="btn btn-primary" @onclick="LoadCustomers">Refresh</button>
+    <input type="text" class="form-control" placeholder="Tìm kiếm theo ID hoặc Tên" @bind="searchText" />
+    <button class="btn btn-primary mt-2" @onclick="SearchCustomers">Tìm kiếm</button>
+</div>
+<br />
+<div class="col-12">
+
+    <h3>Khách Hàng</h3>
+
+    <SpinLoader IsLoading="isLoading">
+        <LoadingTemplate>
+            <div class="col-12" style="background-color: lightgray; height:400px; vertical-align:middle">
+                <br /><br />s
+                <Chase Center="true" Color="#c21f13" Size="70px"></Chase>
+            </div>
+        </LoadingTemplate>
+        <ContentTemplate>
+            @if (customers == null)
+            {
+                <p>Loading...</p>
+            }
+            else
+            {
+                @if (filteredCustomersList != null)
+                {
+                    
+                    <table class="table table-bordered table-striped table-responsive-md">
+                        <thead>
+                            <tr>
+                                <th>Mã Khách Hàng</th>
+                                <th>Tên Khách Hàng</th>
+                                <th>Số điện thoại</th>
+                                <th>Email</th>
+                                <th>Ngày Sinh</th>
+                                <th>CCCD</th>
+                                <th>STK</th>
+                                <th>Password</th>
+                                
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var kh in filteredCustomersList)
+                            {
+                                <tr>
+                                    <td>@kh.MaKhachHang</td>
+                                    <td>@kh.HoTen</td>
+                                    <td>@kh.SoDienThoai</td>
+                                    <td>@kh.Email</td>
+                                    <td>@kh.NgaySinh</td>
+                                    <td>@kh.CCCD</td>
+                                    <td>@kh.STK</td>
+                                    <td>@kh.Password</td>
+                                    <td>
+                                        <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => EditCustomers(kh))">Edit</a> |
+                                        <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => ShowDeleteConfirmation(kh.MaKhachHang))">Delete</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <p>No customers found.</p>
+                }
+
+
+
+
+            }
+        </ContentTemplate>
+    </SpinLoader>
+</div>
 @code {
+    private IEnumerable<TaiKhoan> accounts;
+    private IEnumerable<NhanVien> employees;
+    private IEnumerable<DatPhong> reservations;
+    public NhanVien employee { get; set; }
+    public IEnumerable<NhanVien> filteredEmployees { get; set; }
+    private IEnumerable<KhachHang> customers;
+    public KhachHang customer { get; set; }
+    public TaiKhoan account { get; set; }
+    public IEnumerable<KhachHang> filteredCustomersList { get; set; }
+    public bool IsVisible { get; set; }
+    public bool Result { get; set; }
+    public string RecordName { get; set; }
+    public bool IsGridViewFiltered { get; set; }
+    bool isLoading = true;
+    private string searchText = string.Empty;
+    private string errorMessage;
+    private string successMessage;
+    private string deleteMessage;
+    private bool showDeleteConfirmation = false;
+    private int customerIdToDelete;
 
+    private void ShowDeleteConfirmation(int id)
+    {
+        customerIdToDelete = id; // Lưu lại ID khách hàng cần xóa
+        showDeleteConfirmation = true; // Hiển thị bảng xác nhận
+    }
+
+    private async Task DeleteCustomers()
+    {
+        try
+        {
+            // Kiểm tra xem khách hàng có đặt phòng hay không
+            var customerReservations = reservations.Where(r => r.MaKhachHang == customerIdToDelete);
+            if (customerReservations.Any())
+            {
+                // Nếu khách hàng có đặt phòng, hiển thị thông báo không thể xóa
+                errorMessage = "không xóa được khách hàng khi đang đặt phòng.";
+                successMessage = null; // Xóa thông báo thành công nếu có lỗi
+                showDeleteConfirmation = false; // Ẩn bảng xác nhận
+                StateHasChanged(); // Cập nhật giao diện
+                return; // Dừng việc xóa khách hàng
+            }
+
+            // Nếu không có đặt phòng, tiến hành xóa khách hàng
+            await khservice.DeleteAsync("https://localhost:44359/api/Customers/DeleteCustomer/", customerIdToDelete);
+            await LoadCustomers(); // Làm mới danh sách khách hàng
+            showDeleteConfirmation = false; // Ẩn bảng xác nhận
+            successMessage = "Xóa khách hàng thành công."; // Thông báo thành công
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Không thể xóa khách hàng: " + ex.Message; // Hiển thị thông báo lỗi
+            showDeleteConfirmation = false; // Ẩn bảng xác nhận
+            StateHasChanged();
+        }
+    }
+
+    private void CancelDelete()
+    {
+        showDeleteConfirmation = false; // Ẩn bảng xác nhận
+        StateHasChanged();
+    }
+
+
+    // Tải danh sách nhân viên từ API
+    protected async Task LoadCustomers()
+    {
+        isLoading = true;
+
+        try
+        {
+            customers = await khservice.GetAllAsync("https://localhost:44359/api/Customers/GetCustomers");
+            filteredCustomersList = customers.ToList();
+            LoadReservations();
+            /*foreach (var customer in filteredCustomersList)
+            {
+                var customerReservations = reservations.Where(r => r.MaKhachHang == customer.MaKhachHang);
+                if (customerReservations.Any())
+                {
+                    // Nếu mã khách hàng tồn tại trong bảng đặt phòng
+                    // Thực hiện hành động bạn muốn (ví dụ: đánh dấu hoặc thông báo)
+                    customer.HasReservation = true;  // Thêm thuộc tính `HasReservation` vào lớp `KhachHang`
+                }
+                else
+                {
+                    customer.HasReservation = false;
+                }
+            
+            }*/
+            customer = new KhachHang();
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine("Error loading customers: " + ex.Message);
+        }
+
+        isLoading = false;
+        successMessage = null;
+        errorMessage = null;
+        StateHasChanged(); // Cập nhật giao diện
+    }
+
+    private async Task SearchCustomers()
+    {
+        isLoading = true;
+        try
+        {
+            if (string.IsNullOrEmpty(searchText))
+            {
+                filteredCustomersList = customers.ToList();
+            }
+            else
+            {
+                if (int.TryParse(searchText, out int id))
+                {
+                    filteredCustomersList = customers
+                        .Where(c => c.MaKhachHang == id)
+                        .ToList();
+                }
+                else
+                {
+                    filteredCustomersList = customers
+                        .Where(c => c.HoTen.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+                        .ToList();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine("Error searching customers: " + ex.Message);
+            errorMessage = "Có lỗi xảy ra khi tìm kiếm.";
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+
+    private async Task CreateCustomers()    
+    {
+        try
+        {
+            if (!ValidateCustomer())
+            {
+                return; // Ngừng thực thi nếu không hợp lệ
+            }
+            if (customer.MaKhachHang == 0)
+            {
+                KhachHang CreateCustomer = await khservice.SaveAsync("https://localhost:44359/api/Customers/CreateCustomer", customer);
+                if (CreateCustomer != null)
+                {
+                    customer = new KhachHang();
+                    await LoadCustomers(); // Làm mới dữ liệu bảng
+                    StateHasChanged();
+                }
+            }
+            else
+            {
+                KhachHang CreateCustomer = await khservice.UpdateAsync("https://localhost:44359/api/Customers/UpdateCustomer/", customer.MaKhachHang, customer);
+                if (CreateCustomer != null)
+                {
+                    customer = new KhachHang();
+                    await LoadCustomers(); // Làm mới dữ liệu bảng
+                    successMessage = "Save Info success";
+                    StateHasChanged();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine("Error saving customers: " + ex.Message);
+        }
+
+    }
+
+    private bool ValidateCustomer()
+    {
+        // Kiểm tra email trùng lặp
+        if (IsEmailDuplicated(customer.Email))
+        {
+            errorMessage = "Email này đã tồn tại.";
+            successMessage = null; // Xóa thông báo thành công nếu có lỗi
+            return false;
+        }
+
+        // Kiểm tra số điện thoại trùng lặp
+        if (IsPhoneDuplicated(customer.SoDienThoai))
+        {
+            errorMessage = "Số điện thoại này đã tồn tại.";
+            successMessage = null; // Xóa thông báo thành công nếu có lỗi
+            return false;
+        }
+
+        successMessage = "Save Info success";
+        errorMessage = null; // Xóa thông báo lỗi nếu không có lỗi
+        return true; // Dữ liệu hợp lệ
+    }
+
+
+    // Phương thức xóa nhân viên
+    /*private async Task DeleteCustomers(int id)
+    {
+
+
+        await khservice.DeleteAsync("https://localhost:44359/api/Customers/DeleteCustomer/", id);
+        await LoadCustomers();
+        StateHasChanged();
+        
+    }*/
+
+    // Phương thức chỉnh sửa nhân viên
+    private void EditCustomers(KhachHang kh)
+    {
+        customer = kh;
+        StateHasChanged();
+    }
+
+   
+    
+
+
+    protected override void OnInitialized()
+    {
+        Console.WriteLine("Authors - OnInitialized");
+        base.OnInitialized();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Console.WriteLine("Authors - OnInitializedAsync");
+
+        customer = new KhachHang();
+        await LoadCustomers();
+
+        
+
+        await base.OnInitializedAsync();
+    }
+
+    protected override void OnParametersSet()
+    {
+        Console.WriteLine("Authors - OnParametersSet");
+        base.OnParametersSet();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        Console.WriteLine("Authors - OnParametersSetAsync");
+        await base.OnParametersSetAsync();
+    }
+
+    protected override bool ShouldRender()
+    {
+        base.ShouldRender();
+        Console.WriteLine("Authors - ShouldRender");
+
+        return true;
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        Console.WriteLine("Authors - OnAfterRender - firstRender = " + firstRender);
+        base.OnAfterRender(firstRender);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        Console.WriteLine("Authors - OnAfterRenderAsync - firstRender = " + firstRender);
+
+        if (firstRender)
+        {
+            LoadReservations();
+            await LoadCustomers();
+
+            isLoading = false;
+            StateHasChanged();
+        }
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    public void Dispose()
+    {
+        Console.WriteLine("Authors - Dispose");
+    }
+    protected async Task LoadReservations()
+    {
+        reservations = await dpservice.GetAllAsync("https://localhost:44359/api/DatPhong/GetDatPhong");
+    }
+    protected async Task LoadAccounts()
+    {
+        accounts = await tkservice.GetAllAsync("https://localhost:44359/api/TaiKhoan/GetTaiKhoan");
+    }
+    private bool IsEmailDuplicated(string email)
+    {
+        return filteredCustomersList.Any(cus => cus.Email.Equals(email, StringComparison.OrdinalIgnoreCase) &&
+        cus.MaKhachHang != customer.MaKhachHang);
+    }
+    private bool IsPhoneDuplicated(string phoneNumber)
+    {
+        return filteredCustomersList.Any(cus => cus.SoDienThoai.Equals(phoneNumber, StringComparison.OrdinalIgnoreCase) &&
+        cus.MaKhachHang != customer.MaKhachHang);
+    }
 }
