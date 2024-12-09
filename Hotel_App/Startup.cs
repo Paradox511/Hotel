@@ -44,6 +44,7 @@ namespace Hotel_App
             services.AddHttpClient<HotelService<DatPhong>>();
             services.AddHttpClient<HotelService<DichVu>>();
             services.AddHttpClient<HotelService<CTHoaDon>>();
+            services.AddHttpClient<HotelService<TaiKhoan>>();
 
             services.AddHttpClient<HoaDonService>();
             services.AddSingleton<WeatherForecastService>();
