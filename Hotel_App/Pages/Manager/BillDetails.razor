@@ -25,32 +25,32 @@
             </div>
         </LoadingTemplate>
         <ContentTemplate>
-            @if (bill == null || nhanVien ==null)
+            @if (bill == null)
             {
                 <p>No bill found.</p>
             }
             else
             {
-               
-                    
-                        <tr>
-                            <th>Mã hóa đơn</th>
-                            <td>@bill.MaHoaDon</td>
-                        </tr>
-                        <tr>
-                            <th>Ngày tạo</th>
-                            <td>@bill.NgayTao</td>
-                        </tr>
-                        <tr>
-                            <th>Nhân viên</th>
-                            <td>@nhanVien.HoTen</td>
-                        </tr>
-                        <tr>
-                            <th>Mã phương thức</th>
-                            <td>@pt.TenPhuongThuc</td>
-                        </tr>
-                        <br />
-                <table class ="table table-bordered table-striped table-responsive-md">
+
+
+                <tr>
+                    <th>Mã hóa đơn</th>
+                    <td>@bill.MaHoaDon</td>
+                </tr>
+                <tr>
+                    <th>Ngày tạo</th>
+                    <td>@bill.NgayTao</td>
+                </tr>
+                <tr>
+                    <th>Nhân viên</th>
+                    <td>@bill.MaNhanVien</td>
+                </tr>
+                <tr>
+                    <th>Mã phương thức</th>
+                    <td>@bill.MaPhuongThuc</td>
+                </tr>
+                <br />
+                <table table table-bordered table-striped table-responsive-md>
                     <thead>
                         <tr>
                             <th>Mã dịch vụ</th>
@@ -78,40 +78,26 @@
                         }
                     </tbody>
                 </table>
-                <b>Tổng tiền: </b> <a>@bill.TongSoTien</a>
+                <br />
+                <div>
+                   <b>Tổng tiền: </b>@bill.TongSoTien </div>
             }
+            <div class="form-group">
+                <label for="MaDichVu">Dịch vụ:</label>
+                <select class="form-control" id="MaDichVu" @bind="bill.MaDatPhong" name="MaDatPhong">
+                    <option value="">Chọn Mã Đặt Phòng</option>
+                    @if (reservations != null)
+                    {
+                        @foreach (var datPhong in reservations)
+                        {
+                            <option value="@datPhong.MaDatPhong">@datPhong.MaDatPhong</option>
+                        }
+                    }
+                </select>
+            </div>
         </ContentTemplate>
     </SpinLoader>
-     <hr />
-    
 </div>
-<div class="col-12">
-    <EditForm Model="@cthd" OnValidSubmit="@SaveDetail">
-
-        <div class="form-group">
-            <label for="MaHoaDon">Mã Hóa Đơn:</label>
-            <input type="text" class="form-control" value="@BillId" name="MaHoaDon" readonly>
-        </div>
-        <div class="form-group">
-            <label for="MaDichVu">Mã dịch vụ:</label>
-            <select class="form-control" id="MaDichVu" @bind="cthd.MaDichVu" name="MaDichVu">
-                <option value="">Chọn Dịch vụ</option>
-                @if (dvlist != null)
-                {
-                    @foreach (var datPhong in dvlist)
-                    {
-                        <option  value="@datPhong.MaDichVu">@datPhong.TenDichVu 
-                                             <span class="tooltiptext">@datPhong.Mota</span>
-                        </option>
-                    }
-                }
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="Số lượng">Số lượng</label>
-            <input type="number" class="form-control" @bind="cthd.SoLuong" />
-        </div>
 
 
         <button type="submit" class="btn btn-primary">Thêm</button>
@@ -140,13 +126,10 @@
 @code {
     [Parameter]
     public int BillId { get; set; }
-    public NhanVien nhanVien { get; set; }
-    public DatPhong datPhong { get; set; }
+
     public HoaDon bill { get; set; }
-    public DichVu dichVu { get; set; }
-    public CTHoaDon cthd{ get; set; }
-    public IEnumerable<DichVu> dvlist{ get; set; }
     public PhuongThucThanhToan pt{ get; set; }
+    public ICollection<DichVu> dsdv { get; set; }
     public IEnumerable<CTHoaDon> cthdlist { get; set; }
     public bool IsVisible { get; set; }
     public bool Result { get; set; }
@@ -159,96 +142,47 @@
     {
         isLoading = true;
         var task = BillService.GetByIdAsync("https://localhost:44359/api/Bills/details/{0}", BillId);
-        GetAllServices();
-
-        cthd = new CTHoaDon();
-
+        bill = await task;
         GetNhanVien();
         GetPhuongThuc();
         GetDatPhong();
-        bill = await task;
+
 
         if (bill != null)
         {
             cthdlist = await CTHoaDonService.GetCTHoaDonByMaHoaDon(bill.MaHoaDon);
         }
-
+        UpdateTongTien();
         isLoading = false; // Set loading indicator to false
     }
 
     protected async Task GetDatPhong()
     {
-        datPhong = await dpservice.GetByIdAsync("https://localhost:44359/api/DatPhong/GetByID/{0}", BillId);
+        datPhong = await dpservice.GetByIdAsync("https://localhost:44359/api/DatPhong/GetByID/{0}", bill.MaDatPhong);
     }
     protected async Task GetNhanVien()
     {
-        nhanVien = await nvservice.GetByIdAsync("https://localhost:44359/api/NhanVien/GetByID/{0}",BillId);
+        nhanVien = await nvservice.GetByIdAsync("https://localhost:44359/api/NhanVien/GetByID/{0}",bill.MaNhanVien);
     }
     protected async Task GetPhuongThuc()
     {
-        pt = await ptservice.GetByIdAsync("https://localhost:44359/api/PTTT/GetByID/{0}", BillId);
+        pt = await ptservice.GetByIdAsync("https://localhost:44359/api/PTTT/GetByID/{0}", bill.MaPhuongThuc);
     }
-    protected async Task GetAllServices()
-    {
-        dvlist = await dvservice.GetAllAsync("https://localhost:44359/api/DichVu/GetAll");
-    }
+    protected async Task
     protected async Task UpdateTongTien()
     {
         decimal sum = 0;
-        foreach(var cthd in bill.CTHoaDon)
+        foreach(var cTHoaDon in bill.CTHoaDon)
         {
-            sum += cthd.TongTien;
+            sum += cTHoaDon.dv.Gia;
+            cTHoaDon.MaHoaDon = bill.MaHoaDon;
         }
+        datPhong = await dpservice.GetByIdAsync("https://localhost:44359/api/DatPhong/GetByID/{0}", bill.MaDatPhong);
         sum += datPhong.TongTien;
-        await CTHoaDonService.UpdateTotal(BillId, sum);
-        await ReloadDetails();
-    }
-    protected async Task ReloadDetails()
-    {
-        bill = await BillService.GetByIdAsync("https://localhost:44359/api/Bills/details/{0}", BillId);
-        StateHasChanged();
-    }
-    private async Task DeleteBillDetail(int Id)
-    {
-        await cthdservice.DeleteAsync("https://localhost:44359/api/BillDetails/DeleteBillDetail/", Id);
-        // LoadBills();
-        await ReloadDetails();
+        bill.TongSoTien = sum;
 
+        await CTHoaDonService.UpdateTotal(bill.MaHoaDon, sum);
         StateHasChanged();
-        //throw new Exception("DeleteAuthor");
-    }
-    private async Task EditBillDetail(int Id,int newQuantity)
-    {
-        await CTHoaDonService.UpdateQuantity( Id,newQuantity);
-        // LoadBills();
-        await UpdateTongTien();
-        await ReloadDetails();
-        //throw new Exception("DeleteAuthor");
-    }
-    private async Task HandleQuantityChange(CTHoaDon cthd)
-    {
-        // Update cthd.SoLuong with the new value
-        newQuantity = cthd.SoLuong;
-        // Trigger a re-render or update the database as needed
-        await ReloadDetails();
-    }
-    private async Task SaveDetail()
-    {
-        dichVu = await dvservice.GetByIdAsync("https://localhost:44359/api/DichVu/GetById/{0}", cthd.MaDichVu);
-       // if (cthd.dv == null) cthd.dv = dichVu;
-        cthd.MaHoaDon = BillId;
-    //   cthd.hd = bill;
-   //     cthd.dv.cthds = [];
-        CTHoaDon savedBill = await cthdservice.SaveAsync("https://localhost:44359/api/BillDetails/CreateBillDetail", cthd);
-        if (savedBill != null)
-        {
-            // Display success message using a modal or dialog
-            //  await _modalService.Show<SuccessMessage>("Bill created successfully!");
 
-            // Update the bill list
-            await ReloadDetails();
-            // Clear the form
-            bill = new HoaDon();
-        }
     }
 }
