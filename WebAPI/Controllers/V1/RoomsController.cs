@@ -6,6 +6,7 @@ using System.Text.Json.Serialization;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Domain.Entities;
+using Hotel_App.Service;
 //using Hotel_App.Data;
 
 namespace WebAPI.Controllers.V1
@@ -13,7 +14,7 @@ namespace WebAPI.Controllers.V1
 		public class RoomsController : BaseApiController
 		{
 			private readonly IHotelDBContext _context;
-
+			
 			//private readonly IRoomRepository _roomRepository;
 
 			private readonly IMediator _mediator;
@@ -102,17 +103,33 @@ namespace WebAPI.Controllers.V1
 			return Ok(rooms); // No content to return on successful update
 		}
 
-		[HttpDelete("DeleteRoom/{id}")]
+		[HttpPut("DeleteRoom/{id}")]
 			public async Task<IActionResult> Delete(int id)
 			{
-			if (id == null)
+			var room = await _context.phong.FindAsync(id);
+
+			if (id != room.MaPhong)
 			{
 				return BadRequest("Invalid command data");
 			}
-			var entity = _context.phong.Find(id);
-			_context.phong.Remove(entity);
-			await _context.SaveChangesAsync();
-			return Ok(entity); // No content to return on successful deletion
+
+			// Tìm phòng cần cập nhật trạng thái
+
+
+			// Cập nhật trạng thái của phòng từ 1 thành 0
+			room.TrangThai = 0;
+			_context.phong.Entry(room).State = EntityState.Modified;
+
+			try
+			{
+				await _context.SaveChangesAsync(); // Lưu thay đổi vào database
+			}
+			catch (DbUpdateConcurrencyException)
+			{
+				return StatusCode(500, "Error updating room status.");
+			}
+
+			return Ok(room);
 		}
 		}
 	

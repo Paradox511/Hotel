@@ -5,6 +5,7 @@
 @using Blazored.LocalStorage
 @using Hotel_App.Shared
 @inject HotelService<Phong> RoomService
+@inject RoomService privateRoomService 
 @inject HotelService<LoaiPhong> RoomTypeService
 @inject HotelService<HoaDon> BillService
 @inject HotelService<DatPhong> dpservice;
@@ -44,11 +45,10 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <p>Are you sure you want to delete this customer?</p>
+                        <p>Are you sure you want to delete this room?</p>
                     </div>
                     <div class="modal-footer">
-                        <button class="btn btn-secondary" @onclick="CancelDelete">No</button>
-                        <button class="btn btn-danger" @onclick="DeleteRoom">Yes</button>
+
                     </div>
                 </div>
             </div>
@@ -122,11 +122,12 @@
                             <th>Mã Phòng</th>
                             <th>Trạng Thái Phòng</th>
                             <th>Số Phòng</th>
-                            <th>Mã Loại Phòng</th>                            
+                            <th>Mã Loại Phòng</th>   
+                            <th>Trạng Thái</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var room in Rooms)
+                        @foreach (var room in filteredRoomList)
                         {
                             <tr>
                                 <td>@room.MaPhong</td>
@@ -142,9 +143,10 @@
                                 </td>
                                 <td>@room.SoPhong</td>
                                 <td>@room.MaLoaiPhong</td> 
+                                <td>@room.TrangThai</td>
                                 <td>
                                     <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => EditRoom(room))">Edit</a> |
-                                    <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => ShowDeleteConfirmation(room.MaPhong))">Delete</a>
+                                    <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => DeleteRoom(room))">Delete</a>
                                 </td>
                             </tr>
                         }
@@ -179,9 +181,9 @@
     bool isLoading = true;
 
 
-    private void ShowDeleteConfirmation(int id)
+    private void ShowDeleteConfirmation(Phong deleteRoom)
     {
-        RoomIdToDelete = id; // Lưu lại ID khách hàng cần xóa
+        RoomIdToDelete = deleteRoom.MaPhong; // Lưu lại ID khách hàng cần xóa
         showDeleteConfirmation = true; // Hiển thị bảng xác nhận
     } 
 
@@ -191,7 +193,8 @@
         try
         {
             Rooms = await RoomService.GetAllAsync("https://localhost:44359/api/Rooms/GetRooms");
-            filteredRoomList = Rooms.ToList();
+            filteredRoomList = Rooms.Where(room=>room.TrangThai==1).ToList();
+            //filteredRoomList = Rooms.ToList();
             png = new Phong();
         }
         catch (Exception ex)
@@ -287,38 +290,45 @@
     {
         Console.WriteLine("Rooms - Dispose");
     }
-    private async Task DeleteRoom()
+    // private async Task DeleteRoom(Phong deleteRoom)
+    // {
+    private async Task DeleteRoom(Phong room)
     {
         // await RoomService.DeleteAsync("https:localhost:44359/api/Rooms/DeleteRoom/", id);
         // LoadRooms();
         // StateHasChanged();
-        try
-        {
+        // try
+        // 
         //     Kiểm tra xem khách hàng có đặt phòng hay không
-            var RoomReservations = reservations.Where(r => r.MaPhong == RoomIdToDelete);
-            if (RoomReservations.Any())
-            {
-             //   Nếu khách hàng có đặt phòng, hiển thị thông báo không thể xóa
-                errorMessage = "không xóa được phòng khi phòng đã đặt.";
-                successMessage = null; //Xóa thông báo thành công nếu có lỗi
-                showDeleteConfirmation = false; //Ẩn bảng xác nhận
-                StateHasChanged();// Cập nhật giao diện
-                return;// Dừng việc xóa khách hàng
-            }
+        //     var RoomReservations = reservations.Where(r => r.MaPhong == RoomIdToDelete);
+        //     if (RoomReservations.Any())
+        //     {
+        //        Nếu khách hàng có đặt phòng, hiển thị thông báo không thể xóa
+        //         errorMessage = "không xóa được phòng khi phòng đã đặt.";
+        //         successMessage = null; Xóa thông báo thành công nếu có lỗi
+        //         showDeleteConfirmation = false; Ẩn bảng xác nhận
+        //         StateHasChanged();Cập nhật giao diện
+        //         return;Dừng việc xóa khách hàng
+        //     }
 
-            // Nếu không có đặt phòng, tiến hành xóa khách hàng
-            await RoomService.DeleteAsync("https:localhost:44359/api/Rooms/DeleteRoom/", RoomIdToDelete);
-            await LoadRooms(); // Làm mới danh sách khách hàng
-            showDeleteConfirmation = false; // Ẩn bảng xác nhận
-            successMessage = "Xóa thông tin phòng thành công."; // Thông báo thành công
-            StateHasChanged();
-        }
-        catch (Exception ex)
-        {
-            errorMessage = "Không thể xóa thông tin phòng: " + ex.Message; // Hiển thị thông báo lỗi
-            showDeleteConfirmation = false; // Ẩn bảng xác nhận
-            StateHasChanged();
-        }
+        //     Nếu không có đặt phòng, tiến hành xóa khách hàng
+        //     await RoomService.DeleteAsync("https:localhost:44359/api/Rooms/DeleteRoom/", RoomIdToDelete);
+        //     await LoadRooms(); Làm mới danh sách khách hàng
+        //     showDeleteConfirmation = false; Ẩn bảng xác nhận
+        //     successMessage = "Xóa thông tin phòng thành công."; Thông báo thành công
+        //     StateHasChanged();
+        //  }
+        // catch (Exception ex)
+        //  {
+        //     errorMessage = "Không thể xóa thông tin phòng: " + ex.Message; Hiển thị thông báo lỗi
+        //     showDeleteConfirmation = false; Ẩn bảng xác nhận
+        //     StateHasChanged();
+        //}
+        Phong TPhong = await privateRoomService.DeletePhongAsync(room,room.MaPhong);
+        await LoadRooms(); // Làm mới danh sách khách hàng
+        showDeleteConfirmation = false; // Ẩn bảng xác nhận
+        successMessage = "Xóa phòng thành công."; // Thông báo thành công
+        StateHasChanged();
     }
 
     private void EditRoom(Phong editroom)

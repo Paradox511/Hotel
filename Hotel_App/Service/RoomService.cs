@@ -11,67 +11,12 @@ namespace Hotel_App.Service
 	{
 		//private readonly IRoomRepository _phongRepository;
 		HttpClient _httpClient;
+		string requestUri= "https:localhost:44359/api/Rooms/DeleteRoom/";
 		public RoomService(HttpClient httpClient)
 		{
+			
 			_httpClient = httpClient;
 		}
-		//private readonly IRoomRepository _phongRepository;
-		//private readonly IGenericRepository<LoaiPhong> _loaiPhongRepository;
-		//public RoomService(IRoomRepository phongRepository, IGenericRepository<LoaiPhong> loaiPhongRepository)
-		//{
-		//	_phongRepository = phongRepository;
-		//	_loaiPhongRepository = loaiPhongRepository;
-		//}
-		//private readonly IRoomRepository _phongRepository;
-		//private readonly IGenericRepository<LoaiPhong> _loaiPhongRepository;
-
-		//public RoomService(IRoomRepository phongRepository, IGenericRepository<LoaiPhong> _loaiPhongRepository)
-		//{
-		//	_phongRepository = phongRepository;
-		//	_loaiPhongRepository = loaiPhongRepository;
-		//}
-
-		//public async Task<IEnumerable<Phong>> GetAllPhongsAsync()
-		//{
-		//	return await _phongRepository.GetAllAsync();
-		//}
-
-		//public async Task<Phong> GetPhongByIdAsync(int id)
-		//{
-		//	return await _phongRepository.GetByIdAsync(id);
-		//}
-
-		//public async Task<IEnumerable<Phong>> GetPhongsByLoaiPhongIdAsync(int loaiPhongId)
-		//{
-		//	return await _phongRepository.GetPhongsByLoaiPhongIdAsync(loaiPhongId);
-		//}
-
-		//public async Task CreatePhongAsync(Phong phong)
-		//{
-		//	// Kiểm tra MaLoaiPhong có tồn tại không
-		//	var loaiPhong = await _loaiPhongRepository.GetByIdAsync(phong.MaLoaiPhong);
-		//	if (loaiPhong == null)
-		//	{
-		//		throw new ArgumentException("Loại phòng không tồn tại.");
-		//	}
-
-		//	await _phongRepository.CreateCommandAsync(phong);
-		//}
-
-		//public async Task UpdatePhongAsync(Phong phong)
-		//{
-		//	await _phongRepository.UpdateCommandAsync(phong);
-		//}
-
-		//public async Task DeletePhongAsync(int id)
-		//{
-		//	var phong = await _phongRepository.GetByIdAsync(id);
-		//	if (phong != null)
-		//	{
-		//		await _phongRepository.DeleteCommandAsync(phong);
-		//	}
-
-		//}
 
 		public async Task<IEnumerable<Phong>> GetPhongsByLoaiPhongIdAsync(int loaiPhongId)
 		{
@@ -93,9 +38,45 @@ namespace Hotel_App.Service
 			}
 		}
 
-		//public async Task<IEnumerable<Phong>> GetPhongsByLoaiPhongIdAsync(int loaiPhongId)
-		//{
-		//	return await _phongRepository.GetPhongsByLoaiPhongIdAsync(loaiPhongId);
-		//}
+		public async Task<Phong> DeletePhongAsync(Phong obj,int id)
+		{
+			string serializedUser = JsonConvert.SerializeObject(obj);
+			var baseUrl = "https://localhost:44359/api"; // Replace with your actual base URL
+			var url = $"{baseUrl}/Rooms/DeleteRoom/{id}";
+
+			var requestMessage = new HttpRequestMessage(HttpMethod.Put, url);
+
+
+			requestMessage.Content = new StringContent(serializedUser);
+
+			requestMessage.Content.Headers.ContentType
+				= new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+
+			var response = await _httpClient.SendAsync(requestMessage);
+
+			var responseStatusCode = response.StatusCode;
+			var responseBody = await response.Content.ReadAsStringAsync();
+
+			var returnedObj = JsonConvert.DeserializeObject<Phong>(responseBody);
+
+			return await Task.FromResult(returnedObj);
+
+			//var jsonContent = JsonConvert.SerializeObject(obj);
+			//var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+			//var response = await _httpClient.PostAsync($"https://localhost:44359/api/Rooms/DeleteRoom/{id}", httpContent);
+			//var responsebody = await response.Content.ReadAsStringAsync();
+			//if (response.IsSuccessStatusCode)
+			//{
+			//	var responseData = await response.Content.ReadAsStringAsync();
+			//	return JsonConvert.DeserializeObject<Phong>(responseData);
+			//}
+
+			//// Xử lý lỗi nếu cần
+			//var errorMessage = await response.Content.ReadAsStringAsync();
+			//throw new Exception($"Room failed: {errorMessage}*");
+
+		}
+
 	}
 }
