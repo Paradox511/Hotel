@@ -16,7 +16,7 @@ namespace Hotel_App.Data
 
         [Required]
         public string Mota { get; set; }
-     //   public IEnumerable<CTHoaDon> cthds { get; set; }
+        public IEnumerable<CTHoaDon>? cthds { get; set; } = [];
 
     }
 }

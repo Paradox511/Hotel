@@ -49,12 +49,12 @@ namespace Hotel_App.Service
                 Console.WriteLine("Error updating total: " + ex.Message);
             }
         }
-        public async Task UpdateQuantity(int id, int newQuantity)
+        public async Task UpdateQuantity(int billid,int id, int newQuantity)
         {
             try
             {
                 var baseUrl = "https://localhost:44359/api";
-                var url = $"{baseUrl}/BillDetails/update-quantity/{id}?newQuantity={newQuantity}";
+                var url = $"{baseUrl}/BillDetails/update-quantity/{id}?billid={billid}&newQuantity={newQuantity}";
 
                 // No need to create an object and serialize it, as the query parameter will be used directly in the URL
 

@@ -56,7 +56,7 @@ namespace Persistence.Context
                 .HasOne(ct => ct.dv)
                .WithMany(dv => dv.cthds)
                .HasForeignKey(ct => ct.MaDichVu);
-        
+
             base.OnModelCreating(modelBuilder);
         }
         public virtual DbSet<HoaDon> hoadon { get; set; }

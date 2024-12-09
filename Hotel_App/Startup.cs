@@ -20,6 +20,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using System.Reflection;
+using Microsoft.JSInterop;
 
 namespace Hotel_App
 {
@@ -45,12 +46,16 @@ namespace Hotel_App
             services.AddHttpClient<HotelService<DichVu>>();
             services.AddHttpClient<HotelService<CTHoaDon>>();
             services.AddHttpClient<HotelService<TaiKhoan>>();
+            services.AddHttpClient<HotelService<KhachHang>>();
+            services.AddHttpClient<HotelService<Phong>>();
+            services.AddHttpClient<HotelService<LoaiPhong>>();
 
             services.AddHttpClient<HoaDonService>();
             services.AddHttpClient<DichVuService>();
             services.AddSingleton<WeatherForecastService>();
             services.AddSingleton<UserService>();
             services.AddSingleton<IUserService, UserService>();
+          //  services.AddSingleton<IJSRuntime,JSRuntime>();
 
 
             var appSettingSection = Configuration.GetSection("AppSettings");

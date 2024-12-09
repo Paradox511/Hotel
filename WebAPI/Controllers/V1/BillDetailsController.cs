@@ -18,6 +18,22 @@ namespace WebAPI.Controllers.V1
         {
             _context = context;
         }
+        [HttpGet("GetAll")]
+        public async Task<IActionResult> GetAll()
+        {
+            if (_context == null)
+            {
+                return StatusCode(500, "Internal Server Error: DbContext not injected");
+            }
+
+            var bills = await _context.cthoadon.ToListAsync(); // Assuming your bills are stored in "hoadon" DbSet
+            if (bills == null)
+            {
+                return NotFound("No bills found");
+            }
+
+            return Ok(bills);
+        }
         [HttpGet("/api/BillDetails/details/{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -37,12 +53,13 @@ namespace WebAPI.Controllers.V1
             return Ok(JsonSerializer.Serialize(bill, options));
         }
         [HttpPut("update-quantity/{id}")]
-        public async Task<IActionResult> UpdateTotal(int id, int newQuantity)
+        public async Task<IActionResult> UpdateTotal(int billid,int id, int newQuantity)
         {
             // Retrieve the HoaDon entity from the database
             var hoaDon = await _context.cthoadon
                 .Include(h => h.dv)
-                .FirstOrDefaultAsync(h => h.Macthd == id);
+                //.Where(h=> h.MaDichVu == id && h.MaHoaDon == billid)
+                .FirstOrDefaultAsync(h => h.MaDichVu == id && h.MaHoaDon == billid);
 
             if (hoaDon == null)
             {
@@ -86,7 +103,7 @@ namespace WebAPI.Controllers.V1
             }
             _context.cthoadon.Add(command.Entity);
             await _context.SaveChangesAsync();
-            return Ok("Bill created successfully");
+            return Ok(command.Entity);
         }
     }
 }

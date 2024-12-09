@@ -208,7 +208,7 @@
         // Call the service to save the bill
         try
         {
-            if (dichVu.cthd == null) dichVu.cthd = [];
+            if (dichVu.cthds == null) dichVu.cthds = [];
             if (dichVu.MaDichVu == 0)
             {
                 //  bill.CTHoaDon = null;
@@ -225,6 +225,7 @@
                     dichVu = new DichVu();
                     successMessage = "Service create successfully!";
                 }
+
             }
             else
             {
@@ -237,6 +238,7 @@
                 successMessage = "Service update successfully!";
 
             }
+            await ReloadServices();
             // Handle successful save, e.g., display success message, clear form, etc.
         }
         catch (Exception ex)
@@ -253,6 +255,10 @@
         StateHasChanged();
 
     }
+    private async Task ReloadServices()
+    {
+        services = await dvservice.GetAllAsync("https://localhost:44359/api/DichVu/GetAll");
 
+    }
 
 }
