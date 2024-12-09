@@ -35,6 +35,7 @@ namespace Hotel_App.Data
         [Required(ErrorMessage = "Mật khẩu không được để trống.")]
         public string Password { get; set; }
 
+        public int Status { get; set; } = 1;
         public bool HasReservation { get; set; }
         public KhachHang() { }
     }

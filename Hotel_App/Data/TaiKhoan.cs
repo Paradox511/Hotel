@@ -1,19 +1,19 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System;
 
 namespace Hotel_App.Data
 {
-    public class TaiKhoan
+    public partial class TaiKhoan
     {
         [Key]
         public int MaTaiKhoan { get; set; }
-        [Required]
-        public string Quyen { get; set; }
-        [Required]
+        //[Required]
+        //public string Quyen { get; set; }
         public string Username { get; set; }
-        [Required]
         public string Password { get; set; }
-        public int TrangThai { get; set; } = 1;
+        //public int TrangThai { get; set; } = 1;
+        //public string? ConfirmPassword { get; set; }
 
-        public TaiKhoan() { }
+        
     }
 }

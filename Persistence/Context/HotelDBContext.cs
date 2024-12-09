@@ -4,8 +4,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Persistence.Context
 { 
-    public class HotelDBContext : DbContext,IHotelDBContext
+    public partial class HotelDBContext : DbContext, IHotelDBContext
     {
+
+        public HotelDBContext() { }
         public HotelDBContext(DbContextOptions<HotelDBContext> options) : base(options) {
             
         }
@@ -17,7 +19,29 @@ namespace Persistence.Context
             modelBuilder.Entity<HoaDon>().Property(p => p.TongSoTien).HasColumnType("decimal(10,2)");
             modelBuilder.Entity<LoaiPhong>().Property(p => p.Gia).HasColumnType("decimal(10,2)");
             modelBuilder.Entity<DichVu>().Property(p => p.Gia).HasColumnType("decimal(10,2)");
+            modelBuilder.Entity<TaiKhoan>(entity =>
+            {
+                entity.HasKey(e => e.MaTaiKhoan)
+                    .HasName("PK_user_id_2")
+                    .IsClustered(false);
 
+                entity.ToTable("TaiKhoan");
+
+                entity.Property(e => e.MaTaiKhoan).HasColumnName("MaTaiKhoan");
+
+                entity.Property(e => e.Username)
+                    .IsRequired()
+                    .HasColumnName("username")
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Password)
+                    .IsRequired()
+                    .HasColumnName("password")
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+            });
             modelBuilder.Entity<HoaDon>()
            .HasMany(h => h.CTHoaDon)
            .WithOne(ct => ct.HoaDon)
@@ -32,7 +56,7 @@ namespace Persistence.Context
                 .HasOne(ct => ct.dv)
                 .WithOne(dv => dv.cthd)
                 .HasForeignKey<CTHoaDon>(ct => ct.MaDichVu);
-        
+            
             base.OnModelCreating(modelBuilder);
         }
         public virtual DbSet<HoaDon> hoadon { get; set; }
@@ -46,10 +70,12 @@ namespace Persistence.Context
 
         public virtual DbSet<TaiKhoan> taikhoan { get; set; }
         public virtual DbSet<PhuongThucThanhToan> ptthanhtoan { get; set; }
+
         public async Task<int> SaveChangesAsync()
         {
             return await base.SaveChangesAsync();
         }
+
     }
 
 }

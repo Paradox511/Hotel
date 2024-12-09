@@ -18,7 +18,7 @@ namespace Domain.Entities
         public string CCCD { get; set; }
         public string STK { get; set; }
         public string Password { get; set; }
-
+        public int Status { get; set; } = 1;
         public KhachHang() { }
     }
 }

@@ -32,7 +32,8 @@ namespace WebAPI.Controllers.V1
                 return StatusCode(500, "Internal Server Error: DbContext not injected");
             }
 
-            var customers = await _context.khachhang.ToListAsync(); // Assuming your bills are stored in "hoadon" DbSet
+            var customers = await _context.khachhang.Where(cus => cus.Status == 1).ToListAsync();
+            ; // Assuming your bills are stored in "hoadon" DbSet
             if (customers == null)
             {
                 return NotFound("No Customers found");
@@ -76,14 +77,23 @@ namespace WebAPI.Controllers.V1
         [HttpDelete("DeleteCustomer/{id}")]
         public async Task<IActionResult> DeleteCustomer(int id)
         {
-            if (id == null)
+            var customer = await _context.khachhang.FindAsync(id);
+            if (customer == null)
             {
                 return BadRequest("Invalid command data");
             }
-            var entity = _context.khachhang.Find(id);
-            _context.khachhang.Remove(entity);
-            await _context.SaveChangesAsync();
-            return Ok(entity); // No content to return on successful deletion
+            customer.Status = 0;
+            _context.khachhang.Update(customer);
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal Server Error: DbContext not injected");
+            }
+
+            return Ok("Customer status updated to 0");
         }
         /// <summary>
         /// Updates the Product Entity based on Id.   
