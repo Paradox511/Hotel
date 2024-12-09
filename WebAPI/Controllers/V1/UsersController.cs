@@ -13,6 +13,7 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace WebAPI.Controllers.V1
 {
@@ -78,7 +79,7 @@ namespace WebAPI.Controllers.V1
         }
 
         [HttpPost("RegisterUser")]
-        public async Task<ActionResult<SignupRequest>> RegisterUser([FromBody] SignupRequest user)
+        public async Task<ActionResult<TaiKhoan>> RegisterUser([FromBody] TaiKhoan user)
         {
             if (user == null || string.IsNullOrWhiteSpace(user.Username) || string.IsNullOrWhiteSpace(user.Password))
             {
@@ -93,8 +94,9 @@ namespace WebAPI.Controllers.V1
 
             var newUser = new TaiKhoan
             {
+                MaTaiKhoan = user.MaTaiKhoan,
                 Username = user.Username,
-                Password = Hotel_App.Utility.Encrypt(user.Password)
+                Password = user.Password
             };
 
             _context.taikhoan.Add(newUser);
@@ -103,29 +105,5 @@ namespace WebAPI.Controllers.V1
 
             return CreatedAtAction(nameof(GetUser), new { id = newUser.MaTaiKhoan }, user);
         }
-
-        //private RefreshToken GenerateRefreshToken()
-        //{
-        //    var randomNumber = new byte[32];
-        //    using (var rng = RandomNumberGenerator.Create())
-        //    {
-        //        rng.GetBytes(randomNumber);
-        //        return new RefreshToken { Token = Convert.ToBase64String(randomNumber), Expiry = DateTime.UtcNow.AddDays(7) };
-        //    }
-        //}
-
-        //private string GenerateAccessToken(int userId)
-        //{
-        //    var tokenHandler = new JwtSecurityTokenHandler();
-        //    var key = Encoding.ASCII.GetBytes(_jwtSettings.SecretKey);
-        //    var tokenDescriptor = new SecurityTokenDescriptor
-        //    {
-        //        Subject = new ClaimsIdentity(new Claim[] { new Claim(ClaimTypes.NameIdentifier, userId.ToString()) }),
-        //        Expires = DateTime.UtcNow.AddHours(1),
-        //        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-        //    };
-        //    var token = tokenHandler.CreateToken(tokenDescriptor);
-        //    return tokenHandler.WriteToken(token);
-        //}
     }
 }
