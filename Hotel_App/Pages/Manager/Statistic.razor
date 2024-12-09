@@ -4,6 +4,7 @@
 @using Hotel_App.Data
 @using Blazored.LocalStorage
 @using Hotel_App.Shared
+@using Blazored.ChartJS
 @inject HotelService<HoaDon> BillService
 @inject HotelService<DatPhong> dpservice;
 @inject HotelService<NhanVien> nvservice;
@@ -12,7 +13,58 @@
 @inject HotelService<TaiKhoan> tkservice;
 @implements IDisposable
 
+<div class="col-12">
+    <div class="container statistics-container">
+        <div class="header">Appointment Dashboard</div>
 
+        <div class="grid statistics-grid">
+            <!-- Weekly Appointments -->
+            <div class="card">
+                <h6>Weekly Appointments</h6>
+                <BlazoredChartJS LineChartData="@weeklyAppointmentsData" Width="300" Height="300" />
+            </div>
+
+            <!-- Weekly Revenue -->
+            <div class="card">
+                <h6>Weekly Revenue</h6>
+                <BlazoredChartJS LineChartData="@weeklyRevenueData" Width="300" Height="300" />
+            </div>
+
+            <!-- Appointments by Type -->
+            <div class="card">
+                <h6>Appointments by Type</h6>
+                <BlazoredChartJS BarChartData="@appointmentsByTypeData" Width="300" Height="300" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .statistics-container {
+        display: flex;
+        justify-content: center; /* Căn giữa theo chiều ngang */
+        align-items: center; /* Căn giữa theo chiều dọc */
+        height: 100vh; /* Chiều cao bằng 100% màn hình */
+        flex-direction: column; /* Bố trí theo chiều dọc */
+        text-align: center; /* Căn giữa văn bản */
+    }
+
+    .statistics-grid {
+        display: flex;
+        justify-content: center; /* Căn giữa các card theo chiều ngang */
+        gap: 20px; /* Khoảng cách giữa các card */
+        margin-top: 20px; /* Tạo khoảng cách phía trên */
+    }
+
+    .card {
+        width: 300px; /* Đặt chiều rộng cho từng card */
+        text-align: center; /* Căn giữa nội dung trong card */
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Thêm đổ bóng */
+        padding: 20px;
+        border-radius: 8px; /* Bo góc */
+        background-color: #fff; /* Màu nền trắng */
+    }
+</style>
 
 @code {
     private IEnumerable<TaiKhoan> accounts;
@@ -36,60 +88,56 @@
     private bool showDeleteConfirmation = false;
     private int customerIdToDelete;
 
-    
+    // Dữ liệu cho biểu đồ
+    public List<int> weeklyAppointmentsData { get; set; } = new List<int> { 30, 50, 70, 90, 60, 80, 100 };
+    public List<int> weeklyRevenueData { get; set; } = new List<int> { 500, 700, 800, 1000, 950, 1100, 1200 };
+    public List<int> appointmentsByTypeData { get; set; } = new List<int> { 40, 30, 20, 10, 50 };
 
     protected override void OnInitialized()
     {
-        Console.WriteLine("Authors - OnInitialized");
+        Console.WriteLine("Statistics - OnInitialized");
         base.OnInitialized();
     }
 
     protected override async Task OnInitializedAsync()
     {
-        Console.WriteLine("Authors - OnInitializedAsync");
-
-        
-
-        
+        Console.WriteLine("Statistics - OnInitializedAsync");
 
         await base.OnInitializedAsync();
     }
 
     protected override void OnParametersSet()
     {
-        Console.WriteLine("Authors - OnParametersSet");
+        Console.WriteLine("Statistics - OnParametersSet");
         base.OnParametersSet();
     }
 
     protected override async Task OnParametersSetAsync()
     {
-        Console.WriteLine("Authors - OnParametersSetAsync");
+        Console.WriteLine("Statistics - OnParametersSetAsync");
         await base.OnParametersSetAsync();
     }
 
     protected override bool ShouldRender()
     {
         base.ShouldRender();
-        Console.WriteLine("Authors - ShouldRender");
+        Console.WriteLine("Statistics - ShouldRender");
 
         return true;
     }
 
     protected override void OnAfterRender(bool firstRender)
     {
-        Console.WriteLine("Authors - OnAfterRender - firstRender = " + firstRender);
+        Console.WriteLine("Statistics - OnAfterRender - firstRender = " + firstRender);
         base.OnAfterRender(firstRender);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        Console.WriteLine("Authors - OnAfterRenderAsync - firstRender = " + firstRender);
+        Console.WriteLine("Statistics - OnAfterRenderAsync - firstRender = " + firstRender);
 
         if (firstRender)
         {
-            
-            
-
             isLoading = false;
             StateHasChanged();
         }
@@ -99,7 +147,6 @@
 
     public void Dispose()
     {
-        Console.WriteLine("Authors - Dispose");
+        Console.WriteLine("Statistics - Dispose");
     }
-    
 }
