@@ -1,0 +1,266 @@
+﻿@page "/roomtype"
+<h3>Room_Style_Manager</h3>
+@using Hotel_App.Service
+@using Hotel_App.Data
+@using Blazored.LocalStorage
+@using Hotel_App.Shared
+@inject HotelService<Phong> RoomService
+@inject HotelService<LoaiPhong> RoomTypeService
+@inject HotelService<HoaDon> BillService
+@inject HotelService<DatPhong> dpservice;
+@inject HotelService<NhanVien> nvservice;
+@inject HotelService<PhuongThucThanhToan> ptservice;
+@implements IDisposable 
+
+
+<div class="col-12">
+    <h3><b>Enter Room Type Information</b></h3>
+    <hr />
+    <EditForm Model="@png" OnValidSubmit="@SaveRoomType">
+
+        <div class="form-group">
+            <label for="MaPhong">Mã Loại Phòng :</label>
+            <input type="text" class="form-control" @bind="Type.MaLoaiPhong" name="MaLoaiPhong" readonly>
+        </div>
+
+        <div class="form-group">
+            <label for="TenLoaiPhong">Tên Loại Phòng:</label>
+            <input type="text" class="form-control" id="TenLoaiPhong" @bind="Type.TenLoaiPhong" name="TenLoaiPhong" >
+            @* <ValidationMessage For="@(() => Type.TenLoaiPhong)"/> *@
+        </div>
+
+        <div class="form-group">
+            <label for="SoLuong">Nhập số lượng phòng:</label>
+            <input type="text" class="form-control" id="SoLuongPhong" @bind=Type.SoLuongPhong name="SoLuongPhong">
+             @* <ValidationMessage For="@(() => Type.SoLuongPhong)"/> *@
+        </div>
+
+        <div class="form-group">
+            <label for="MoTa">Nhập Mô Tả:</label>
+            <input type="text" class="form-control" id="Mô Tả" @bind=Type.Mota name="MoTa">
+             @* <ValidationMessage For="@(() => Type.Mota)"/> *@
+        </div>
+
+        <div class="form-group">
+            <label for="Gia">Nhập Giá Phòng:</label>
+            <input type="text" class="form-control" id="Gia" @bind=Type.Gia name="Gia">
+             @* <ValidationMessage For="@(() => Type.Gia)"/> *@
+        </div>
+        <button type="submit" class="btn btn-primary">Tạo</button>
+    </EditForm>
+
+</div>
+
+<div class="col-12">
+
+    <h3>Loại Phòng</h3>
+    <SpinLoader IsLoading="isLoading">
+        <LoadingTemplate>
+            <div class="col-12" style="background-color: lightgray; height:400px; vertical-align:middle">
+                <br /><br />
+                <Chase Center="true" Color="#c21f13" Size="70px"></Chase>
+            </div>
+        </LoadingTemplate>
+        <ContentTemplate>
+            @if (loaiphong == null)
+            {
+                <p>Loading...</p>
+            }
+            else
+            {
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Mã Loại Phòng</th>
+                            <th>Tên Loại Phòng</th>
+                            <th>Số Lượng Phòng</th>
+                            <th>Mô Tả</th>
+                            <th>Giá</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var TypeRoom in loaiphong)
+                        {
+                            <tr>
+                                <td>@TypeRoom.MaLoaiPhong</td>
+                                <td>@TypeRoom.TenLoaiPhong</td>
+                                <td>@TypeRoom.SoLuongPhong</td>
+                                <td>@TypeRoom.Mota</td
+                                <td>@TypeRoom.Gia</td>
+                                <td>
+                                    <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => EditRoomType(TypeRoom))">Edit</a> |
+                                    <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => DeleteRoomType(TypeRoom.MaLoaiPhong))">Delete</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </ContentTemplate>
+    </SpinLoader>
+</div>
+
+@code {
+    private IEnumerable<Phong> Rooms;
+    private IEnumerable<LoaiPhong> loaiphong;
+    private IEnumerable<HoaDon> bills;
+    private IEnumerable<DatPhong> reservations;
+    private IEnumerable<NhanVien> employees;
+    private IEnumerable<PhuongThucThanhToan> methods;
+    public Phong png { get; set; }
+    public LoaiPhong Type { get; set; }
+    public bool IsVisible { get; set; }
+    public bool Result { get; set; }
+    public string RecordName { get; set; }
+    public bool IsGridViewFiltered { get; set; }
+    bool isLoading = true;
+
+     protected async Task LoadRoomTypes()
+    {
+        isLoading = true;
+        try
+        {
+            loaiphong = await RoomTypeService.GetAllAsync("https://localhost:44359/api/RoomTypes/GetRoomTypes");
+            IEnumerable<LoaiPhong> filterRoomType = loaiphong.ToList(); // Gán dữ liệu ban đầu cho filteredRoom
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine("Error loading RoomType: " + ex.Message);
+        }
+
+        isLoading = false;
+        StateHasChanged(); // Cập nhật giao diện
+
+    }
+
+    protected override void OnInitialized()
+    {
+        Console.WriteLine("RoomType - OnInitialized");
+        base.OnInitialized();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Console.WriteLine("RoomType - OnInitializedAsync");
+
+        png = new Phong();
+        Type = new LoaiPhong();
+        //authorList = await authorService.GetAuthors();
+
+        await base.OnInitializedAsync();
+    }
+
+    protected override void OnParametersSet()
+    {
+        Console.WriteLine("RoomTypes - OnParametersSet");
+        base.OnParametersSet();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        Console.WriteLine("RoomTypes - OnParametersSetAsync");
+        await base.OnParametersSetAsync();
+    }
+
+    protected override bool ShouldRender()
+    {
+        base.ShouldRender();
+        Console.WriteLine("RoomTypes - ShouldRender");
+
+        return true;
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        Console.WriteLine("RoomTypes - OnAfterRender - firstRender = " + firstRender);
+        base.OnAfterRender(firstRender);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        Console.WriteLine("Authors - OnAfterRenderAsync - firstRender = " + firstRender);
+
+        if (firstRender)
+        {
+            await Loadloaiphong();
+            isLoading = false;
+            StateHasChanged();
+        }
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    public void Dispose()
+    {
+        Console.WriteLine("Rooms - Dispose");
+    }
+    private async Task DeleteRoomType(int id)
+    {
+
+        await RoomTypeService.DeleteAsync("https://localhost:44359/api/RoomTypes/DeleteRoomType/", id);
+        LoadRoomTypes();
+        StateHasChanged();
+    }
+
+    private void EditRoomType(LoaiPhong editroomtype)
+    {
+        Type = editroomtype;
+        StateHasChanged();
+    }
+
+    private async Task SaveRoomType()
+    {
+        // Call the service to save the bill
+        try
+        {
+            if (Type.phong == null) Type.phong = [];
+            if (Type.MaLoaiPhong == 0)
+            {
+                //  bill.CTHoaDon = null;
+                 LoaiPhong loaiPhong = await RoomTypeService.SaveAsync("https://localhost:44359/api/RoomTypes/CreateRoomType", Type);
+                if (loaiPhong != null)
+                {
+                    // Display success message using a modal or dialog
+                    //  await _modalService.Show<SuccessMessage>("Bill created successfully!");
+                    Type = new LoaiPhong();
+                    await LoadRoomTypes();
+                    // Update the bill list
+                    StateHasChanged();
+
+                    // Clear the form
+
+                }
+            }
+            else
+            {
+                LoaiPhong loaiPhong = await RoomTypeService.UpdateAsync("https://localhost:44359/api/RoomTypes/UpdateRoomType/", Type.MaLoaiPhong, Type);
+                // Update the bill list
+                Type = new LoaiPhong();
+                await LoadRoomTypes();
+                StateHasChanged();
+
+                // Clear the form
+               
+
+            }
+            // Handle successful save, e.g., display success message, clear form, etc.
+        }
+        catch (Exception ex)
+        {
+            // Handle errors, e.g., display error message to the user
+            Console.Error.WriteLine("Error saving bill: " + ex.Message);
+        }
+    }
+     // protected async Task LoadReservations()
+     //     {
+     //     reservations = await dpservice.GetAllAsync("https:localhost:44359/api/DatPhong/GetDatPhong");
+     // }
+     protected async Task Loadloaiphong()
+         {
+        loaiphong = await RoomTypeService.GetAllAsync("https://localhost:44359/api/RoomTypes/GetRoomTypes");
+     }
+    //  protected async Task LoadMethods()
+    //      {
+    //      methods = await ptservice.GetAllAsync("https:localhost:44359/api/PTTT/GetPTTT");
+    // }
+}

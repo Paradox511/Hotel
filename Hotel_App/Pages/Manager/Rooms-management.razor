@@ -1,6 +1,433 @@
 ﻿@page "/rooms"
 <h3>Rooms_management</h3>
+@using Hotel_App.Service
+@using Hotel_App.Data
+@using Blazored.LocalStorage
+@using Hotel_App.Shared
+@inject HotelService<Phong> RoomService
+@inject HotelService<LoaiPhong> RoomTypeService
+@inject HotelService<HoaDon> BillService
+@inject HotelService<DatPhong> dpservice;
+@inject HotelService<NhanVien> nvservice;
+@inject HotelService<PhuongThucThanhToan> ptservice;
+@implements IDisposable
+
+
+
+<div class="col-12">
+
+    <button onclick="window.location.href='/Roomtype';">Đi đến quản lý loại phòng</button>
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger">@errorMessage</div>
+    }
+    @if (!string.IsNullOrEmpty(successMessage))
+    {
+        <div class="alert alert-success">@successMessage</div>
+    }
+    @if (!string.IsNullOrEmpty(deleteMessage))
+    {
+        <div class="alert alert-danger">
+            @deleteMessage
+        </div>
+    }
+    @if (showDeleteConfirmation)
+    {
+        <div class="modal" style="display:block; background-color: rgba(0, 0, 0, 0.5);">
+            <div class="modal-dialog" style="max-width: 400px; margin-top: 150px;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirm Deletion</h5>
+                        <button type="button" class="close" @onclick="CancelDelete">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to delete this customer?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" @onclick="CancelDelete">No</button>
+                        <button class="btn btn-danger" @onclick="DeleteRoom">Yes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <EditForm Model="@png" OnValidSubmit="@SaveRoom">
+
+        <div class="form-group">
+            <label for="MaPhong">Mã Phòng :</label>
+            <input type="text" class="form-control" @bind="png.MaPhong" name="MaPhong" readonly>
+        </div>
+
+        @* <div class="form-group">  *@
+        @*     <label for="TrangThai">Trạng Thái Phòng:</label>  *@
+        @*     <select class="form-control" id="TrangThai" @bind="png.TrangThaiPhong" name="TrangThai" readonly>  *@
+        @*         <option value="0" >Đã đặt</option>  *@
+        @*         <option value="1" >Trống</option>  *@
+        @*     </select> *@
+        @* </div> *@
+
+        <div class="form-group">
+            <label for="SoLuong">Nhập số phòng:</label>
+            <input type="text" class="form-control" id="SoLuong" @bind=png.SoPhong name="SoLuong" >
+            <ValidationMessage For="@(() => png.SoPhong)"/>
+        </div>
+
+        <div class="form-group">
+            <label for="MaLoaiPhong">Mã Loại Phòng :</label>
+            <select class="form-control" id="MaLoaiPhong" @bind="png.MaLoaiPhong" name="MaLoaiPhong">
+                @* <option value="">Chọn mã loại phòng</option>  *@
+                @if (loaiphong != null)
+                {
+                    @foreach (var type in loaiphong)
+                    {
+                        <option value=@type.MaLoaiPhong>@type.MaLoaiPhong-@type.TenLoaiPhong-@type.SoLuongPhong-@type.Mota-@type.Gia                         </option>
+                    }
+                }
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Tạo</button>
+    </EditForm>
+    <button class="btn btn-primary" @onclick="LoadRooms">Refresh</button>
+    <input type="text" class="form-control" placeholder="Tìm kiếm theo ID hoặc Tên" @bind="searchText" />
+    <button class="btn btn-primary mt-2" @onclick="SearchAll">Tìm kiếm</button>
+</div>
+<br />
+
+
+
+<div class="col-12">
+
+    <h3>Phòng</h3>
+    <SpinLoader IsLoading="isLoading">
+        <LoadingTemplate>
+            <div class="col-12" style="background-color: lightgray; height:400px; vertical-align:middle">
+                <br /><br />
+                <Chase Center="true" Color="#c21f13" Size="70px"></Chase>
+            </div>
+        </LoadingTemplate>
+        <ContentTemplate>
+            @if (Rooms == null)
+            {
+                <p>Loading...</p>
+            }
+            else
+            {
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Mã Phòng</th>
+                            <th>Trạng Thái Phòng</th>
+                            <th>Số Phòng</th>
+                            <th>Mã Loại Phòng</th>                            
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var room in Rooms)
+                        {
+                            <tr>
+                                <td>@room.MaPhong</td>
+                                <td>
+                                    @if (@room.TrangThaiPhong == 0)
+                                    {
+                                        <span>Đã đặt</span>
+                                    }
+                                    else
+                                    {
+                                        <span>Trống</span>
+                                    }
+                                </td>
+                                <td>@room.SoPhong</td>
+                                <td>@room.MaLoaiPhong</td> 
+                                <td>
+                                    <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => EditRoom(room))">Edit</a> |
+                                    <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => ShowDeleteConfirmation(room.MaPhong))">Delete</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </ContentTemplate>
+    </SpinLoader>
+</div>
 
 @code {
+    private IEnumerable<Phong> Rooms;
+    private IEnumerable<LoaiPhong> loaiphong;
+    private IEnumerable<HoaDon> bills;
+    private IEnumerable<DatPhong> reservations;
+    private IEnumerable<NhanVien> employees;
+    public IEnumerable<Phong> filteredRoomList { get; set; }
+    private IEnumerable<PhuongThucThanhToan> methods;
+    public Phong png { get; set; }
+    public LoaiPhong Type { get; set; }
+    private int RoomIdToDelete;
+    private string errorMessage;
+    private string successMessage;
+    private string searchText = string.Empty;
+    private string deleteMessage;
+    private int roomIDtoDelete;
+    private bool showDeleteConfirmation = false;
+    public bool IsVisible { get; set; }
+    public bool Result { get; set; }
+    public string RecordName { get; set; }
+    public bool IsGridViewFiltered { get; set; }
+    bool isLoading = true;
 
+
+    private void ShowDeleteConfirmation(int id)
+    {
+        RoomIdToDelete = id; // Lưu lại ID khách hàng cần xóa
+        showDeleteConfirmation = true; // Hiển thị bảng xác nhận
+    } 
+
+    protected async Task LoadRooms()
+    {
+        isLoading = true;
+        try
+        {
+            Rooms = await RoomService.GetAllAsync("https://localhost:44359/api/Rooms/GetRooms");
+            filteredRoomList = Rooms.ToList();
+            png = new Phong();
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine("Error loading rooms: " + ex.Message);
+        }
+
+        isLoading = false;
+        successMessage = null;
+        errorMessage = null;
+        StateHasChanged(); // Cập nhật giao diện
+
+    }
+
+    private bool ValidateRoom(){
+        // Kiểm tra email trùng lặp
+        if (IsRoomNumberDuplicated(png.SoPhong))
+        {
+            errorMessage = "Số phòng này đã tồn tại.";
+            successMessage = null; // Xóa thông báo thành công nếu có lỗi
+            return false;
+        }
+        successMessage = "Save Info success";
+        errorMessage = null; // Xóa thông báo lỗi nếu không có lỗi
+        return true; // Dữ liệu hợp lệ
+    }
+
+    private bool IsRoomNumberDuplicated(int RoomNumber)
+    {
+        return filteredRoomList.Any(room => room.SoPhong == RoomNumber) ;
+    }
+
+    protected override void OnInitialized()
+    {
+        Console.WriteLine("Room - OnInitialized");
+        base.OnInitialized();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Console.WriteLine("Room - OnInitializedAsync");
+
+        png = new Phong();
+        Type = new LoaiPhong();
+        //authorList = await authorService.GetAuthors();
+
+        await base.OnInitializedAsync();
+    }
+
+    protected override void OnParametersSet()
+    {
+        Console.WriteLine("Rooms - OnParametersSet");
+        base.OnParametersSet();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        Console.WriteLine("Rooms - OnParametersSetAsync");
+        await base.OnParametersSetAsync();
+    }
+
+    protected override bool ShouldRender()
+    {
+        base.ShouldRender();
+        Console.WriteLine("Rooms - ShouldRender");
+
+        return true;
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        Console.WriteLine("Rooms - OnAfterRender - firstRender = " + firstRender);
+        base.OnAfterRender(firstRender);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        Console.WriteLine("Authors - OnAfterRenderAsync - firstRender = " + firstRender);
+
+        if (firstRender)
+        {
+
+            await LoadRooms();
+            await Loadloaiphong();
+            isLoading = false;
+            StateHasChanged();
+        }
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    public void Dispose()
+    {
+        Console.WriteLine("Rooms - Dispose");
+    }
+    private async Task DeleteRoom()
+    {
+        // await RoomService.DeleteAsync("https:localhost:44359/api/Rooms/DeleteRoom/", id);
+        // LoadRooms();
+        // StateHasChanged();
+        try
+        {
+        //     Kiểm tra xem khách hàng có đặt phòng hay không
+            var RoomReservations = reservations.Where(r => r.MaPhong == RoomIdToDelete);
+            if (RoomReservations.Any())
+            {
+             //   Nếu khách hàng có đặt phòng, hiển thị thông báo không thể xóa
+                errorMessage = "không xóa được phòng khi phòng đã đặt.";
+                successMessage = null; //Xóa thông báo thành công nếu có lỗi
+                showDeleteConfirmation = false; //Ẩn bảng xác nhận
+                StateHasChanged();// Cập nhật giao diện
+                return;// Dừng việc xóa khách hàng
+            }
+
+            // Nếu không có đặt phòng, tiến hành xóa khách hàng
+            await RoomService.DeleteAsync("https:localhost:44359/api/Rooms/DeleteRoom/", RoomIdToDelete);
+            await LoadRooms(); // Làm mới danh sách khách hàng
+            showDeleteConfirmation = false; // Ẩn bảng xác nhận
+            successMessage = "Xóa thông tin phòng thành công."; // Thông báo thành công
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Không thể xóa thông tin phòng: " + ex.Message; // Hiển thị thông báo lỗi
+            showDeleteConfirmation = false; // Ẩn bảng xác nhận
+            StateHasChanged();
+        }
+    }
+
+    private void EditRoom(Phong editroom)
+    {
+        png = editroom;
+        StateHasChanged();
+    }
+
+    private async Task SearchAll()
+    {
+        isLoading = true;
+        try
+        {
+            if (string.IsNullOrEmpty(searchText))
+            {
+                filteredRoomList = Rooms.ToList();
+            }
+            else
+            {
+                if (int.TryParse(searchText, out int Roomid))
+                {
+                    filteredRoomList = Rooms
+                        .Where(c => c.MaPhong == Roomid)
+                        .ToList();
+                }
+                else
+                {
+                    if (int.TryParse(searchText, out int RoomTypeid))
+                    {
+                        filteredRoomList = Rooms
+                            .Where(c => c.MaLoaiPhong == RoomTypeid)
+                            .ToList();
+                    }
+                    else{
+                        if (int.TryParse(searchText, out int RoomNumberid))
+                        {
+                            filteredRoomList = Rooms
+                                .Where(c => c.MaLoaiPhong == RoomNumberid)
+                                .ToList();
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine("Error searching customers: " + ex.Message);
+            errorMessage = "Có lỗi xảy ra khi tìm kiếm.";
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private void CancelDelete()
+    {
+        showDeleteConfirmation = false; // Ẩn bảng xác nhận
+        StateHasChanged();
+    }
+
+    private async Task SaveRoom()
+    {
+        // Call the service to save the bill
+        try
+        {
+            //if (png.MaPhong == null) png.LoaiPhong = new LoaiPhong();
+            if (png.MaPhong == 0)
+            {                
+                Phong TPhong = await RoomService.SaveAsync("https://localhost:44359/api/Rooms/CreateRoom", png);             
+                if (TPhong != null)
+                {                  
+                    png = new Phong();
+                    await LoadRooms();                   
+                    StateHasChanged();
+                    // Clear the form
+                }
+            }
+            else
+            {
+                Phong TPhong = await RoomService.UpdateAsync("https://localhost:44359/api/Rooms/UpdateRoom/", png.MaPhong, png);
+                // Update the bill list
+                png = new Phong();
+                await LoadRooms();
+                StateHasChanged();
+
+                // Clear the form
+               
+
+            }
+            // Handle successful save, e.g., display success message, clear form, etc.
+        }
+        catch (Exception ex)
+        {
+            // Handle errors, e.g., display error message to the user
+            Console.Error.WriteLine("Error saving bill: " + ex.Message);
+        }
+    }
+     // protected async Task LoadReservations()
+     //     {
+     //     reservations = await dpservice.GetAllAsync("https:localhost:44359/api/DatPhong/GetDatPhong");
+     // }
+     protected async Task Loadloaiphong()
+         {
+        loaiphong = await RoomTypeService.GetAllAsync("https://localhost:44359/api/RoomTypes/GetRoomTypes");
+     }
+    //  protected async Task LoadMethods()
+    //      {
+    //      methods = await ptservice.GetAllAsync("https:localhost:44359/api/PTTT/GetPTTT");
+    // }
 }

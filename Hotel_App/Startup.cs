@@ -40,13 +40,26 @@ namespace Hotel_App
             services.AddServerSideBlazor();
             services.AddHttpClient<HotelService<HoaDon>>();
             services.AddHttpClient<HotelService<NhanVien>>();
+            services.AddHttpClient<HotelService<KhachHang>>();
             services.AddHttpClient<HotelService<PhuongThucThanhToan>>();
             services.AddHttpClient<HotelService<DatPhong>>();
+
+            services.AddHttpClient<HotelService<Phong>>();
+            //services.AddHttpClient<RoomService<Phong>>();
+			services.AddHttpClient<HotelService<LoaiPhong>>();
+			services.AddHttpClient<HoaDonService>();
+
             services.AddHttpClient<HotelService<DichVu>>();
 
             services.AddHttpClient<HoaDonService>();
             services.AddHttpClient<DichVuService>();
+
+
+            services.AddHttpClient<HotelService<TaiKhoan>>();
+			services.AddHttpClient<HoaDonService>();
+
             services.AddSingleton<WeatherForecastService>();
+
 
           
 

@@ -15,9 +15,10 @@ namespace Persistence.Context
             modelBuilder.Entity<HoaDon>().HasKey("MaHoaDon");
             modelBuilder.Entity<PhuongThucThanhToan>().HasKey("MaPhuongThuc");
             modelBuilder.Entity<HoaDon>().Property(p => p.TongSoTien).HasColumnType("decimal(10,2)");
-            modelBuilder.Entity<LoaiPhong>().Property(p => p.Gia).HasColumnType("decimal(10,2)");
-            modelBuilder.Entity<DichVu>().Property(p => p.Gia).HasColumnType("decimal(10,2)");
-
+			modelBuilder.Entity<LoaiPhong>().Property(p => p.Gia).HasColumnType("decimal(10,2)");
+			//modelBuilder.Entity<LoaiPhong>().Property(p => p.Gia).HasColumnType("int");
+			modelBuilder.Entity<DichVu>().Property(p => p.Gia).HasColumnType("decimal(10,2)");
+           
             modelBuilder.Entity<HoaDon>()
            .HasMany(h => h.CTHoaDon)
            .WithOne(ct => ct.HoaDon)
@@ -27,11 +28,26 @@ namespace Persistence.Context
              .HasOne(ct => ct.HoaDon)
             .WithMany(h => h.CTHoaDon)
              .HasForeignKey(ct => ct.MaHoaDon);
-
+            
             modelBuilder.Entity<CTHoaDon>()
                 .HasOne(ct => ct.dv)
                 .WithMany(dv => dv.cthd)
                 .HasForeignKey(ct => ct.MaDichVu);
+
+            modelBuilder.Entity<Phong>()
+                .HasOne(ct => ct.LoaiPhong)
+                .WithMany(lp => lp.phong)
+                .HasForeignKey(ct => ct.MaLoaiPhong);
+
+			modelBuilder.Entity<LoaiPhong>()
+		   .HasMany(h => h.phong)
+		   .WithOne(ct => ct.LoaiPhong)
+		   .HasForeignKey(ct => ct.MaLoaiPhong);
+
+            //base.OnModelCreating(modelBuilder);
+
+            //    .WithMany(dv => dv.cthd)
+            //    .HasForeignKey(ct => ct.MaDichVu);
 
             //modelBuilder.Entity<DichVu>()
             //    .HasMany(dv => dv.CTHoaDon)
@@ -39,6 +55,7 @@ namespace Persistence.Context
             //    .HasForeignKey(ct => ct.MaDichVu);
 
             base.OnModelCreating(modelBuilder);
+
         }
         public virtual DbSet<HoaDon> hoadon { get; set; }
         public virtual DbSet<CTHoaDon> cthoadon { get; set; }
