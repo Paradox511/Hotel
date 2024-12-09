@@ -292,20 +292,20 @@
             filteredCustomersList = customers.ToList();
             totalCustomers = customers.Count();
             LoadReservations();
-            /*foreach (var customer in filteredCustomersList)
-            {
-                var customerReservations = reservations.Where(r => r.MaKhachHang == customer.MaKhachHang);
-                if (customerReservations.Any())
+                /*foreach (var customer in filteredCustomersList)
                 {
+                var customerReservations = reservations.Where(r => r.MaKhachHang == customer.MaKhachHang);
+                    if (customerReservations.Any())
+                    {
                     // Nếu mã khách hàng tồn tại trong bảng đặt phòng
                     // Thực hiện hành động bạn muốn (ví dụ: đánh dấu hoặc thông báo)
                     customer.HasReservation = true;  // Thêm thuộc tính `HasReservation` vào lớp `KhachHang`
                 }
-                else
-                {
+                    else
+                    {
                     customer.HasReservation = false;
-                }
-            
+            }
+
             }*/
             customer = new KhachHang();
             PaginateCustomers();
@@ -407,9 +407,23 @@
         }
 
         // Kiểm tra số điện thoại trùng lặp
-        if (IsPhoneDuplicated(customer.SoDienThoai))
+        else if (IsPhoneDuplicated(customer.SoDienThoai))
         {
             errorMessage = "Số điện thoại này đã tồn tại.";
+            successMessage = null; // Xóa thông báo thành công nếu có lỗi
+            return false;
+        }
+
+        else if(IsCCCDDuplicated(customer.CCCD))
+        {
+            errorMessage = "CCCD này đã tồn tại.";
+            successMessage = null; // Xóa thông báo thành công nếu có lỗi
+            return false;
+        }
+
+        else if(IsSTKDuplicated(customer.STK))
+        {
+            errorMessage = "STK này đã tồn tại.";
             successMessage = null; // Xóa thông báo thành công nếu có lỗi
             return false;
         }
@@ -522,6 +536,16 @@
     private bool IsPhoneDuplicated(string phoneNumber)
     {
         return filteredCustomersList.Any(cus => cus.SoDienThoai.Equals(phoneNumber, StringComparison.OrdinalIgnoreCase) &&
+        cus.MaKhachHang != customer.MaKhachHang);
+    }
+    private bool IsCCCDDuplicated(string cccd)
+    {
+        return filteredCustomersList.Any(cus => cus.CCCD.Equals(cccd, StringComparison.OrdinalIgnoreCase) &&
+        cus.MaKhachHang != customer.MaKhachHang);
+    }
+    private bool IsSTKDuplicated(string stk)
+    {
+        return filteredCustomersList.Any(cus => cus.STK.Equals(stk, StringComparison.OrdinalIgnoreCase) &&
         cus.MaKhachHang != customer.MaKhachHang);
     }
 }
