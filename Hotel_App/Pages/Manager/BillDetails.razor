@@ -6,14 +6,6 @@
 @using System;
 @inject HotelService<HoaDon> BillService
 @inject HoaDonService CTHoaDonService
-@inject HotelService<CTHoaDon> cthdservice;
-@inject HotelService<DichVu> dvservice;
-@inject HotelService<NhanVien> nvservice;
-@inject HotelService<DatPhong> dpservice;
-@inject HotelService<PhuongThucThanhToan> ptservice;
-
-    
-
 <div class="col-12">
 
     <h3>Bill details</h3>
@@ -78,23 +70,7 @@
                         }
                     </tbody>
                 </table>
-                <br />
-                <div>
-                   <b>Tổng tiền: </b>@bill.TongSoTien </div>
             }
-            <div class="form-group">
-                <label for="MaDichVu">Dịch vụ:</label>
-                <select class="form-control" id="MaDichVu" @bind="bill.MaDatPhong" name="MaDatPhong">
-                    <option value="">Chọn Mã Đặt Phòng</option>
-                    @if (reservations != null)
-                    {
-                        @foreach (var datPhong in reservations)
-                        {
-                            <option value="@datPhong.MaDatPhong">@datPhong.MaDatPhong</option>
-                        }
-                    }
-                </select>
-            </div>
         </ContentTemplate>
     </SpinLoader>
 </div>
@@ -128,8 +104,6 @@
     public int BillId { get; set; }
 
     public HoaDon bill { get; set; }
-    public PhuongThucThanhToan pt{ get; set; }
-    public ICollection<DichVu> dsdv { get; set; }
     public IEnumerable<CTHoaDon> cthdlist { get; set; }
     public bool IsVisible { get; set; }
     public bool Result { get; set; }
@@ -143,46 +117,13 @@
         isLoading = true;
         var task = BillService.GetByIdAsync("https://localhost:44359/api/Bills/details/{0}", BillId);
         bill = await task;
-        GetNhanVien();
-        GetPhuongThuc();
-        GetDatPhong();
-
 
         if (bill != null)
         {
             cthdlist = await CTHoaDonService.GetCTHoaDonByMaHoaDon(bill.MaHoaDon);
         }
-        UpdateTongTien();
+
         isLoading = false; // Set loading indicator to false
     }
-
-    protected async Task GetDatPhong()
-    {
-        datPhong = await dpservice.GetByIdAsync("https://localhost:44359/api/DatPhong/GetByID/{0}", bill.MaDatPhong);
-    }
-    protected async Task GetNhanVien()
-    {
-        nhanVien = await nvservice.GetByIdAsync("https://localhost:44359/api/NhanVien/GetByID/{0}",bill.MaNhanVien);
-    }
-    protected async Task GetPhuongThuc()
-    {
-        pt = await ptservice.GetByIdAsync("https://localhost:44359/api/PTTT/GetByID/{0}", bill.MaPhuongThuc);
-    }
-    protected async Task
-    protected async Task UpdateTongTien()
-    {
-        decimal sum = 0;
-        foreach(var cTHoaDon in bill.CTHoaDon)
-        {
-            sum += cTHoaDon.dv.Gia;
-            cTHoaDon.MaHoaDon = bill.MaHoaDon;
-        }
-        datPhong = await dpservice.GetByIdAsync("https://localhost:44359/api/DatPhong/GetByID/{0}", bill.MaDatPhong);
-        sum += datPhong.TongTien;
-        bill.TongSoTien = sum;
-
-        await CTHoaDonService.UpdateTotal(bill.MaHoaDon, sum);
-        StateHasChanged();
-
-    }
+}
 }

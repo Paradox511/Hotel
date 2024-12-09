@@ -40,7 +40,7 @@ namespace WebAPI.Controllers.V1
             return Ok(bills);
         }
         [HttpPost("CreateDichVu")]
-        public async Task<IActionResult> CreateBill([FromBody] CreateCommand<DichVu> command)
+        public async Task<IActionResult> CreateDichVu([FromBody] CreateCommand<DichVu> command)
         {
             if ( command.Entity == null)
             {
@@ -75,7 +75,7 @@ namespace WebAPI.Controllers.V1
         /// <param name="id"></param>
         /// <param name="command"></param>
         /// <returns></returns>
-        [HttpPut("UpdateBill/{id}")]
+        [HttpPut("UpdateDichVu/{id}")]
         public async Task<IActionResult> Update(int id, DichVu dichVu)
         {
             if (id != dichVu.MaDichVu)
