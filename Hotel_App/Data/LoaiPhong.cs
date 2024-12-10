@@ -20,6 +20,8 @@ namespace Hotel_App.Data
 		public decimal Gia { get; set; }
         public LoaiPhong() { }
 
+		public int TrangThai { get; set; } = 1;
+
 		public List<Phong> phong { get; set; }
 	}
 }

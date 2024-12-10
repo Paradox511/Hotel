@@ -26,13 +26,13 @@
         <div class="form-group">
             <label for="TenLoaiPhong">Tên Loại Phòng:</label>
             <input type="text" class="form-control" id="TenLoaiPhong" @bind="Type.TenLoaiPhong" name="TenLoaiPhong" >
-            @* <ValidationMessage For="@(() => Type.TenLoaiPhong)"/> *@
+             <ValidationMessage For="@(() => Type.TenLoaiPhong)"/> 
         </div>
 
         <div class="form-group">
             <label for="SoLuong">Nhập số lượng phòng:</label>
             <input type="text" class="form-control" id="SoLuongPhong" @bind=Type.SoLuongPhong name="SoLuongPhong">
-             @* <ValidationMessage For="@(() => Type.SoLuongPhong)"/> *@
+              <ValidationMessage For="@(() => Type.SoLuongPhong)"/> 
         </div>
 
         <div class="form-group">
@@ -44,7 +44,7 @@
         <div class="form-group">
             <label for="Gia">Nhập Giá Phòng:</label>
             <input type="text" class="form-control" id="Gia" @bind=Type.Gia name="Gia">
-             @* <ValidationMessage For="@(() => Type.Gia)"/> *@
+              <ValidationMessage For="@(() => Type.Gia)"/> 
         </div>
         <button type="submit" class="btn btn-primary">Tạo</button>
     </EditForm>
@@ -76,6 +76,7 @@
                             <th>Số Lượng Phòng</th>
                             <th>Mô Tả</th>
                             <th>Giá</th>
+                            <th>Trạng thái</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -87,6 +88,7 @@
                                 <td>@TypeRoom.SoLuongPhong</td>
                                 <td>@TypeRoom.Mota</td
                                 <td>@TypeRoom.Gia</td>
+                                <td>@TypeRoom.TrangThai</td>
                                 <td>
                                     <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => EditRoomType(TypeRoom))">Edit</a> |
                                     <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => DeleteRoomType(TypeRoom.MaLoaiPhong))">Delete</a>

@@ -5,6 +5,7 @@
 @using Blazored.LocalStorage
 @using Hotel_App.Shared
 @inject HotelService<Phong> RoomService
+@inject RoomService privateRoomService 
 @inject HotelService<LoaiPhong> RoomTypeService
 @inject HotelService<HoaDon> BillService
 @inject HotelService<DatPhong> dpservice;
@@ -44,11 +45,10 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <p>Are you sure you want to delete this customer?</p>
+                        <p>Are you sure you want to delete this room?</p>
                     </div>
                     <div class="modal-footer">
-                        <button class="btn btn-secondary" @onclick="CancelDelete">No</button>
-                        <button class="btn btn-danger" @onclick="DeleteRoom">Yes</button>
+
                     </div>
                 </div>
             </div>
@@ -91,9 +91,10 @@
         </div>
         <button type="submit" class="btn btn-primary">Tạo</button>
     </EditForm>
-    <button class="btn btn-primary" @onclick="LoadRooms">Refresh</button>
-    <input type="text" class="form-control" placeholder="Tìm kiếm theo ID hoặc Tên" @bind="searchText" />
-    <button class="btn btn-primary mt-2" @onclick="SearchAll">Tìm kiếm</button>
+    <div class="search-box">
+        <b><label class="col-2 font-weight-bold">Search:</label></b>
+        <input type="text" class="form-control col-3" @bind="searchText" @oninput="OnSearchTextChanged" placeholder="Search Room" />
+    </div>
 </div>
 <br />
 
@@ -101,7 +102,8 @@
 
 <div class="col-12">
 
-    <h3>Phòng</h3>
+    <h3>Thông tin phòng</h3>
+    <button class="btn btn-primary" @onclick="LoadRooms">Refresh</button>
     <SpinLoader IsLoading="isLoading">
         <LoadingTemplate>
             <div class="col-12" style="background-color: lightgray; height:400px; vertical-align:middle">
@@ -115,18 +117,18 @@
                 <p>Loading...</p>
             }
             else
-            {
+            {            
                 <table>
                     <thead>
                         <tr>
                             <th>Mã Phòng</th>
                             <th>Trạng Thái Phòng</th>
                             <th>Số Phòng</th>
-                            <th>Mã Loại Phòng</th>                            
+                            <th>Mã Loại Phòng</th>                             
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var room in Rooms)
+                        @foreach (var room in filteredRoomList)
                         {
                             <tr>
                                 <td>@room.MaPhong</td>
@@ -144,13 +146,19 @@
                                 <td>@room.MaLoaiPhong</td> 
                                 <td>
                                     <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => EditRoom(room))">Edit</a> |
-                                    <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => ShowDeleteConfirmation(room.MaPhong))">Delete</a>
+                                    <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => DeleteRoom(room.MaPhong))">Delete</a>
                                 </td>
                             </tr>
                         }
                     </tbody>
                 </table>
+                <div class="pagination-controls">
+                    <button class="btn btn-secondary" @onclick="PreviousPage" disabled="@IsFirstPage()">Previous</button>
+                    <span>Page @currentPage of @totalPages</span>
+                    <button class="btn btn-secondary" @onclick="NextPage" disabled="@IsLastPage()">Next</button>
+                </div>
             }
+
         </ContentTemplate>
     </SpinLoader>
 </div>
@@ -168,7 +176,7 @@
     private int RoomIdToDelete;
     private string errorMessage;
     private string successMessage;
-    private string searchText = string.Empty;
+    private string searchText = string.Empty ;
     private string deleteMessage;
     private int roomIDtoDelete;
     private bool showDeleteConfirmation = false;
@@ -176,23 +184,35 @@
     public bool Result { get; set; }
     public string RecordName { get; set; }
     public bool IsGridViewFiltered { get; set; }
+    private int currentPage = 1; // set number of first
+    private int itemsPerPage = 10; // Change this number based on your preference
+    private int totalRoom = 0;  
+    private bool IsFirstPage() => currentPage == 1;
+    private bool IsLastPage() => currentPage == totalPages;
+    private int totalPages => (int)Math.Ceiling((double)Rooms.Count() / itemsPerPage);
+
+
     bool isLoading = true;
 
 
-    private void ShowDeleteConfirmation(int id)
+    private void ShowDeleteConfirmation(Phong deleteRoom)
     {
-        RoomIdToDelete = id; // Lưu lại ID khách hàng cần xóa
+        RoomIdToDelete = deleteRoom.MaPhong; // Lưu lại ID khách hàng cần xóa
         showDeleteConfirmation = true; // Hiển thị bảng xác nhận
     } 
 
     protected async Task LoadRooms()
     {
         isLoading = true;
+        Loadloaiphong();
         try
         {
             Rooms = await RoomService.GetAllAsync("https://localhost:44359/api/Rooms/GetRooms");
             filteredRoomList = Rooms.ToList();
+            totalRoom = Rooms.Count();
             png = new Phong();
+            // Apply pagination to the employees
+            PaginateRooms();
         }
         catch (Exception ex)
         {
@@ -203,21 +223,9 @@
         successMessage = null;
         errorMessage = null;
         StateHasChanged(); // Cập nhật giao diện
-
     }
 
-    private bool ValidateRoom(){
-        // Kiểm tra email trùng lặp
-        if (IsRoomNumberDuplicated(png.SoPhong))
-        {
-            errorMessage = "Số phòng này đã tồn tại.";
-            successMessage = null; // Xóa thông báo thành công nếu có lỗi
-            return false;
-        }
-        successMessage = "Save Info success";
-        errorMessage = null; // Xóa thông báo lỗi nếu không có lỗi
-        return true; // Dữ liệu hợp lệ
-    }
+
 
     private bool IsRoomNumberDuplicated(int RoomNumber)
     {
@@ -287,44 +295,53 @@
     {
         Console.WriteLine("Rooms - Dispose");
     }
-    private async Task DeleteRoom()
-    {
-        // await RoomService.DeleteAsync("https:localhost:44359/api/Rooms/DeleteRoom/", id);
-        // LoadRooms();
-        // StateHasChanged();
-        try
-        {
-        //     Kiểm tra xem khách hàng có đặt phòng hay không
-            var RoomReservations = reservations.Where(r => r.MaPhong == RoomIdToDelete);
-            if (RoomReservations.Any())
-            {
-             //   Nếu khách hàng có đặt phòng, hiển thị thông báo không thể xóa
-                errorMessage = "không xóa được phòng khi phòng đã đặt.";
-                successMessage = null; //Xóa thông báo thành công nếu có lỗi
-                showDeleteConfirmation = false; //Ẩn bảng xác nhận
-                StateHasChanged();// Cập nhật giao diện
-                return;// Dừng việc xóa khách hàng
-            }
 
-            // Nếu không có đặt phòng, tiến hành xóa khách hàng
-            await RoomService.DeleteAsync("https:localhost:44359/api/Rooms/DeleteRoom/", RoomIdToDelete);
-            await LoadRooms(); // Làm mới danh sách khách hàng
-            showDeleteConfirmation = false; // Ẩn bảng xác nhận
-            successMessage = "Xóa thông tin phòng thành công."; // Thông báo thành công
-            StateHasChanged();
-        }
-        catch (Exception ex)
-        {
-            errorMessage = "Không thể xóa thông tin phòng: " + ex.Message; // Hiển thị thông báo lỗi
-            showDeleteConfirmation = false; // Ẩn bảng xác nhận
-            StateHasChanged();
-        }
+    // Phương thức tìm kiếm
+    private void OnSearchTextChanged(ChangeEventArgs e)
+    {
+        string searchValue = e.Value.ToString().ToLower();
+
+        // Lọc danh sách theo tất cả các trường dữ liệu
+        filteredRoomList = Rooms.Where(room =>
+            room.MaPhong.ToString().Contains(searchValue) ||
+            room.SoPhong.ToString().Contains(searchValue) ||
+            room.MaLoaiPhong.ToString().Contains(searchValue)
+        ).ToList();
+
+        totalRoom = filteredRoomList.Count(); // Cập nhật tổng số phòng sau khi lọc dữ liệu
+        currentPage = 1; // Reset về trang đầu tiên
+
+        // Áp dụng phân trang cho danh sách đã lọc
+        filteredRoomList = filteredRoomList
+        .Skip((currentPage - 1) * itemsPerPage)
+        .Take(itemsPerPage)
+        .ToList();
+        StateHasChanged(); // Cập nhật lại giao diện
+    }
+
+    private async Task DeleteRoom(int id)
+    {     
+        //Phong TPhong = await privateRoomService.DeletePhongAsync(room,room.MaPhong);
+        await RoomService.DeleteAsync("https://localhost:44359/api/Rooms/DeleteRoom/", id);
+        LoadRooms(); // Làm mới danh sách khách hàng
+        showDeleteConfirmation = false; // Ẩn bảng xác nhận
+        successMessage = "Xóa phòng thành công."; // Thông báo thành công
+        StateHasChanged();
     }
 
     private void EditRoom(Phong editroom)
     {
         png = editroom;
         StateHasChanged();
+    }
+
+    private void PaginateRooms()
+    {
+        // Sử dụng danh sách phòng cho việc phân trang
+        filteredRoomList = Rooms
+            .Skip((currentPage - 1) * itemsPerPage)
+            .Take(itemsPerPage)
+            .ToList();
     }
 
     private async Task SearchAll()
@@ -375,15 +392,52 @@
         }
     }
 
+    private void NextPage()
+    {
+        if (currentPage < totalPages)
+        {
+            currentPage++;
+            PaginateRooms();
+            StateHasChanged(); // Cập nhật UI
+        }
+    }
+
+
+    private void PreviousPage()
+    {
+        if (currentPage > 1)
+        {
+            currentPage--;
+            PaginateRooms();
+            StateHasChanged(); // Cập nhật UI
+        }
+    }
+
+
     private void CancelDelete()
     {
         showDeleteConfirmation = false; // Ẩn bảng xác nhận
         StateHasChanged();
     }
 
+    private bool ValidateRoom(Phong png)
+    {
+        // Kiểm tra email trùng lặp
+        if (IsRoomNumberDuplicated(png.SoPhong))
+        {
+            errorMessage = "Số phòng này đã tồn tại.";
+            successMessage = null; // Xóa thông báo thành công nếu có lỗi
+            return false;
+        }
+        successMessage = "Save Info success";
+        errorMessage = null; // Xóa thông báo lỗi nếu không có lỗi
+        return true; // Dữ liệu hợp lệ
+    }
+
     private async Task SaveRoom()
     {
         // Call the service to save the bill
+        ValidateRoom(png);
         try
         {
             //if (png.MaPhong == null) png.LoaiPhong = new LoaiPhong();
