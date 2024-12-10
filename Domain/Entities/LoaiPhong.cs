@@ -16,7 +16,9 @@ namespace Domain.Entities
         [DataType(DataType.Currency)]
         public decimal Gia { get; set; }
 		[Required]
-		public ICollection <Phong> phong { get; set; } 
-        public LoaiPhong() { }
+		public ICollection <Phong> phong { get; set; }
+
+		public int TrangThai { get; set; } = 1;
+		public LoaiPhong() { }
     }
 }

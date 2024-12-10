@@ -34,7 +34,7 @@ namespace WebAPI.Controllers.V1
 					return StatusCode(500, "Internal Server Error: DbContext not injected");
 				}
 
-				var rooms = await _context.phong.ToListAsync(); // Assuming your bills are stored in "hoadon" DbSet
+				var rooms = await _context.phong.Where(Room=>Room.TrangThai==1).ToListAsync(); // Assuming your bills are stored in "hoadon" DbSet
 				if (rooms == null)
 				{
 					return NotFound("No rooms found");
@@ -106,30 +106,24 @@ namespace WebAPI.Controllers.V1
 		[HttpPut("DeleteRoom/{id}")]
 			public async Task<IActionResult> Delete(int id)
 			{
-			var room = await _context.phong.FindAsync(id);
-
-			if (id != room.MaPhong)
+			var room = await _context.phong.FindAsync(id);			
+			if (room == null)
 			{
 				return BadRequest("Invalid command data");
 			}
 
-			// Tìm phòng cần cập nhật trạng thái
-
-
 			// Cập nhật trạng thái của phòng từ 1 thành 0
 			room.TrangThai = 0;
-			_context.phong.Entry(room).State = EntityState.Modified;
-
 			try
 			{
 				await _context.SaveChangesAsync(); // Lưu thay đổi vào database
 			}
-			catch (DbUpdateConcurrencyException)
+			catch (Exception ex)
 			{
 				return StatusCode(500, "Error updating room status.");
 			}
 
-			return Ok(room);
+			return Ok("Room status updated to 0");
 		}
 		}
 	

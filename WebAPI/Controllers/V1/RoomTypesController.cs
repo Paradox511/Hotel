@@ -29,7 +29,7 @@ namespace WebAPI.Controllers.V1
 				return StatusCode(500, "Internal Server Error: DbContext not injected");
 			}
 
-			var roomtypes = await _context.loaiphong.ToListAsync(); // Assuming your bills are stored in "hoadon" DbSet
+			var roomtypes = await _context.loaiphong.Where(RoomType=>RoomType.TrangThai==1).ToListAsync(); // Assuming your bills are stored in "hoadon" DbSet
 			if (roomtypes == null)
 			{
 				return NotFound("No rooms found");
@@ -45,7 +45,7 @@ namespace WebAPI.Controllers.V1
 				.Where(h => h.MaLoaiPhong == id)
 				//.ThenInclude(ct => ct.)// Include related CTHoaDon entities
 				//.FirstOrDefaultAsync(h => h.MaLoaiPhong == id);
-			    .FirstOrDefaultAsync();
+				.FirstOrDefaultAsync();
 
 			if (loaiphong == null)
 			{
@@ -99,15 +99,22 @@ namespace WebAPI.Controllers.V1
 
 		[HttpDelete("DeleteRoomType/{id}")]
 		public async Task<IActionResult> Delete(int id)
-		{
-			if (id == null)
+		{		
+			var roomtype = await _context.loaiphong.FindAsync(id);
+			if (roomtype == null)
 			{
 				return BadRequest("Invalid command data");
 			}
-			var entity = _context.loaiphong.Find(id);
-			_context.loaiphong.Remove(entity);
-			await _context.SaveChangesAsync();
-			return Ok(entity); // No content to return on successful deletion
+			roomtype.TrangThai = 0;
+			try
+			{
+				await _context.SaveChangesAsync();
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, "Internal Server Error: DbContext not injected");
+			}
+			return Ok("RoomType status updated to 0");
 		}
 	}
 }
