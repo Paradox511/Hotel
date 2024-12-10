@@ -4,6 +4,7 @@
 	@inject RoomService RoomService
 	@inject HotelService<PhuongThucThanhToan> paymentMethodService;
 	@inject NavigationManager NavigationManager
+	@inject IJSRuntime JSRuntime
 <header class="px-2 py-3" style="background-color: #2549ff">
 	<div class="">
 		<div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
@@ -44,69 +45,71 @@
 <div class="container mt-5">
 	<h2 class="text-center">Xác nhận đặt phòng</h2>
 	<p class="text-center">Experience something new every moment.</p>
-	<form class="">
-		<div class="row">
-			<div class="col-md-6">
-				<img src="https://thumbs.dreamstime.com/b/hotel-room-23802674.jpg?w=768" class="img-fluid" alt="Hình ảnh phòng">
+	<div class="row">
+		<div class="col-md-6">
+			<img src="https://thumbs.dreamstime.com/b/hotel-room-23802674.jpg?w=768" class="img-fluid" alt="Hình ảnh phòng">
+		</div>
+		<div class="d-flex flex-column col-md-6 justify-content-between">
+			<div class="">
+				<h3>Thông tin khách hàng</h3>
+				<ul class="list-group">
+					<li class="list-group-item"><strong>Mã:</strong> @khachHang.MaKhachHang</li>
+					<li class="list-group-item"><strong>Tên:</strong> @khachHang.HoTen</li>
+					<li class="list-group-item"><strong>Số điện thoại:</strong> @khachHang.SoDienThoai</li>
+					<li class="list-group-item"><strong>Email:</strong> @khachHang.Email</li>
+
+				</ul>
+				<h3 class="mt-1">Thông tin đặt phòng</h3>
+				<ul class="list-group">
+					<li class="list-group-item"><strong>Loại phòng:</strong> @loaiPhong.TenLoaiPhong</li>
+					<li class="list-group-item"><strong>Số phòng:</strong> @room.SoPhong</li>
+					<li class="list-group-item"><strong>Giá phòng ngày hôm nay:</strong> @loaiPhong.Gia VNĐ</li>
+					<li class="list-group-item"><strong>Ngày nhận phòng:</strong> @StartDate</li>
+					<li class="list-group-item"><strong>Ngày trả phòng:</strong> @EndDate</li>
+					<li class="list-group-item"><strong>Số ngày đặt:</strong> @NumberOfDays</li>
+
+					<li class="list-group-item d-flex flex-row align-items-baseline">
+						<select @onchange="SelectPaymentMethod" class="form-select" style="width: 300px" id="paymentMethodDropdown">
+							@if (methods != null)
+							{
+								<option>Chọn phương thức thanh toán</option>
+								@foreach (var item in methods)
+								{
+									<option value="@item.MaPhuongThuc">@item.TenPhuongThuc</option>
+								}
+							}
+						</select>
+					</li>
+
+					<li class="list-group-item d-flex flex-row align-items-baseline">
+						<select @onchange="CalculateTotalPrice" class="form-select" style="width: 220px" aria-label="Default select example">
+							@if (AvailableRooms != null)
+							{
+								<option>Chọn số lượng phòng</option>
+								@foreach (var item in AvailableRooms)
+								{
+									<option value="@item">@item phòng</option>
+								}
+							}
+						</select>
+					</li>
+					<li class="list-group-item"><strong>Tổng số tiền phải trả:</strong> <span id="totalPrice"></span></li>
+					<script>
+						window.updateTotalPriceElement = (total) => {
+						document.getElementById("totalPrice").innerText = ` ${total} VNĐ`;
+						};
+					</script>
+				</ul>
 			</div>
-			<div class="d-flex flex-column col-md-6 justify-content-between">
-				<div class="">
-					<h3>Thông tin khách hàng</h3>
-					<ul class="list-group">
-						<li class="list-group-item"><strong>Mã:</strong> @khachHang.MaKhachHang</li>
-						<li class="list-group-item"><strong>Tên:</strong> @khachHang.HoTen</li>
-						<li class="list-group-item"><strong>Số điện thoại:</strong> @khachHang.SoDienThoai</li>
-						<li class="list-group-item"><strong>Email:</strong> @khachHang.Email</li>
-
-					</ul>
-					<h3 class="mt-1">Thông tin đặt phòng</h3>
-					<ul class="list-group">
-						<li class="list-group-item"><strong>Loại phòng:</strong> @loaiPhong.TenLoaiPhong</li>
-						<li class="list-group-item"><strong>Số phòng:</strong> @room.SoPhong</li>
-						<li class="list-group-item"><strong>Ngày nhận phòng:</strong> @StartDate</li>
-						<li class="list-group-item"><strong>Ngày trả phòng:</strong> @EndDate</li>
-						<li class="list-group-item"><strong>Số ngày đặt:</strong> @NumberOfDays</li>
-
-						<li class="list-group-item d-flex flex-row align-items-baseline">
-							<strong class="me-lg-4">Phương thức thanh toán:</strong>
-							<select class="form-select" style="width: 210px" id="paymentMethodDropdown">
-								@if (methods != null)
-								{
-									@foreach (var item in methods)
-									{
-										<option value="@item.MaPhuongThuc">@item.TenPhuongThuc</option>
-									}
-								}
-							</select>
-						</li>
-
-						<li class="list-group-item d-flex flex-row align-items-baseline">
-							<strong class="me-lg-4">Chọn số lượng phòng:</strong>
-							<select @bind="selectedNumberOfRooms" class="form-select mb-3" style="width: 300px" aria-label="Default select example">
-								@if (AvailableRooms != null)
-								{
-									total = @PriceRoom * @NumberOfDays;
-									@foreach (var item in AvailableRooms)
-									{
-										<option value="@item">@item phòng (@total) VNĐ</option>
-									}
-								}
-							</select>
-						</li>
-						@* <li class="list-group-item"><strong>Tổng số tiền phải trả:</strong> @ToltalPriceRoom VNĐ</li> *@
-					</ul>
-				</div>
-				<div class="align-self-end">
-					<button @onclick="ThanhToan" type="submit" class="btn btn-primary">Thanh toán</button>
-					<NavLink href=@string.Format("/booking") class="btn btn-secondary"><i class="fas fa-redo"></i>Quay lại</NavLink>
-				</div>
+			<div class="align-self-end">
+				<button @onclick="ThanhToan" type="button" class="btn btn-primary">Thanh toán</button>
+				<NavLink href=@string.Format("/booking") class="btn btn-secondary"><i class="fas fa-redo"></i>Quay lại</NavLink>
 			</div>
 		</div>
+	</div>
 
-	</form>
 </div>
 @code {
-	public Phong room { get; set; }
 	[Parameter]
 	public int RoomID { get; set; }
 	[Parameter]
@@ -122,19 +125,20 @@
 
 	KhachHang khachHang { get; set; }
 	LoaiPhong loaiPhong { get; set; }
-	PhuongThucThanhToan paymentMethod { get; set; }
+	private DatPhong datPhong { get; set; }
+	public Phong room { get; set; }
 	private IEnumerable<PhuongThucThanhToan> methods;
 
-	string selectedRoom;
+	PhuongThucThanhToan paymentMethod { get; set; }
+
 	public int countAvailableRooms { get; set; }
 	private List<int> availableRoomCounts { get; set; }
 	List<string> AvailableRooms { get; set; }
 	public int NumberOfDays => (EndDate - StartDate).Days;
 
-	private string getIDPaymentMethod { get; set; }
-	private int selectedNumberOfRooms;
-	public decimal ToltalPriceRoom => (PriceRoom * NumberOfDays);
-	decimal total;
+	private decimal ToltalPriceRoom;
+	private int selectedPaymentMethodId = 0;
+
 	protected async override Task OnInitializedAsync()
 	{
 		khachHang = new KhachHang();
@@ -150,7 +154,6 @@
 		loaiPhong = await RoomService.GetRoomTypeByIdAsync("https://localhost:44359/api/Room/GetRoomTypeInfo/{0}", TypeRoomID);
 		methods = await paymentMethodService.GetAllAsync("https://localhost:44359/api/PTTT/GetPTTT");
 		await LoadAvailableRooms();
-		// await ThanhToan();
 	}
 
 	private async Task LoadAvailableRooms()
@@ -163,10 +166,51 @@
 		}
 	}
 
+	// tính tổng số tiền phòng
+	private void CalculateTotalPrice(ChangeEventArgs e)
+	{
+		if (int.TryParse(e.Value.ToString(), out int numberOfRooms))
+		{
+			ToltalPriceRoom = (PriceRoom * NumberOfDays) * numberOfRooms;
+			StateHasChanged(); // Cập nhật giao diện
+			JSRuntime.InvokeVoidAsync("updateTotalPriceElement", ToltalPriceRoom);
+		}
+	}
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+		{
+			await JSRuntime.InvokeVoidAsync("updateTotalPriceElement", ToltalPriceRoom);
+		}
+	}
+	[JSInvokable]
+	public void updateTotalPrice(decimal total)
+	{
+		JSRuntime.InvokeVoidAsync("updateTotalPriceElement", total);
+	}
+
+	//lấy mã phương thức thanh toán
+	private void SelectPaymentMethod(ChangeEventArgs e)
+	{
+		if (int.TryParse(e.Value.ToString(), out int selectedId))
+		{
+			selectedPaymentMethodId = selectedId;
+			paymentMethod = methods.FirstOrDefault(m => m.MaPhuongThuc == selectedPaymentMethodId);
+			StateHasChanged();
+			Console.WriteLine($"Giá trị được chọn từ dropdown: {selectedPaymentMethodId}");
+		}
+	}
+
+	// thanh toán đặt phòng
 	private async Task ThanhToan()
 	{
-		Console.WriteLine("Selected number of rooms: " + selectedNumberOfRooms);
-		// await Task.Delay(100);
-		// NavigationManager.NavigateTo("/booking");
+		datPhong = new DatPhong();
+		datPhong.MaKhachHang = 1;
+		datPhong.CheckInDate = StartDate;
+		datPhong.CheckOutDate = EndDate;
+		datPhong.MaPhong = RoomID;
+
+		var result = await RoomService.AddDatPhong(datPhong);
+		Console.WriteLine($"THong tin dat phong: {result}");
 	}
 }

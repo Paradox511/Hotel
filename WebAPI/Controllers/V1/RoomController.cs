@@ -1,4 +1,5 @@
 ﻿using Application.Interfaces;
+using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
@@ -54,23 +55,6 @@ namespace WebAPI.Controllers.V1
 
 			return availableRooms;
 		}
-
-		//[HttpGet("CountAvailableRooms")]
-		//public async Task<int> CountAvailableRooms(int maLoaiPhong, DateTime checkInDate, DateTime checkOutDate)
-		//{
-		//	// Lấy danh sách phòng đã được đặt trong khoảng thời gian checkInDate và checkOutDate
-		//	var phongsDaDat = await _context.datphong
-		//		.Where(d => d.CheckInDate <= checkOutDate && d.CheckOutDate >= checkInDate)
-		//		.Select(d => d.MaPhong)
-		//		.ToListAsync();
-
-		//	// Đếm số lượng loại phòng thỏa mãn điều kiện
-		//	var count = await _context.phong
-		//		.Where(p => p.TrangThaiPhong == 1 && p.MaLoaiPhong == maLoaiPhong && !phongsDaDat.Contains(p.MaPhong))
-		//		.CountAsync();
-
-		//	return count;
-		//}
 
 		[HttpGet("CountAvailableRooms/{maLoaiPhong}")]
 		public IActionResult CountAvailableRooms(int maLoaiPhong, DateTime checkInDate, DateTime checkOutDate)
@@ -168,6 +152,27 @@ namespace WebAPI.Controllers.V1
 			};
 
 			return Ok(JsonSerializer.Serialize(loaiPhong, options));
+		}
+
+		[HttpPost("CreateBookingRoom")]
+		public async Task<IActionResult> AddDatPhong(DatPhong datPhong)
+		{
+			try
+			{
+				if (ModelState.IsValid)
+				{
+					_context.datphong.Add(datPhong);
+					await _context.SaveChangesAsync();
+					return Ok();
+				}
+				return BadRequest(ModelState);
+			}
+			catch (DbUpdateException ex)
+			{
+				// Trích xuất thông báo lỗi từ inner exception
+				var errorMessage = "Lỗi khi thêm dữ liệu vào bảng DatPhong: " + ex.InnerException?.Message;
+				return StatusCode(500, errorMessage);
+			}
 		}
 	}
 }

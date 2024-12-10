@@ -41,33 +41,6 @@ namespace Hotel_App.Service
 			return phongs;
 		}
 
-		//public async Task<int> GetAvailableRoomCountAsync(int maLoaiPhong, DateTime checkInDate, DateTime checkOutDate)
-		//{
-		//	string apiUrl = $"https://localhost:44359/api/Room/CountAvailableRooms?maLoaiPhong={maLoaiPhong}&checkInDate={checkInDate}&checkOutDate={checkOutDate}";
-
-		//	try
-		//	{
-		//		HttpResponseMessage response = await _httpClient.GetAsync(apiUrl);
-
-		//		if (response.IsSuccessStatusCode)
-		//		{
-		//			string responseContent = await response.Content.ReadAsStringAsync();
-		//			int availableRoomCount = JsonSerializer.Deserialize<int>(responseContent, new JsonSerializerOptions
-		//			{
-		//				PropertyNameCaseInsensitive = true
-		//			});
-		//			return availableRoomCount;
-		//		}
-		//		else
-		//		{
-		//			return -1;
-		//		}
-		//	}
-		//	catch (Exception ex)
-		//	{
-		//		return -1;
-		//	}
-		//}
 		public async Task<int> GetAvailableRoomCountAsync(int maLoaiPhong, DateTime checkInDate, DateTime checkOutDate)
 		{
 			try
@@ -154,5 +127,26 @@ namespace Hotel_App.Service
 			}
 		}
 
+		public async Task<string> AddDatPhong(DatPhong datPhong)
+		{
+			try
+			{
+				HttpResponseMessage response = await _httpClient.PostAsJsonAsync("https://localhost:44359/api/Room/CreateBookingRoom", datPhong);
+
+				if (response.IsSuccessStatusCode)
+				{
+					return "Dữ liệu đã được thêm thành công vào bảng DatPhong.";
+				}
+				else
+				{
+					string errorMessage = await response.Content.ReadAsStringAsync();
+					return $"Lỗi khi thêm dữ liệu vào bảng DatPhong: {errorMessage}";
+				}
+			}
+			catch (Exception ex)
+			{
+				return $"Lỗi khi gửi yêu cầu tới API: {ex.Message}";
+			}
+		}
 	}
 }
