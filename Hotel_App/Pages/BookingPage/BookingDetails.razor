@@ -210,7 +210,10 @@
 		datPhong.CheckOutDate = EndDate;
 		datPhong.MaPhong = RoomID;
 
-		var result = await RoomService.AddDatPhong(datPhong);
-		Console.WriteLine($"THong tin dat phong: {result}");
+		// var result = await RoomService.AddDatPhong(datPhong);
+		Console.WriteLine($"THong tin dat phong: {datPhong.MaKhachHang}");
+		Console.WriteLine($"THong tin dat phong: {datPhong.CheckInDate}");
+		Console.WriteLine($"THong tin dat phong: {datPhong.CheckOutDate}");
+		Console.WriteLine($"THong tin dat phong: {datPhong.MaPhong}");
 	}
 }
