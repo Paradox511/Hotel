@@ -15,7 +15,7 @@
 
 <div class="col-12">
     <hr />   
-   @if (!string.IsNullOrEmpty(errorMessage))
+    @if (!string.IsNullOrEmpty(errorMessage))
     {
         <div class="alert alert-danger">@errorMessage</div>
     }
@@ -74,7 +74,7 @@
         <div class="form-group">
             <label for="MoTa">Nhập Mô Tả:</label>
             <input type="text" class="form-control" id="MoTa" @bind=Type.Mota name="MoTa">
-             <ValidationMessage For="@(() => Type.Mota)"/> 
+            <ValidationMessage For="@(() => Type.Mota)"/> 
         </div>
 
         <div class="form-group">
@@ -297,6 +297,7 @@
     private IEnumerable<NhanVien> employees;
     private IEnumerable<PhuongThucThanhToan> methods;
     public IEnumerable<LoaiPhong> filteredRoomTypeList { get; set; }
+    public IEnumerable<Phong> filteredRoomList { get; set; }
     public Phong png { get; set; }
     public LoaiPhong Type { get; set; }
     public bool IsVisible { get; set; }
@@ -321,7 +322,7 @@
     private bool IsLastPage() => currentPage == totalPages;
     private int totalPages => (int)Math.Ceiling((double)loaiphong.Count() / itemsPerPage);
 
-     private void ShowDeleteConfirmation(int id)
+    private void ShowDeleteConfirmation(int id)
     {
         RoomTypeIdToDelete = id; // Lưu lại ID loại phòng cần xóa
         showDeleteConfirmation = true; // Hiển thị bảng xác nhận
@@ -331,12 +332,12 @@
     protected async Task LoadRoomTypes()
     {
         isLoading = true;
-       
+
         try
         {
             loaiphong = await RoomTypeService.GetAllAsync("https://localhost:44359/api/RoomTypes/GetRoomTypes");
             filteredRoomTypeList = loaiphong.ToList(); // Gán dữ liệu ban đầu cho filteredRoom
-             LoadRooms();
+            LoadRooms();
             totalRoomType = loaiphong.Count();
             Type = new LoaiPhong();
             PaginateRoomTypes();
@@ -433,14 +434,18 @@
         // await RoomTypeService.DeleteAsync("https://localhost:44359/api/RoomTypes/DeleteRoomType/", id);
         // LoadRoomTypes();
         // StateHasChanged();
-         try
+        try
         {
             // Kiểm tra xem khách hàng có đặt phòng hay không
             var roomTypeDuplicated = Rooms.Where(r => r.MaLoaiPhong == RoomTypeIdToDelete);
             if (roomTypeDuplicated.Any())
             {
+                List<int> arr =[];
+                Rooms = await RoomService.GetAllAsync("https://localhost:44359/api/Rooms/GetRooms");
+                filteredRoomList = Rooms.ToList();
+                arr.AddRange(filteredRoomList.Where(r => r.MaLoaiPhong == RoomTypeIdToDelete).Select(r=>r.MaPhong));
                 // Nếu khách hàng có đặt phòng, hiển thị thông báo không thể xóa
-                errorMessage = $"Không xóa được!!! Tồn tại phòng chứa mã loại phòng:{RoomTypeIdToDelete}.";
+                errorMessage = $"Không xóa được!!! Tồn tại phòng {string.Join(", ", arr)} chứa mã loại phòng.";
                 successMessage = null; // Xóa thông báo thành công nếu có lỗi
                 showDeleteConfirmation = false; // Ẩn bảng xác nhận
                 StateHasChanged(); // Cập nhật giao diện
