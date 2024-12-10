@@ -32,7 +32,7 @@ namespace WebAPI.Controllers.V1
                 return StatusCode(500, "Internal Server Error: DbContext not injected");
             }
 
-            var employees = await _context.nhanvien.ToListAsync(); 
+            var employees = await _context.nhanvien.Where(emp => emp.TrangThai == 1).ToListAsync();
             if (employees == null)
             {
                 return NotFound("No employees found");
@@ -81,15 +81,22 @@ namespace WebAPI.Controllers.V1
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete("DeleteNhanVien/{id}")]
-        public async Task<IActionResult> Delete(int id) { 
-            if (id == null)
+        public async Task<IActionResult> Delete(int id) {
+            var employee = await _context.nhanvien.FindAsync(id);
+            if (employee == null)
             {
                 return BadRequest("Invalid command data");
             }
-            var entity = _context.nhanvien.Find(id);
-            _context.nhanvien.Remove(entity);
-            await _context.SaveChangesAsync();
-            return Ok("Nhan vien deleted."); // No content to return on successful deletion
+            employee.TrangThai = 0;
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal Server Error: DbContext not injected");
+            }
+            return Ok("employee status updated to 0");
         }
         /// <summary>
         /// Updates the Product Entity based on Id.   

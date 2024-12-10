@@ -618,10 +618,10 @@
 
     protected async Task LoadBills()
     {
-        
+
 
         bills = await BillService.GetAllAsync("https://localhost:44359/api/Bills/GetBills");
-       
+
     }
 
     protected override void OnInitialized()
@@ -690,5 +690,4 @@
         Console.WriteLine("Authors - Dispose");
     }
 }
-
 

@@ -19,11 +19,9 @@ namespace Domain.Entities
         //[Required]
         //public int MaTaiKhoan { get; set; }
         [Required]
-
-        public int MaTaiKhoan { get; set; }
-
         public string Password { get; set; }
-
+        [Required]
+        public int TrangThai { get; set; } = 1;
 
 
         public NhanVien() { }

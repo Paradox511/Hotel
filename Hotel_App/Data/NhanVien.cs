@@ -18,6 +18,8 @@ namespace Hotel_App.Data
         //public int MaTaiKhoan { get; set; }
         [Required]
         public string Password { get; set; }
+        [Required]
+        public int TrangThai { get; set; } = 1;
 
         public NhanVien() { }
     }
