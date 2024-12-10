@@ -163,7 +163,7 @@ namespace WebAPI.Controllers.V1
 				{
 					_context.datphong.Add(datPhong);
 					await _context.SaveChangesAsync();
-					return Ok();
+					return Ok(datPhong); // Trả về đối tượng DatPhong đã được thêm thành công
 				}
 				return BadRequest(ModelState);
 			}
@@ -174,5 +174,6 @@ namespace WebAPI.Controllers.V1
 				return StatusCode(500, errorMessage);
 			}
 		}
+
 	}
 }

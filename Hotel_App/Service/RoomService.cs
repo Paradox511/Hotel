@@ -127,7 +127,7 @@ namespace Hotel_App.Service
 			}
 		}
 
-		public async Task<string> AddDatPhong(DatPhong datPhong)
+		public async Task<DatPhong> AddDatPhong(DatPhong datPhong)
 		{
 			try
 			{
@@ -135,17 +135,19 @@ namespace Hotel_App.Service
 
 				if (response.IsSuccessStatusCode)
 				{
-					return "Dữ liệu đã được thêm thành công vào bảng DatPhong.";
+					DatPhong newDatPhong = await response.Content.ReadFromJsonAsync<DatPhong>();
+					return newDatPhong;
 				}
 				else
 				{
-					string errorMessage = await response.Content.ReadAsStringAsync();
-					return $"Lỗi khi thêm dữ liệu vào bảng DatPhong: {errorMessage}";
+					// Xử lý lỗi khi API trả về không thành công
+					throw new HttpRequestException($"API trả về mã lỗi: {response.StatusCode}");
 				}
 			}
 			catch (Exception ex)
 			{
-				return $"Lỗi khi gửi yêu cầu tới API: {ex.Message}";
+				// Xử lý lỗi khi gửi yêu cầu đến API
+				throw new HttpRequestException($"Lỗi khi gửi yêu cầu đến API: {ex.Message}");
 			}
 		}
 	}
