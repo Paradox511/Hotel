@@ -1,0 +1,172 @@
+﻿	@page "/booking/GetRoomDetails/{RoomID:int}/{StartDate:datetime}/{EndDate:datetime}/{PriceRoom:decimal}/{TypeRoomID:int}"
+	@using Hotel_App.Service
+	@using Hotel_App.Data
+	@inject RoomService RoomService
+	@inject HotelService<PhuongThucThanhToan> paymentMethodService;
+	@inject NavigationManager NavigationManager
+<header class="px-2 py-3" style="background-color: #2549ff">
+	<div class="">
+		<div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+			<a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-dark text-decoration-none">
+				<img src="/img/logoSGU.png" width="50" height="50" />
+			</a>
+
+			<ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+				<li><a href="#" class="nav-link px-2 link-secondary">Overview</a></li>
+				<li><a href="#" class="nav-link px-2 link-dark">Inventory</a></li>
+				<li><a href="#" class="nav-link px-2 link-dark">Customers</a></li>
+				<li><a href="#" class="nav-link px-2 link-dark">Products</a></li>
+			</ul>
+
+			<form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3">
+				<input type="search" class="form-control" placeholder="Search..." aria-label="Search">
+			</form>
+
+			@* <div class="d-none"> *@
+			@* 	<button type="button" class="btn btn-outline-primary me-2"><a href="#" class="nav-link">Đăng nhập</a></button> *@
+			@* 	<button type="button" class="btn btn-primary"><a href="#" class="nav-link link-dark text-white">Đăng ký</a></button> *@
+			@* </div> *@
+			<div class="dropdown text-end">
+				<a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+					<img src="https://github.com/mdo.png" alt="mdo" width="32" height="32" class="rounded-circle">
+				</a>
+				<ul class="dropdown-menu text-small" aria-labelledby="dropdownUser1">
+					<li><a class="dropdown-item" href="#">New project...</a></li>
+					<li><a class="dropdown-item" href="#">Settings</a></li>
+					<li><a class="dropdown-item" href="#">Profile</a></li>
+					<li><hr class="dropdown-divider"></li>
+					<li><a class="dropdown-item" href="#">Sign out</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</header>
+<div class="container mt-5">
+	<h2 class="text-center">Xác nhận đặt phòng</h2>
+	<p class="text-center">Experience something new every moment.</p>
+	<form class="">
+		<div class="row">
+			<div class="col-md-6">
+				<img src="https://thumbs.dreamstime.com/b/hotel-room-23802674.jpg?w=768" class="img-fluid" alt="Hình ảnh phòng">
+			</div>
+			<div class="d-flex flex-column col-md-6 justify-content-between">
+				<div class="">
+					<h3>Thông tin khách hàng</h3>
+					<ul class="list-group">
+						<li class="list-group-item"><strong>Mã:</strong> @khachHang.MaKhachHang</li>
+						<li class="list-group-item"><strong>Tên:</strong> @khachHang.HoTen</li>
+						<li class="list-group-item"><strong>Số điện thoại:</strong> @khachHang.SoDienThoai</li>
+						<li class="list-group-item"><strong>Email:</strong> @khachHang.Email</li>
+
+					</ul>
+					<h3 class="mt-1">Thông tin đặt phòng</h3>
+					<ul class="list-group">
+						<li class="list-group-item"><strong>Loại phòng:</strong> @loaiPhong.TenLoaiPhong</li>
+						<li class="list-group-item"><strong>Số phòng:</strong> @room.SoPhong</li>
+						<li class="list-group-item"><strong>Ngày nhận phòng:</strong> @StartDate</li>
+						<li class="list-group-item"><strong>Ngày trả phòng:</strong> @EndDate</li>
+						<li class="list-group-item"><strong>Số ngày đặt:</strong> @NumberOfDays</li>
+
+						<li class="list-group-item d-flex flex-row align-items-baseline">
+							<strong class="me-lg-4">Phương thức thanh toán:</strong>
+							<select class="form-select" style="width: 210px" id="paymentMethodDropdown">
+								@if (methods != null)
+								{
+									@foreach (var item in methods)
+									{
+										<option value="@item.MaPhuongThuc">@item.TenPhuongThuc</option>
+									}
+								}
+							</select>
+						</li>
+
+						<li class="list-group-item d-flex flex-row align-items-baseline">
+							<strong class="me-lg-4">Chọn số lượng phòng:</strong>
+							<select @bind="selectedNumberOfRooms" class="form-select mb-3" style="width: 300px" aria-label="Default select example">
+								@if (AvailableRooms != null)
+								{
+									total = @PriceRoom * @NumberOfDays;
+									@foreach (var item in AvailableRooms)
+									{
+										<option value="@item">@item phòng (@total) VNĐ</option>
+									}
+								}
+							</select>
+						</li>
+						@* <li class="list-group-item"><strong>Tổng số tiền phải trả:</strong> @ToltalPriceRoom VNĐ</li> *@
+					</ul>
+				</div>
+				<div class="align-self-end">
+					<button @onclick="ThanhToan" type="submit" class="btn btn-primary">Thanh toán</button>
+					<NavLink href=@string.Format("/booking") class="btn btn-secondary"><i class="fas fa-redo"></i>Quay lại</NavLink>
+				</div>
+			</div>
+		</div>
+
+	</form>
+</div>
+@code {
+	public Phong room { get; set; }
+	[Parameter]
+	public int RoomID { get; set; }
+	[Parameter]
+	public DateTime StartDate { get; set; }
+	[Parameter]
+	public DateTime EndDate { get; set; }
+	[Parameter]
+	public decimal PriceRoom { get; set; }
+	[Parameter]
+	public int TypeRoomID { get; set; }
+
+	public int CustomerID { get; set; }
+
+	KhachHang khachHang { get; set; }
+	LoaiPhong loaiPhong { get; set; }
+	PhuongThucThanhToan paymentMethod { get; set; }
+	private IEnumerable<PhuongThucThanhToan> methods;
+
+	string selectedRoom;
+	public int countAvailableRooms { get; set; }
+	private List<int> availableRoomCounts { get; set; }
+	List<string> AvailableRooms { get; set; }
+	public int NumberOfDays => (EndDate - StartDate).Days;
+
+	private string getIDPaymentMethod { get; set; }
+	private int selectedNumberOfRooms;
+	public decimal ToltalPriceRoom => (PriceRoom * NumberOfDays);
+	decimal total;
+	protected async override Task OnInitializedAsync()
+	{
+		khachHang = new KhachHang();
+		room = new Phong();
+		loaiPhong = new LoaiPhong();
+		paymentMethod = new PhuongThucThanhToan();
+		availableRoomCounts = new List<int>();
+		AvailableRooms = new List<string>();
+
+		await RoomService.GetByIdAsync("https://localhost:44359/api/Room/GetRoomDetails/{0}/{1}/{2}{3}/{4}", RoomID, StartDate, EndDate, PriceRoom, TypeRoomID);
+		khachHang = await RoomService.GetCustomerByIdAsync("https://localhost:44359/api/Room/api/Room/GetCustomerInfo/{0}", 1);
+		room = await RoomService.GetRoomByIdAsync("https://localhost:44359/api/Room/GetRoomInfo/{0}", RoomID);
+		loaiPhong = await RoomService.GetRoomTypeByIdAsync("https://localhost:44359/api/Room/GetRoomTypeInfo/{0}", TypeRoomID);
+		methods = await paymentMethodService.GetAllAsync("https://localhost:44359/api/PTTT/GetPTTT");
+		await LoadAvailableRooms();
+		// await ThanhToan();
+	}
+
+	private async Task LoadAvailableRooms()
+	{
+		var roomCount = await RoomService.GetAvailableRoomCountAsync(TypeRoomID, StartDate, EndDate);
+		AvailableRooms = Enumerable.Range(1, roomCount).Select(i => $"{i}").ToList();
+		foreach (var item in AvailableRooms)
+		{
+			Console.WriteLine("AvailableRooms item: " + item);
+		}
+	}
+
+	private async Task ThanhToan()
+	{
+		Console.WriteLine("Selected number of rooms: " + selectedNumberOfRooms);
+		// await Task.Delay(100);
+		// NavigationManager.NavigateTo("/booking");
+	}
+}

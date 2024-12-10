@@ -24,23 +24,30 @@
 			</form>
 
 			@* kiểm tra khi khôgn có user sẽ hiển thị  *@
-			<div class="d-none">
-				<button type="button" class="btn btn-outline-primary me-2"><a href="#" class="nav-link">Đăng nhập</a></button>
-				<button type="button" class="btn btn-primary"><a href="#" class="nav-link link-dark text-white">Đăng ký</a></button>
-			</div>
+			@if (khachHang == null)
+			{
+				<div class="d-none">
+					<button type="button" class="btn btn-outline-primary me-2"><a href="#" class="nav-link">Đăng nhập</a></button>
+					<button type="button" class="btn btn-primary"><a href="#" class="nav-link link-dark text-white">Đăng ký</a></button>
+				</div>
+			}
 
-			<div class="dropdown text-end">
-				<a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-					<img src="https://github.com/mdo.png" alt="mdo" width="32" height="32" class="rounded-circle">
-				</a>
-				<ul class="dropdown-menu text-small" aria-labelledby="dropdownUser1">
-					<li><a class="dropdown-item" href="#">New project...</a></li>
-					<li><a class="dropdown-item" href="#">Settings</a></li>
-					<li><a class="dropdown-item" href="#">Profile</a></li>
-					<li><hr class="dropdown-divider"></li>
-					<li><a class="dropdown-item" href="#">Sign out</a></li>
-				</ul>
-			</div>
+			@if (khachHang == null)
+			{
+
+				<div class="dropdown text-end">
+					<a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+						<img src="https://github.com/mdo.png" alt="mdo" width="32" height="32" class="rounded-circle">
+					</a>
+					<ul class="dropdown-menu text-small" aria-labelledby="dropdownUser1">
+						<li><a class="dropdown-item" href="#">New project...</a></li>
+						<li><a class="dropdown-item" href="#">Settings</a></li>
+						<li><a class="dropdown-item" href="#">Profile</a></li>
+						<li><hr class="dropdown-divider"></li>
+						<li><a class="dropdown-item" href="#">Sign out</a></li>
+					</ul>
+				</div>
+			}
 		</div>
 	</div>
 </header>
@@ -54,117 +61,93 @@
 		<h2 class="mt-2 border-top d-block">Phòng trống</h2>
 		<div class="d-flex justify-content-start my-2">
 			<div class="datepicker">
-				<label for="start-date" class="form-label">Check-in Date:</label>
-				<input type="text" id="start-date" class="form-control" placeholder="Select check-in date">
+				<label for="checkindate" class="form-label">Check-in Date:</label>
+				<input min="@DateTime.Now.ToString("yyyy-MM-dd")" type="date" id="checkindate" @bind="startDate" class="form-control" placeholder="Ngày nhận phòng">
 			</div>
 			<div class="datepicker">
-				<label for="end-date" class="form-label">Check-out Date:</label>
-				<input type="text" id="end-date" class="form-control" placeholder="Select check-out date">
+				<label for="checkoutdate" class="form-label">Check-out Date:</label>
+				<input min="@startDate.AddDays(1).ToString("yyyy-MM-dd")" type="date" id="checkoutdate" @bind="endDate" class="form-control" placeholder="Ngày trả phòng">
 			</div>
+			<button @onclick="SearchRooms" class="btn btn-primary">Search</button>
 		</div>
 
-		<script>
-			$(document).ready(function () {
-			var startDate = $('#start-date');
-			var endDate = $('#end-date');
-
-			startDate.datepicker({
-			format: 'dd/mm/yyyy',
-			autoclose: true,
-			todayHighlight: true
-			});
-
-			endDate.datepicker({
-			format: 'dd/mm/yyyy',
-			autoclose: true,
-			todayHighlight: true
-			});
-
-			// Xử lý khi chọn ngày cho startDate
-			startDate.on('changeDate', function (selected) {
-			var currentDate = new Date();
-			currentDate.setHours(0, 0, 0, 0); // Đặt giờ về 0 để so sánh ngày
-			var selectedDate = new Date(selected.date.valueOf());
-			selectedDate.setHours(0, 0, 0, 0);
-
-			if (selectedDate < currentDate) {
-			startDate.datepicker('setDate', currentDate);
-			}
-
-			var minDate = new Date(selected.date.valueOf());
-			minDate.setDate(minDate.getDate() + 1);
-			endDate.datepicker('setStartDate', minDate);
-
-			if (endDate.val() === '') {
-			endDate.datepicker('setDate', minDate);
-			}
-			});
-			});
-		</script>
-		<div class="">
-			<table class="table table-bordered table-striped table-responsive-md">
-				<thead class="table-dark">
-					<tr>
-						<th scope="col">Loại phòng</th>
-						<th scope="col">Giá</th>
-						<th scope="col">Số phòng</th>
-						<th scope="col">Mô tả</th>
-						<th scope="col">Số lượng</th>
-					</tr>
-				</thead>
-				<tbody>
-					@if (phongs != null && phongs.Any())
+		@if (phongs != null && phongs.Any())
+		{
+			<div class="container">
+				<div class="row row-cols-1 row-cols-md-2 g-4">
+					@foreach (var phong in phongs.Where(p => p.TrangThaiPhong == 1))
 					{
-						@foreach (var phong in phongs.Where(p => p.TrangThaiPhong == 1))
-						{
-							<tr>
-								<td scope="col">
-									<div class="d-flex align-baseline">
-										<div class="flex-md-row me-3">
-											<div class="mb-1" style="max-width: 204px; height: 114px;">
-												<img src="https://cf.bstatic.com/xdata/images/hotel/max500/274543815.jpg?k=f6c0dc4d0d1d175a8de643d6e23c80b620147156fb01a220938577872782d384&o=" class="img-fluid rounded-3 w-100 h-100" alt="Hình ảnh 1">
-											</div>
-											<div class="flex-row d-flex align-items-center justify-content-between">
-												<div class="me-1" style="max-width: 100px; height: 56px;">
-													<img src="https://cf.bstatic.com/xdata/images/hotel/max500/274543645.jpg?k=f0d023c8f640749669e2e69005a47d154b45a8b914a165ab877bb458dd782ac1&o=" class="img-fluid rounded-3 w-100 h-100" alt="Hình ảnh 2">
-												</div>
-												<div class="" style="max-width: 100px; height: 56px;">
-													<img src="https://cf.bstatic.com/xdata/images/hotel/max1024x768/274543555.jpg?k=94e5eecc58931591e05c6e65bef9bc878820145cf008a28bf586f40946d228cd&o=" class="img-fluid rounded-3 w-100 h-100" alt="Hình ảnh 3">
-												</div>
-											</div>
-										</div>
-										<span>
-											@phong.LoaiPhong.TenLoaiPhong
-										</span>
-									</div>
+						var randomImageIndex = new Random().Next(0, listImage.Count);
+						var randomImage = listImage[randomImageIndex];
+						
 
-								</td>
-								<td scope="col">@phong.LoaiPhong.Gia</td>
-								<td scope="col">@phong.SoPhong</td>
-								<td scope="col">@phong.LoaiPhong.Mota</td>
-								<td scope="col">@phong.LoaiPhong.SoLuongPhong</td>
-							</tr>
-						}
+						<div class="col">
+							<div class="card w-75">
+								<img src="@randomImage" class="card-img-top" alt="Hình ảnh phòng khách sạn">
+								<div class="card-body">
+									<h5 class="card-title">@phong.LoaiPhong.TenLoaiPhong</h5>
+									@* <select class="form-select mb-3" style="width: 210px" aria-label="Default select example"> *@
+									@* 	<option selected>Chọn số lượng phòng</option> *@
+									@* 	@for (int i = 1; i <= countAvailableRooms; i++) *@
+									@* 	{ *@
+									@* 		<option value="@i">@i phòng</option> *@
+									@* 	} *@
+									@* </select> *@
+
+									<p class="card-text"><strong>Mô tả:</strong> @phong.LoaiPhong.Mota</p>
+									<p class="card-text"><strong>Giá:</strong> @phong.LoaiPhong.Gia đ/ngày</p>
+									<p class="card-text"><strong>Mã phòng:</strong> @phong.MaPhong</p>
+									<p class="card-text"><strong>Mã loại phòng:</strong> @phong.LoaiPhong.MaLoaiPhong</p>
+									@* <a href="#" class="btn btn-primary">Đặt phòng ngay</a> *@
+									@* <NavLink href=@string.Format("/booking/GetRoomDetails/{0}",phong.MaPhong) class="btn btn-primary">Đặt phòng ngay</NavLink> *@
+									<NavLink href=@string.Format("/booking/GetRoomDetails/{0}/{1}/{2}/{3}/{4}", phong.MaPhong, startDate.ToString("yyyy-MM-dd"), endDate.ToString("yyyy-MM-dd"), phong.LoaiPhong.Gia,phong.LoaiPhong.MaLoaiPhong) class="btn btn-primary">Đặt phòng ngay</NavLink>
+								</div>
+							</div>
+						</div>
 					}
-					else
-					{
-						<tr>
-							<td colspan="5">Không có dữ liệu phòng</td>
-						</tr>
-					}
-				</tbody>
-			</table>
-		</div>
+				</div>
+			</div>
+		}
 	</div>
 </section>
 
 <footer></footer>
 
 @code {
-	List<Phong> phongs;
+	List<string> listImage = new List<string>
+	{
+		"https://thumbs.dreamstime.com/b/hotel-room-23802674.jpg?w=768",
+		"https://thumbs.dreamstime.com/b/luxury-hotel-room-master-bedroom-creative-ai-design-background-instagram-facebook-wall-painting-photo-wallpaper-backgrounds-325040660.jpg?w=1400",
+		"https://thumbs.dreamstime.com/b/hotel-room-bright-modern-interior-condominium-37608904.jpg?w=992",
+		"https://thumbs.dreamstime.com/b/modern-hotel-room-floral-wall-mural-large-bed-white-linens-plush-gold-footrest-desk-city-view-ai-generative-decor-326849892.jpg?w=1400"
+	};
+	List<Phong> phongs = new List<Phong>();
+	KhachHang khachHang;
+	DateTime startDate = DateTime.Today;
+	DateTime endDate = DateTime.Today.AddDays(1);
+	// public int countAvailableRooms { get; set; }
 
 	protected override async Task OnInitializedAsync()
 	{
-		phongs = await Http.GetFromJsonAsync<List<Phong>>("https://localhost:44359/api/Room/GetRoomInfo");
+		await GetRooms();
+	}
+
+	async Task SearchRooms()
+	{
+		await GetRooms();
+	}
+
+	async Task GetRooms()
+	{
+		if (startDate != null && endDate != null)
+		{
+			phongs = await RoomService.GetAvailableRooms("https://localhost:44359/api/Room/GetRoomInfo", startDate, endDate);
+
+		}
+	}
+
+	void updateCheckoutDate()
+	{
+		endDate = startDate.AddDays(1); // Update on check-in change
 	}
 }
