@@ -73,41 +73,55 @@ namespace WebAPI.Controllers.V1
 			return Ok("Bill created successfully");
 		}
 
-		// Similar methods for updating and deleting KhachHang
-		/// <summary>
-		/// Deletes Product Entity based on Id.
-		/// </summary>
-		/// <param name="id"></param>
-		/// <returns></returns>
-		[HttpDelete("DeleteBill")]
-		public async Task<IActionResult> Delete([FromBody] DeleteCommand<HoaDon> command)
-		{
-			if (command == null || command.Id == null)
-			{
-				return BadRequest("Invalid command data");
-			}
-			var entity = _context.hoadon.Find(command.Id);
-			_context.hoadon.Remove(entity);
-			await _context.SaveChangesAsync();
-			return Ok("Bill deleted."); // No content to return on successful deletion
-		}
-		/// <summary>
-		/// Updates the Product Entity based on Id.   
-		/// </summary>
-		/// <param name="id"></param>
-		/// <param name="command"></param>
-		/// <returns></returns>
-		[HttpPut("[action]")]
-		public async Task<IActionResult> Update([FromBody] UpdateCommand<HoaDon> command)
-		{
-			if (command == null || command.Entity == null)
-			{
-				return BadRequest("Invalid command data");
-			}
-
-			await _mediator.Send(command);
-			return NoContent(); // No content to return on successful update
-		}
+        // Similar methods for updating and deleting KhachHang
+        /// <summary>
+        /// Deletes Product Entity based on Id.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpDelete("DeleteBill/{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            if (id == null)
+            {
+                return BadRequest("Invalid command data");
+            }
+            var entity = _context.hoadon.Find(id);
+            _context.hoadon.Remove(entity);
+            await _context.SaveChangesAsync();
+            return Ok(entity); // No content to return on successful deletion
+        }
+        /// <summary>
+        /// Updates the Product Entity based on Id.   
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        [HttpPut("UpdateBill/{id}")]
+        public async Task<IActionResult> Update(int id , HoaDon bill)
+        {
+            if (id != bill.MaHoaDon)
+            {
+                return BadRequest("Invalid command data");
+            }
+            _context.hoadon.Entry(bill).State = EntityState.Modified;
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (bill==null)
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return Ok(bill); // No content to return on successful update
+        }
 
 	}
 }

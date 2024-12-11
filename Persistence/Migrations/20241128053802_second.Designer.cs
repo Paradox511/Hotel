@@ -12,7 +12,7 @@ using Persistence.Context;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(HotelDBContext))]
-    [Migration("20241122083853_second")]
+    [Migration("20241128053802_second")]
     partial class second
     {
         /// <inheritdoc />
@@ -41,7 +41,8 @@ namespace Persistence.Migrations
 
                     b.HasKey("Macthd");
 
-                    b.HasIndex("MaDichVu");
+                    b.HasIndex("MaDichVu")
+                        .IsUnique();
 
                     b.HasIndex("MaHoaDon");
 
@@ -92,12 +93,7 @@ namespace Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("cthdMacthd")
-                        .HasColumnType("int");
-
                     b.HasKey("MaDichVu");
-
-                    b.HasIndex("cthdMacthd");
 
                     b.ToTable("dichvu");
                 });
@@ -303,8 +299,8 @@ namespace Persistence.Migrations
             modelBuilder.Entity("Domain.Entities.CTHoaDon", b =>
                 {
                     b.HasOne("Domain.Entities.DichVu", "dv")
-                        .WithMany()
-                        .HasForeignKey("MaDichVu")
+                        .WithOne("cthd")
+                        .HasForeignKey("Domain.Entities.CTHoaDon", "MaDichVu")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -319,17 +315,6 @@ namespace Persistence.Migrations
                     b.Navigation("dv");
                 });
 
-            modelBuilder.Entity("Domain.Entities.DichVu", b =>
-                {
-                    b.HasOne("Domain.Entities.CTHoaDon", "cthd")
-                        .WithMany()
-                        .HasForeignKey("cthdMacthd")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("cthd");
-                });
-
             modelBuilder.Entity("Domain.Entities.Phong", b =>
                 {
                     b.HasOne("Domain.Entities.LoaiPhong", "LoaiPhong")
@@ -339,6 +324,12 @@ namespace Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("LoaiPhong");
+                });
+
+            modelBuilder.Entity("Domain.Entities.DichVu", b =>
+                {
+                    b.Navigation("cthd")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Domain.Entities.HoaDon", b =>
