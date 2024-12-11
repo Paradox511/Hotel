@@ -155,7 +155,7 @@ namespace Hotel_App.Service
 		{
 			try
 			{
-				HttpResponseMessage response = await _httpClient.GetAsync("https://localhost:44359/api/Room/GetCustomers\r\n");
+				HttpResponseMessage response = await _httpClient.GetAsync("https://localhost:44359/api/Room/GetCustomers");
 
 				if (response.IsSuccessStatusCode)
 				{

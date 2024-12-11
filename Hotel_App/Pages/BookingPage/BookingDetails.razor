@@ -5,6 +5,7 @@
 	@inject HotelService<PhuongThucThanhToan> paymentMethodService;
 	@inject NavigationManager NavigationManager
 	@inject IJSRuntime JSRuntime
+	@inject HotelService<HoaDon> BillService
 <header class="px-2 py-3" style="background-color: #2549ff">
 	<div class="">
 		<div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
@@ -45,23 +46,32 @@
 <div class="container mt-5">
 	<h2 class="text-center">Xác nhận đặt phòng</h2>
 	<p class="text-center">Experience something new every moment.</p>
+	@if (!string.IsNullOrEmpty(errorMessage))
+	{
+		<p class="alert alert-danger" style="color: black;">@errorMessage</p>
+	}
 	<div class="row">
-		<div class="d-flex flex-column col-md-6 justify-content-between">
-			<div class="">
+		<div class="d-flex justify-content-lg-between">
+			<div class="me-3">
 				<h3>Thông tin khách hàng</h3>
 				<ul class="list-group">
 					<li class="list-group-item d-flex flex-row align-items-baseline">
-						<select class="form-select" style="width: 300px" id="">
+						<select class="form-select" style="width: 300px" id="" @onchange="@((e) => OnCustomerChange(e))">
 							<option>Chọn khách hàng</option>
-							<option value="">Phan Quang Duy</option>
+							@foreach (var item in listKhachHang)
+							{
+								<option value="@item.MaKhachHang">@item.HoTen</option>
+							}
 						</select>
 					</li>
-					@* <li class="list-group-item"><strong>Mã:</strong> @khachHang.MaKhachHang</li> *@
-					@* <li class="list-group-item"><strong>Tên:</strong> @khachHang.HoTen</li> *@
-					@* <li class="list-group-item"><strong>Số điện thoại:</strong> @khachHang.SoDienThoai</li> *@
-					@* <li class="list-group-item"><strong>Email:</strong> @khachHang.Email</li> *@
+					<li class="list-group-item"><strong>Mã:</strong> @khachHang.MaKhachHang</li>
+					<li class="list-group-item"><strong>Tên:</strong> @khachHang.HoTen</li>
+					<li class="list-group-item"><strong>Số điện thoại:</strong> @khachHang.SoDienThoai</li>
+					<li class="list-group-item"><strong>Email:</strong> @khachHang.Email</li>
 
 				</ul>
+			</div>
+			<div class="w-100">
 				<h3 class="mt-1">Thông tin đặt phòng</h3>
 				<ul class="list-group">
 					<li class="list-group-item"><strong>Loại phòng:</strong> @loaiPhong.TenLoaiPhong</li>
@@ -103,10 +113,10 @@
 						};
 					</script>
 				</ul>
-			</div>
-			<div class="align-self-end">
-				<button @onclick="ThanhToan" type="button" class="btn btn-primary">Thanh toán</button>
-				<NavLink href=@string.Format("/booking") class="btn btn-secondary"><i class="fas fa-redo"></i>Quay lại</NavLink>
+				<div class="align-self-end mt-3">
+					<button @onclick="ThanhToan" type="button" class="btn btn-primary">Thanh toán</button>
+					<NavLink href=@string.Format("/booking") class="btn btn-secondary"><i class="fas fa-redo"></i>Quay lại</NavLink>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -146,6 +156,11 @@
 
 	private DateTime today = DateTime.Today;
 
+	private int selectedCustomerID { get; set; }
+	public HoaDon bill { get; set; }
+
+	private string errorMessage = "";
+
 	protected async override Task OnInitializedAsync()
 	{
 		khachHang = new KhachHang();
@@ -155,6 +170,8 @@
 		availableRoomCounts = new List<int>();
 		AvailableRooms = new List<string>();
 		listKhachHang = new List<KhachHang>();
+		bill = new HoaDon();
+
 
 		await RoomService.GetByIdAsync("https://localhost:44359/api/Room/GetRoomDetails/{0}/{1}/{2}{3}/{4}", RoomID, StartDate, EndDate, PriceRoom, TypeRoomID);
 		// khachHang = await RoomService.GetCustomerByIdAsync("https:localhost:44359/api/Room/api/Room/GetCustomerInfo/{0}", 1);
@@ -162,11 +179,7 @@
 		loaiPhong = await RoomService.GetRoomTypeByIdAsync("https://localhost:44359/api/Room/GetRoomTypeInfo/{0}", TypeRoomID);
 		methods = await paymentMethodService.GetAllAsync("https://localhost:44359/api/PTTT/GetPTTT");
 		listKhachHang = await RoomService.GetCustomers();
-		foreach (var item in listKhachHang)
-		{
-			Console.WriteLine($"Danh sach: {item}");
 
-		}
 
 
 		await LoadAvailableRooms();
@@ -213,23 +226,51 @@
 			selectedPaymentMethodId = selectedId;
 			paymentMethod = methods.FirstOrDefault(m => m.MaPhuongThuc == selectedPaymentMethodId);
 			StateHasChanged();
-			Console.WriteLine($"Giá trị được chọn từ dropdown: {selectedPaymentMethodId}");
+
 		}
 	}
+	private void OnCustomerChange(ChangeEventArgs e)
+	{
+		if (int.TryParse(e.Value.ToString(), out int customerId))
+		{
+			selectedCustomerID = customerId;
+			khachHang = listKhachHang.FirstOrDefault(c => c.MaKhachHang == customerId);
+			StateHasChanged(); // Update UI with new customer information
 
+		}
+	}
 	// thanh toán đặt phòng
 	private async Task ThanhToan()
 	{
+		if (selectedCustomerID == 0 || selectedPaymentMethodId == 0 || ToltalPriceRoom == 0)
+		{
+			Console.WriteLine("Vui lòng chọn đầy đủ thông tin trước khi thanh toán.");
+			// Hiển thị thông báo lỗi trên giao diện người dùng nếu cần
+			errorMessage = "Vui lòng chọn đầy đủ thông tin trước khi thanh toán.";
+			return;
+		}
 		datPhong = new DatPhong();
 		datPhong.MaKhachHang = 1;
 		datPhong.CheckInDate = StartDate;
 		datPhong.CheckOutDate = EndDate;
 		datPhong.MaPhong = RoomID;
 
-		// var result = await RoomService.AddDatPhong(datPhong);
+		var result = await RoomService.AddDatPhong(datPhong);
+		if (result != null)
+		{
+			if (bill.CTHoaDon == null) bill.CTHoaDon = [];
+			bill.NgayTao = today;
+			bill.TongSoTien = ToltalPriceRoom;
+			bill.MaPhuongThuc = selectedPaymentMethodId;
+			bill.MaTaiKhoan = 1;
+			bill.MaDatPhong = result.MaDatPhong;
+			HoaDon savedBill = await BillService.SaveAsync("https:localhost:44359/api/Bills/CreateBill", bill);
+		}
 		Console.WriteLine($"THong tin dat phong: {datPhong.MaKhachHang}");
 		Console.WriteLine($"THong tin dat phong: {datPhong.CheckInDate}");
 		Console.WriteLine($"THong tin dat phong: {datPhong.CheckOutDate}");
 		Console.WriteLine($"THong tin dat phong: {datPhong.MaPhong}");
+		Console.WriteLine($"Ma khach hang chon: {selectedCustomerID}");
+		Console.WriteLine($"Ma phuong thuc chon duoc: {selectedPaymentMethodId}");
 	}
 }
