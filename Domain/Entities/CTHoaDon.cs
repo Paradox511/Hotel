@@ -9,8 +9,9 @@ namespace Domain.Entities
         public int MaHoaDon { get; set; }
         
         public int MaDichVu { get; set; }
-
-        public HoaDon HoaDon { get; set; }
-        public DichVu dv { get; set; }
+        public int SoLuong { get; set; }
+        public decimal TongTien { get; set; }
+        public HoaDon? HoaDon { get; set; } = null;
+        public DichVu? dv { get; set; } = null;
     }
 }

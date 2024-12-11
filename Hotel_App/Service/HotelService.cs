@@ -21,7 +21,7 @@ namespace Hotel_App.Service
             string url = requestUri + Id;
            
             var response = await _httpClient.SendAsync(requestMessage);
-
+            var responsebody = await response.Content.ReadAsStringAsync();
             var responseStatusCode = response.StatusCode;
 
             return await Task.FromResult(true);
@@ -32,6 +32,8 @@ namespace Hotel_App.Service
             try
             {
                 var response = await _httpClient.GetAsync(requestUri);
+                var responsebody = response.Content.ReadAsStringAsync();
+
                 response.EnsureSuccessStatusCode();
                 var data = await response.Content.ReadFromJsonAsync<IEnumerable<T>>();
                 return data;
@@ -49,7 +51,10 @@ namespace Hotel_App.Service
             try
             {
                 var response = await _httpClient.GetAsync(string.Format(requestUri, Id));
+                var responseBody = await response.Content.ReadAsStringAsync();
+
                 response.EnsureSuccessStatusCode();
+
                 var data = await response.Content.ReadFromJsonAsync<T>();
                 return data;
             }

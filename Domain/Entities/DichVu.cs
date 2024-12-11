@@ -14,9 +14,9 @@ namespace Domain.Entities
         [Required]
         public string Mota { get; set; }
 
-        public ICollection<CTHoaDon> cthd { get; set; }
+        public ICollection<CTHoaDon> cthds { get; set; } = [];
+        public int TrangThai { get; set; }
 
-        //public ICollection<CTHoaDon> CTHoaDon { get; set; }
         public DichVu() { }
     }
 }

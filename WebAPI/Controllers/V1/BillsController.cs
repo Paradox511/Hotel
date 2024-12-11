@@ -139,10 +139,12 @@ namespace WebAPI.Controllers.V1
                 }
 
                 // Update the TongSoTien property
-                hoaDon.TongSoTien = newTotal;
+               
+            hoaDon.TongSoTien = newTotal;
 
-                // Save the changes to the database
-                _context.hoadon.Entry(hoaDon).State = EntityState.Modified;
+
+            // Save the changes to the database
+            _context.hoadon.Entry(hoaDon).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
 
                 return Ok(hoaDon);

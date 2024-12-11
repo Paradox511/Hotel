@@ -42,14 +42,14 @@
             <param name="command"></param>
             <returns></returns>
         </member>
-        <member name="M:WebAPI.Controllers.V1.NhanVienController.Delete(System.Int32)">
+        <member name="M:WebAPI.Controllers.V1.taikhoanController.Delete(System.Int32)">
             <summary>
             Deletes Product Entity based on Id.
             </summary>
             <param name="id"></param>
             <returns></returns>
         </member>
-        <member name="M:WebAPI.Controllers.V1.NhanVienController.Update(System.Int32,Domain.Entities.NhanVien)">
+        <member name="M:WebAPI.Controllers.V1.taikhoanController.Update(System.Int32,Domain.Entities.TaiKhoan)">
             <summary>
             Updates the Product Entity based on Id.   
             </summary>

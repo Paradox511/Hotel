@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-
+using Hotel_App.Data;
 namespace Hotel_App.Data
 {
     public class TaiKhoan
@@ -7,12 +7,19 @@ namespace Hotel_App.Data
         [Key]
         public int MaTaiKhoan { get; set; }
         [Required]
-        public string Quyen { get; set; }
+        public string HoTen { get; set; }
         [Required]
-        public string Username { get; set; }
+        public string SoDienThoai { get; set; }
+        [Required]
+        public string Email { get; set; }
+        [Required]
+        public string DiaChi { get; set; }
+      
+        public string Username {  get; set; }
         [Required]
         public string Password { get; set; }
-        public int TrangThai { get; set; } = 1;
+        public int TrangThai { get; set; }
+
 
         public TaiKhoan() { }
     }

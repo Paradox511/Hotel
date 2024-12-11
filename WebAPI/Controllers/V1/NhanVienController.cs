@@ -11,20 +11,20 @@ using System.Text.Json;
 namespace WebAPI.Controllers.V1
 {
     [ApiVersion("1.0")]
-    public class NhanVienController : BaseApiController
+    public class taikhoanController : BaseApiController
     {
         private readonly IHotelDBContext _context;
         private readonly IMediator _mediator;
 
 
-        public NhanVienController(IHotelDBContext context, IMediator mediator)
+        public taikhoanController(IHotelDBContext context, IMediator mediator)
         {
             _context = context;
             _mediator = mediator;
 
 
         }
-        [HttpGet("GetNhanVien")]
+        [HttpGet("Gettaikhoan")]
         public async Task<IActionResult> GetAll()
         {
             if (_context == null)
@@ -32,7 +32,7 @@ namespace WebAPI.Controllers.V1
                 return StatusCode(500, "Internal Server Error: DbContext not injected");
             }
 
-            var employees = await _context.nhanvien.Where(emp => emp.TrangThai == 1).ToListAsync();
+            var employees = await _context.taikhoan.ToListAsync(); 
             if (employees == null)
             {
                 return NotFound("No employees found");
@@ -44,8 +44,8 @@ namespace WebAPI.Controllers.V1
         [HttpGet("GetByID/{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var employees = await _context.nhanvien
-                .FirstOrDefaultAsync(h => h.MaNhanVien == id);
+            var employees = await _context.taikhoan
+                .FirstOrDefaultAsync(h => h.MaTaiKhoan == id);
             //.ThenInclude(ct => ct.dv)// Include related CTHoaDon entities
             //.FirstOrDefaultAsync(h => h.MaHoaDon == id);
 
@@ -59,17 +59,17 @@ namespace WebAPI.Controllers.V1
                 ReferenceHandler = ReferenceHandler.IgnoreCycles
             };
 
-            return Ok(JsonSerializer.Serialize(employees, options));
+            return Ok(employees);
         }
 
-        [HttpPost("CreateNhanVien")]
-        public async Task<IActionResult> CreateNhanVien([FromBody] CreateCommand<NhanVien> command)
+        [HttpPost("Createtaikhoan")]
+        public async Task<IActionResult> Createtaikhoan([FromBody] CreateCommand<TaiKhoan> command)
         {
             if (command == null || command.Entity == null)
             {
                 return BadRequest("Invalid command data");
             }
-            _context.nhanvien.Add(command.Entity);
+            _context.taikhoan.Add(command.Entity);
             await _context.SaveChangesAsync();
             return Ok("Nhan Vien created successfully");
         }
@@ -80,9 +80,9 @@ namespace WebAPI.Controllers.V1
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpDelete("DeleteNhanVien/{id}")]
+        [HttpDelete("DeleteTaiKhoan/{id}")]
         public async Task<IActionResult> Delete(int id) {
-            var employee = await _context.nhanvien.FindAsync(id);
+            var employee = await _context.taikhoan.FindAsync(id);
             if (employee == null)
             {
                 return BadRequest("Invalid command data");
@@ -104,14 +104,14 @@ namespace WebAPI.Controllers.V1
         /// <param name="id"></param>
         /// <param name="command"></param>
         /// <returns></returns>
-        [HttpPut("UpdateNhanVien/{id}")]
-        public async Task<IActionResult> Update(int id, NhanVien employee)
+        [HttpPut("Updatetaikhoan/{id}")]
+        public async Task<IActionResult> Update(int id, TaiKhoan employee)
         {
-            if (id != employee.MaNhanVien)
+            if (id != employee.MaTaiKhoan)
             {
                 return BadRequest("Invalid command data");
             }
-            _context.nhanvien.Entry(employee).State = EntityState.Modified;
+            _context.taikhoan.Entry(employee).State = EntityState.Modified;
             try
             {
                 await _context.SaveChangesAsync();

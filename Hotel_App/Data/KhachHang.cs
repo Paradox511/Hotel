@@ -31,10 +31,11 @@ namespace Hotel_App.Data
         [Required(ErrorMessage = "Số tài khoản không được để trống.")]
         public string STK { get; set; }
 
-        [Required(ErrorMessage = "Mật khẩu không được để trống.")]
-        public string Password { get; set; }
+        
 
         public bool HasReservation { get; set; }
+        public int TrangThai { get; set; }
+
         public KhachHang() { }
     }
 }

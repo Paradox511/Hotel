@@ -5,7 +5,7 @@
 @using Hotel_App.Shared
 @inject HotelService<HoaDon> BillService
 @inject HotelService<DatPhong> dpservice;
-@inject HotelService<NhanVien> nvservice;
+@inject HotelService<TaiKhoan> nvservice;
 @inject HotelService<PhuongThucThanhToan> ptservice;
 @implements IDisposable
 
@@ -70,13 +70,13 @@
 
         <div class="form-group">
             <label for="MaNhanVien">Nhân Viên:</label>
-            <select class="form-control" id="MaNhanVien" @bind="bill.MaNhanVien" name="MaNhanVien">
+            <select class="form-control" id="MaNhanVien" @bind="bill.MaTaiKhoan" name="MaNhanVien">
                 <option value="">Chọn Nhân Viên</option>
                 @if (employees != null)
                 {
                     @foreach (var nhanVien in employees)
                     {
-                        <option value="@nhanVien.MaNhanVien">@nhanVien.HoTen</option>
+                        <option value="@nhanVien.MaTaiKhoan">@nhanVien.HoTen</option>
                     }
                 }
 
@@ -144,7 +144,7 @@
                                 <td>@bill.NgayTao</td>
                                 <td>@bill.TongSoTien</td>
                                     <td class="action-links">
-                                        <a class="edit-link" @onclick="(() => EditBill(bill))">Edit</a> |
+                                        <a class="edit-link" @onclick="(() => EditBill(bill))">Edit</a> 
                                         <a class="delete-link" @onclick="(() => ShowDeleteConfirmation(bill.MaHoaDon))">Delete</a>
                                     </td>
                                 <td>
@@ -315,7 +315,7 @@
 @code {
     private IEnumerable<HoaDon> bills;
     private IEnumerable<DatPhong> reservations;
-    private IEnumerable<NhanVien> employees;
+    private IEnumerable<TaiKhoan> employees;
     private IEnumerable<PhuongThucThanhToan> methods;
     private IEnumerable<CTHoaDon> cthd;
     public HoaDon bill { get; set; }
@@ -328,7 +328,7 @@
     private int currentPage = 1;
     private int itemsPerPage = 5; // Change this number based on your preference
     private int totalBills = 0;
-    private int totalPages => (int)Math.Ceiling((double)employees.Count() / itemsPerPage);
+    private int totalPages => (int)Math.Ceiling((double)bills.Count() / itemsPerPage);
     // private int totalPages => (int)Math.Ceiling((double)filteredEmployees.Count() / itemsPerPage);
     private bool IsFirstPage() => currentPage == 1;
     private bool IsLastPage() => currentPage == totalPages;
@@ -346,7 +346,7 @@
 
         // Lọc danh sách theo tất cả các trường dữ liệu
         filteredAuthorList = bills.Where(hd =>
-            hd.MaHoaDon.ToString().Contains(searchValue) 
+            hd.MaHoaDon.ToString().Contains(searchValue)
         ).ToList();
 
         totalBills = filteredAuthorList.Count(); // Cập nhật tổng số lượng nhân viên sau khi lọc
@@ -406,8 +406,7 @@
     }
 
     protected override async Task OnParametersSetAsync()
-    {
-        Console.WriteLine("Authors - OnParametersSetAsync");
+    {Console.WriteLine("Authors - OnParametersSetAsync");
         await base.OnParametersSetAsync();
     }
 
@@ -495,7 +494,6 @@
                 {
                     // Display success message using a modal or dialog
                     //  await _modalService.Show<SuccessMessage>("Bill created successfully!");
-
                     // Update the bill list
                     StateHasChanged();
                     successMessage = "Hóa đơn đã được thêm thành công!";
