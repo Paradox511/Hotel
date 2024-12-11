@@ -18,7 +18,7 @@ namespace Application.Interfaces
         DbSet<LoaiPhong> loaiphong { get; set; }
         DbSet<DichVu> dichvu { get; set; }
         DbSet<KhachHang> khachhang { get; set; }
-        DbSet<NhanVien> nhanvien { get; set; }
+        //DbSet<NhanVien> nhanvien { get; set; }
 
         DbSet<TaiKhoan> taikhoan { get; set; }
         DbSet<PhuongThucThanhToan> ptthanhtoan { get; set; }
