@@ -12,8 +12,8 @@ using Persistence.Context;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(HotelDBContext))]
-    [Migration("20241122083853_second")]
-    partial class second
+    [Migration("20241211091843_abc")]
+    partial class abc
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -38,6 +38,12 @@ namespace Persistence.Migrations
 
                     b.Property<int>("MaHoaDon")
                         .HasColumnType("int");
+
+                    b.Property<int>("SoLuong")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("TongTien")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Macthd");
 
@@ -68,6 +74,12 @@ namespace Persistence.Migrations
                     b.Property<int>("MaPhong")
                         .HasColumnType("int");
 
+                    b.Property<decimal?>("TongTien")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("TrangThai")
+                        .HasColumnType("int");
+
                     b.HasKey("MaDatPhong");
 
                     b.ToTable("datphong");
@@ -92,12 +104,10 @@ namespace Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("cthdMacthd")
+                    b.Property<int>("TrangThai")
                         .HasColumnType("int");
 
                     b.HasKey("MaDichVu");
-
-                    b.HasIndex("cthdMacthd");
 
                     b.ToTable("dichvu");
                 });
@@ -113,10 +123,10 @@ namespace Persistence.Migrations
                     b.Property<int>("MaDatPhong")
                         .HasColumnType("int");
 
-                    b.Property<int>("MaNhanVien")
+                    b.Property<int>("MaPhuongThuc")
                         .HasColumnType("int");
 
-                    b.Property<int>("MaPhuongThuc")
+                    b.Property<int>("MaTaiKhoan")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("NgayTao")
@@ -124,6 +134,9 @@ namespace Persistence.Migrations
 
                     b.Property<decimal?>("TongSoTien")
                         .HasColumnType("decimal(10,2)");
+
+                    b.Property<int>("TrangThai")
+                        .HasColumnType("int");
 
                     b.HasKey("MaHoaDon");
 
@@ -150,9 +163,6 @@ namespace Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("MaTaiKhoan")
-                        .HasColumnType("int");
-
                     b.Property<DateTime?>("NgaySinh")
                         .HasColumnType("datetime2");
 
@@ -163,6 +173,9 @@ namespace Persistence.Migrations
                     b.Property<string>("SoDienThoai")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TrangThai")
+                        .HasColumnType("int");
 
                     b.HasKey("MaKhachHang");
 
@@ -191,41 +204,12 @@ namespace Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("TrangThai")
+                        .HasColumnType("int");
+
                     b.HasKey("MaLoaiPhong");
 
                     b.ToTable("loaiphong");
-                });
-
-            modelBuilder.Entity("Domain.Entities.NhanVien", b =>
-                {
-                    b.Property<int>("MaNhanVien")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaNhanVien"));
-
-                    b.Property<string>("DiaChi")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("HoTen")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("MaTaiKhoan")
-                        .HasColumnType("int");
-
-                    b.Property<string>("SoDienThoai")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("MaNhanVien");
-
-                    b.ToTable("nhanvien");
                 });
 
             modelBuilder.Entity("Domain.Entities.Phong", b =>
@@ -236,13 +220,13 @@ namespace Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaPhong"));
 
-                    b.Property<int>("LoaiPhongMaLoaiPhong")
-                        .HasColumnType("int");
-
                     b.Property<int>("MaLoaiPhong")
                         .HasColumnType("int");
 
                     b.Property<int>("SoPhong")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TrangThai")
                         .HasColumnType("int");
 
                     b.Property<int>("TrangThaiPhong")
@@ -250,7 +234,7 @@ namespace Persistence.Migrations
 
                     b.HasKey("MaPhong");
 
-                    b.HasIndex("LoaiPhongMaLoaiPhong");
+                    b.HasIndex("MaLoaiPhong");
 
                     b.ToTable("phong");
                 });
@@ -276,15 +260,31 @@ namespace Persistence.Migrations
                 {
                     b.Property<int>("MaTaiKhoan")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("MaTaiKhoan");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaTaiKhoan"));
 
-                    b.Property<string>("Password")
+                    b.Property<string>("DiaChi")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Quyen")
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("HoTen")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("password");
+
+                    b.Property<string>("SoDienThoai")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -293,17 +293,23 @@ namespace Persistence.Migrations
 
                     b.Property<string>("Username")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("username");
 
-                    b.HasKey("MaTaiKhoan");
+                    b.HasKey("MaTaiKhoan")
+                        .HasName("PK_user_id_2");
 
-                    b.ToTable("taikhoan");
+                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("MaTaiKhoan"), false);
+
+                    b.ToTable("TaiKhoan", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.CTHoaDon", b =>
                 {
                     b.HasOne("Domain.Entities.DichVu", "dv")
-                        .WithMany()
+                        .WithMany("cthds")
                         .HasForeignKey("MaDichVu")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -319,31 +325,30 @@ namespace Persistence.Migrations
                     b.Navigation("dv");
                 });
 
-            modelBuilder.Entity("Domain.Entities.DichVu", b =>
-                {
-                    b.HasOne("Domain.Entities.CTHoaDon", "cthd")
-                        .WithMany()
-                        .HasForeignKey("cthdMacthd")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("cthd");
-                });
-
             modelBuilder.Entity("Domain.Entities.Phong", b =>
                 {
                     b.HasOne("Domain.Entities.LoaiPhong", "LoaiPhong")
-                        .WithMany()
-                        .HasForeignKey("LoaiPhongMaLoaiPhong")
+                        .WithMany("phong")
+                        .HasForeignKey("MaLoaiPhong")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("LoaiPhong");
                 });
 
+            modelBuilder.Entity("Domain.Entities.DichVu", b =>
+                {
+                    b.Navigation("cthds");
+                });
+
             modelBuilder.Entity("Domain.Entities.HoaDon", b =>
                 {
                     b.Navigation("CTHoaDon");
+                });
+
+            modelBuilder.Entity("Domain.Entities.LoaiPhong", b =>
+                {
+                    b.Navigation("phong");
                 });
 #pragma warning restore 612, 618
         }

@@ -20,9 +20,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using System.Reflection;
-using Blazorise;
-using Blazorise.Charts;
-using Blazorise.Bootstrap;
+using Microsoft.JSInterop;
 
 namespace Hotel_App
 {
@@ -42,15 +40,29 @@ namespace Hotel_App
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddHttpClient<HotelService<HoaDon>>();
-            services.AddHttpClient<HotelService<NhanVien>>();
+            services.AddHttpClient<HotelService<TaiKhoan>>();
             services.AddHttpClient<HotelService<PhuongThucThanhToan>>();
             services.AddHttpClient<HotelService<DatPhong>>();
+			services.AddHttpClient<RoomService>();
+			services.AddHttpClient<HotelService<Phong>>();
+            //services.AddHttpClient<RoomService<Phong>>();
+			services.AddHttpClient<HotelService<LoaiPhong>>();
+			services.AddHttpClient<HoaDonService>();
+
+            services.AddHttpClient<HotelService<DichVu>>();
+            services.AddHttpClient<HotelService<CTHoaDon>>();
             services.AddHttpClient<HotelService<TaiKhoan>>();
-            services.AddHttpClient<HotelService<KhachHang>>();
             services.AddHttpClient<HoaDonService>();
+            services.AddHttpClient<DichVuService>();
+
+
+            services.AddHttpClient<HotelService<TaiKhoan>>();
+			services.AddHttpClient<HoaDonService>();
+
             services.AddSingleton<WeatherForecastService>();
             services.AddSingleton<UserService>();
             services.AddSingleton<IUserService, UserService>();
+          //  services.AddSingleton<IJSRuntime,JSRuntime>();
 
 
             var appSettingSection = Configuration.GetSection("AppSettings");

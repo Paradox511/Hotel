@@ -5,45 +5,79 @@
 @using Hotel_App.Shared
 @inject HotelService<HoaDon> BillService
 @inject HotelService<DatPhong> dpservice;
-@inject HotelService<NhanVien> nvservice;
+@inject HotelService<TaiKhoan> nvservice;
 @inject HotelService<PhuongThucThanhToan> ptservice;
 @implements IDisposable
 
 
 <div class="col-12">
-    <h3><b>Enter Author Information</b></h3>
+    <h3><b>Thông tin hóa đơn</b></h3>
     <hr />
-
-
-    <form>
+    @if (!string.IsNullOrEmpty(successMessage))
+    {
+        <div class="alert alert-success">@successMessage</div>
+    }
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger">@errorMessage</div>
+    }
+    @if (showDeleteConfirmation)
+    {
+        <div class="modal" style="display:block; background-color: rgba(0, 0, 0, 0.5);">
+            <div class="modal-dialog" style="max-width: 400px; margin-top: 150px;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirm Deletion</h5>
+                        <button type="button" class="close" @onclick="CancelDelete">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to delete this customer?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" @onclick="CancelDelete">No</button>
+                        <button class="btn btn-danger" @onclick="DeleteBill">Yes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    <EditForm Model="@bill" OnValidSubmit="@SaveBill">
         <div class="form-group">
             <label for="MaHoaDon">Mã Hóa Đơn:</label>
-            <input type="text" class="form-control" id="MaHoaDon" name="MaHoaDon" readonly>
+            <input type="text" class="form-control" @bind="bill.MaHoaDon" name="MaHoaDon" readonly>
         </div>
 
         <div class="form-group">
-            1
+            <label for="NgayTao">Ngày tạo</label>
+            <input type="datetime-local" class="form-control" @bind="bill.NgayTao" />
+
+        </div>
+        <div class="form-group">
             <label for="MaDatPhong">Mã Đặt Phòng:</label>
-            <select class="form-control" id="MaDatPhong" name="MaDatPhong">
+            <select class="form-control" id="MaDatPhong" @bind="bill.MaDatPhong" name="MaDatPhong">
                 <option value="">Chọn Mã Đặt Phòng</option>
-                @if (reservations != null){
-                @foreach (var datPhong in reservations)
+                @if (reservations != null)
                 {
-                    <option value="@datPhong.MaDatPhong">@datPhong.MaDatPhong</option>
-                }
+                    @foreach (var datPhong in reservations)
+                    {
+                        <option value="@datPhong.MaDatPhong">@datPhong.MaDatPhong</option>
+                    }
                 }
             </select>
         </div>
 
         <div class="form-group">
             <label for="MaNhanVien">Nhân Viên:</label>
-            <select class="form-control" id="MaNhanVien" name="MaNhanVien">
+            <select class="form-control" id="MaNhanVien" @bind="bill.MaTaiKhoan" name="MaNhanVien">
                 <option value="">Chọn Nhân Viên</option>
-                @if(employees !=null){
-                @foreach (var nhanVien in employees)
+                @if (employees != null)
                 {
-                    <option value="@nhanVien.MaNhanVien">@nhanVien.HoTen</option>
-                }
+                    @foreach (var nhanVien in employees)
+                    {
+                        <option value="@nhanVien.MaTaiKhoan">@nhanVien.HoTen</option>
+                    }
                 }
 
             </select>
@@ -51,20 +85,26 @@
 
         <div class="form-group">
             <label for="MaPhuongThuc">Phương Thức Thanh Toán:</label>
-            <select class="form-control" id="MaPhuongThuc" name="MaPhuongThuc">
+            <select class="form-control" id="MaPhuongThuc" @bind="bill.MaPhuongThuc" name="MaPhuongThuc">
                 <option value="">Chọn Phương Thức</option>
-                
+                @if (methods != null)
+                {
+                    @foreach (var pt in methods)
+                    {
+                        <option value="@pt.MaPhuongThuc">@pt.TenPhuongThuc</option>
+                    }
+                }
             </select>
         </div>
 
         <button type="submit" class="btn btn-primary">Lưu Hóa Đơn</button>
-    </form>
+    </EditForm>
 </div>
 <br />
-    <div class="col-12">
+<div class="col-12">
 
-<h3>Bills</h3>
- <SpinLoader IsLoading="isLoading">
+    <h3>Bills <button class="btn btn-primary" @onclick="LoadBills">Refresh</button></h3>
+    <SpinLoader IsLoading="isLoading">
         <LoadingTemplate>
             <div class="col-12" style="background-color: lightgray; height:400px; vertical-align:middle">
                 <br /><br />
@@ -72,40 +112,201 @@
             </div>
         </LoadingTemplate>
         <ContentTemplate>
-@if (bills == null)
-{
-    <p>Loading...</p>
-}
-else
-{
-    <table>
-        <thead>
-            <tr>
-                <th>Mã hóa đơn</th>
-                <th>Ngày tạo</th>
-                <th>Tổng tiền</th>
-                <th>Hành động</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var bill in bills)
+            @if (bills == null)
             {
-                <tr>
-                    <td>@bill.MaHoaDon</td>
-                    <td>@bill.NgayTao</td>
-                    <td>@bill.TongSoTien</td>
-                    <td>
-                                    <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => EditBill(bill))">Edit</a> |
-                                    <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => DeleteBill(bill.MaHoaDon))">Delete</a>
-                    </td>
-                    <td>
-                        <NavLink href=@string.Format("/bills/details/{0}",bill.MaHoaDon)>View Details</NavLink>
-                    </td>
-                </tr>
+                <p>Loading...</p>
             }
-        </tbody>
-    </table>
-}
+            else
+            {
+                @if (filteredAuthorList != null)
+            {
+                <!-- Search Box -->
+                <div class="search-box">
+                    <b><label class="col-2 font-weight-bold">Search:</label></b>
+                    <input type="text" class="form-control col-3" @bind="searchText" @oninput="OnSearchTextChanged" placeholder="Search bills" />
+                </div>
+                <table class="table table-bordered table-striped table-responsive-md">
+                    <thead>
+                        <tr>
+                            <th>Mã hóa đơn</th>
+                            <th>Ngày tạo</th>
+                            <th>Tổng tiền</th>
+                            <th>Hành động</th>
+                            <th>Chi tiết hóa đơn</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                            @foreach (var bill in filteredAuthorList)
+
+                        {
+                            <tr>
+                                <td>@bill.MaHoaDon</td>
+                                <td>@bill.NgayTao</td>
+                                <td>@bill.TongSoTien</td>
+                                    <td class="action-links">
+                                        <a class="edit-link" @onclick="(() => EditBill(bill))">Edit</a> 
+                                        <a class="delete-link" @onclick="(() => ShowDeleteConfirmation(bill.MaHoaDon))">Delete</a>
+                                    </td>
+                                <td>
+                                    <NavLink href=@string.Format("/bills/details/{0}",bill.MaHoaDon)>View Details</NavLink>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                <div class="pagination-controls">
+                    <button class="btn btn-secondary" @onclick="PreviousPage" disabled="@IsFirstPage()">Previous</button>
+                    <span>Page @currentPage of @totalPages</span>
+                    <button class="btn btn-secondary" @onclick="NextPage" disabled="@IsLastPage()">Next</button>
+                </div>
+                }
+                else
+                {
+                    <p>No employees found.</p>
+                }
+            }
+            <style>
+                /* Action links style */
+                .action-links {
+                    display: flex;
+                    gap: 10px;
+                }
+
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin: 20px 0;
+                    font-size: 16px;
+                    text-align: left;
+                }
+
+                thead tr {
+                    background-color: #06163C;
+                    color: white;
+                }
+
+                th, td {
+                    padding: 12px 15px;
+                    border: 1px solid #ddd;
+                }
+
+                tbody tr:nth-child(even) {
+                    background-color: #f2f2f2;
+                }
+
+                tbody tr:hover {
+                    background-color: #f1f1f1;
+                }
+
+                a {
+                    text-decoration: none;
+                    color: blue;
+                    font-weight: bold;
+                }
+
+                    a:hover {
+                        text-decoration: underline;
+                        color: darkblue;
+                    }
+
+                /* Search bar styling */
+                .search-bar {
+                    margin-bottom: 20px;
+                    display: flex;
+                    gap: 10px;
+                    align-items: center;
+                }
+
+                    .search-bar input[type="text"] {
+                        width: 300px;
+                        padding: 8px;
+                        font-size: 16px;
+                        border: 1px solid #ddd;
+                        border-radius: 4px;
+                    }
+
+                    .search-bar button {
+                        padding: 8px 15px;
+                        font-size: 16px;
+                        color: white;
+                        background-color: #4CAF50;
+                        border: none;
+                        border-radius: 4px;
+                        cursor: pointer;
+                    }
+
+                        .search-bar button:hover {
+                            background-color: #45a049;
+                        }
+
+                /* Style for the search bar */
+                .search-bar {
+                    margin-bottom: 20px;
+                    display: flex;
+                    gap: 10px;
+                    align-items: center;
+                }
+
+                    .search-bar input[type="text"] {
+                        width: 300px;
+                        padding: 8px;
+                        font-size: 16px;
+                        border: 1px solid #ddd;
+                        border-radius: 4px;
+                    }
+
+                    .search-bar button {
+                        padding: 8px 15px;
+                        font-size: 16px;
+                        color: white;
+                        background-color: #4CAF50;
+                        border: none;
+                        border-radius: 4px;
+                        cursor: pointer;
+                    }
+
+                        .search-bar button:hover {
+                            background-color: #45a049;
+                        }
+
+                /* Action link color changes */
+                .edit-link {
+                    color: blue;
+                    cursor: pointer;
+                }
+
+                    .edit-link:hover {
+                        text-decoration: underline;
+                    }
+
+                .delete-link {
+                    color: red;
+                    cursor: pointer;
+                }
+
+                    .delete-link:hover {
+                        text-decoration: underline;
+                    }
+
+                .pagination-controls {
+                    display: flex;
+                    justify-content: center;
+                    gap: 10px;
+                    margin-top: 20px;
+                }
+
+                    .pagination-controls button {
+                        padding: 8px 15px;
+                        font-size: 16px;
+                        border-radius: 4px;
+                    }
+
+                    .pagination-controls span {
+                        font-size: 16px;
+                        align-self: center;
+                    }
+
+            </style>
         </ContentTemplate>
     </SpinLoader>
 </div>
@@ -114,8 +315,9 @@ else
 @code {
     private IEnumerable<HoaDon> bills;
     private IEnumerable<DatPhong> reservations;
-    private IEnumerable<NhanVien> employees;
+    private IEnumerable<TaiKhoan> employees;
     private IEnumerable<PhuongThucThanhToan> methods;
+    private IEnumerable<CTHoaDon> cthd;
     public HoaDon bill { get; set; }
     public IEnumerable<HoaDon> filteredAuthorList { get; set; }
     public bool IsVisible { get; set; }
@@ -123,10 +325,63 @@ else
     public string RecordName { get; set; }
     public bool IsGridViewFiltered { get; set; }
     bool isLoading = true;
+    private int currentPage = 1;
+    private int itemsPerPage = 5; // Change this number based on your preference
+    private int totalBills = 0;
+    private int totalPages => (int)Math.Ceiling((double)bills.Count() / itemsPerPage);
+    // private int totalPages => (int)Math.Ceiling((double)filteredEmployees.Count() / itemsPerPage);
+    private bool IsFirstPage() => currentPage == 1;
+    private bool IsLastPage() => currentPage == totalPages;
+    private string deleteMessage;
+    private bool showDeleteConfirmation = false;
+    private int billIdToDelete;
+    // Success and error messages for operations
+    private string successMessage;
+    private string errorMessage;
+    private string searchText = string.Empty;
+
+    private void OnSearchTextChanged(ChangeEventArgs e)
+    {
+        string searchValue = e.Value.ToString().ToLower();
+
+        // Lọc danh sách theo tất cả các trường dữ liệu
+        filteredAuthorList = bills.Where(hd =>
+            hd.MaHoaDon.ToString().Contains(searchValue)
+        ).ToList();
+
+        totalBills = filteredAuthorList.Count(); // Cập nhật tổng số lượng nhân viên sau khi lọc
+        currentPage = 1; // Reset về trang đầu tiên
+
+        // Áp dụng phân trang cho danh sách đã lọc
+        filteredAuthorList = filteredAuthorList
+        .Skip((currentPage - 1) * itemsPerPage)
+        .Take(itemsPerPage)
+        .ToList();
+        StateHasChanged(); // Cập nhật lại giao diện
+    }
 
     protected async Task LoadBills()
     {
-        bills = await BillService.GetAllAsync("https://localhost:44359/api/Bills/GetBills");
+        isLoading = true;
+        try
+        {
+            // Fetch all employees (no filtering applied yet)
+            var allBills = await BillService.GetAllAsync("https://localhost:44359/api/Bills/GetBills");
+
+            bills = allBills; // Store all employees for search filtering later
+            filteredAuthorList = bills; // Initially, no filtering
+            totalBills = bills.Count(); // Get the total count for pagination
+
+            // Apply pagination to the employees
+            PaginateEmployees();
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine("Error loading employees: " + ex.Message);
+        }
+        //bills = await BillService.GetAllAsync("https://localhost:44359/api/Bills/GetBills");
+        isLoading = false;
+        StateHasChanged();
     }
     protected override void OnInitialized()
     {
@@ -140,7 +395,7 @@ else
 
         bill = new HoaDon();
         //authorList = await authorService.GetAuthors();
-       
+
         await base.OnInitializedAsync();
     }
 
@@ -151,8 +406,7 @@ else
     }
 
     protected override async Task OnParametersSetAsync()
-    {
-        Console.WriteLine("Authors - OnParametersSetAsync");
+    {Console.WriteLine("Authors - OnParametersSetAsync");
         await base.OnParametersSetAsync();
     }
 
@@ -178,6 +432,7 @@ else
         {
             LoadReservations();
             LoadEmployees();
+            LoadMethods();
             await LoadBills();
 
             isLoading = false;
@@ -191,20 +446,89 @@ else
     {
         Console.WriteLine("Authors - Dispose");
     }
-    private async Task DeleteBill(int Id)
+    private async Task DeleteBill()
     {
-        await BillService.DeleteAsync("authors/DeleteAuthor/",Id);
-        await LoadBills();
-
-        //throw new Exception("DeleteAuthor");
+        try
+        {
+            var billReservations = cthd.Where(cthd => cthd.MaHoaDon == billIdToDelete);
+            if (billReservations.Any())
+            {
+                // Nếu khách hàng có đặt phòng, hiển thị thông báo không thể xóa
+                errorMessage = "không xóa được hóa đơn";
+                successMessage = null; // Xóa thông báo thành công nếu có lỗi
+                showDeleteConfirmation = false; // Ẩn bảng xác nhận
+                StateHasChanged(); // Cập nhật giao diện
+                return; // Dừng việc xóa khách hàng
+            }
+            await BillService.DeleteAsync("https://localhost:44359/api/Bills/DeleteBill/", billIdToDelete);
+            await LoadEmployees();
+            showDeleteConfirmation = false; // Ẩn bảng xác nhận
+            successMessage = "Xóa hóa đơn thành công."; // Thông báo thành công
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Không thể xóa hóa đơn: " + ex.Message; // Hiển thị thông báo lỗi
+            showDeleteConfirmation = false; // Ẩn bảng xác nhận
+            StateHasChanged();
+        }
     }
 
-    private void EditBill(HoaDon argAuthor)
+    private void EditBill(HoaDon savedbill)
     {
-       bill = argAuthor;
+        bill = savedbill;
+        StateHasChanged();
+
     }
-    private void SaveBill(HoaDon bill)
+    private async Task SaveBill()
     {
+        // Call the service to save the bill
+        try
+        {
+            if (bill.CTHoaDon == null) bill.CTHoaDon = [];
+            if (bill.MaHoaDon == 0)
+            {
+                //  bill.CTHoaDon = null;
+                HoaDon savedBill = await BillService.SaveAsync("https://localhost:44359/api/Bills/CreateBill", bill);
+                if (savedBill != null)
+                {
+                    // Display success message using a modal or dialog
+                    //  await _modalService.Show<SuccessMessage>("Bill created successfully!");
+                    // Update the bill list
+                    StateHasChanged();
+                    successMessage = "Hóa đơn đã được thêm thành công!";
+                    // Clear the form
+                    bill = new HoaDon();
+                }
+                else
+                {
+                    errorMessage = "Lỗi khi thêm hóa đơn.";
+                }
+            }
+            else
+            {
+
+                HoaDon savedBill = await BillService.UpdateAsync("https://localhost:44359/api/Bills/UpdateBill/", bill.MaHoaDon, bill);
+                if (savedBill != null)
+                {
+                    // Update the bill list
+                    StateHasChanged();
+                    successMessage = "Hóa đơn đã được cập nhật thành công!";
+                    // Clear the form
+                    bill = new HoaDon();
+                }
+                else
+                {
+                    errorMessage = "Lỗi khi cập nhật hóa đơn.";
+                }
+            }
+            // Handle successful save, e.g., display success message, clear form, etc.
+        }
+        catch (Exception ex)
+        {
+            // Handle errors, e.g., display error message to the user
+            Console.Error.WriteLine("Error saving bill: " + ex.Message);
+        }
 
     }
     protected async Task LoadReservations()
@@ -213,11 +537,53 @@ else
     }
     protected async Task LoadEmployees()
     {
-       employees = await nvservice.GetAllAsync("https://localhost:44359/api/NhanVien/GetNhanVien");
+        employees = await nvservice.GetAllAsync("https://localhost:44359/api/NhanVien/GetNhanVien");
     }
     protected async Task LoadMethods()
     {
         methods = await ptservice.GetAllAsync("https://localhost:44359/api/PTTT/GetPTTT");
+    }
+
+    private void NextPage()
+    {
+        if (currentPage < totalPages)
+        {
+            currentPage++;
+            PaginateEmployees();
+            StateHasChanged(); // Cập nhật UI
+        }
+    }
+
+
+    private void PreviousPage()
+    {
+        if (currentPage > 1)
+        {
+            currentPage--;
+            PaginateEmployees();
+            StateHasChanged(); // Cập nhật UI
+        }
+    }
+
+    private void PaginateEmployees()
+    {
+        // Sử dụng danh sách gốc employees cho việc phân trang
+        filteredAuthorList = bills
+            .Skip((currentPage - 1) * itemsPerPage)
+            .Take(itemsPerPage)
+            .ToList();
+    }
+
+    private void ShowDeleteConfirmation(int id)
+    {
+        billIdToDelete = id; // Lưu lại ID khách hàng cần xóa
+        showDeleteConfirmation = true; // Hiển thị bảng xác nhận
+    }
+
+    private void CancelDelete()
+    {
+        showDeleteConfirmation = false; // Ẩn bảng xác nhận
+        StateHasChanged();
     }
 
 }

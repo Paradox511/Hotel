@@ -1,0 +1,585 @@
+﻿@page "/roomtype"
+<h3>Room_Style_Manager</h3>
+@using Hotel_App.Service
+@using Hotel_App.Data
+@using Blazored.LocalStorage
+@using Hotel_App.Shared
+@inject HotelService<Phong> RoomService
+@inject HotelService<LoaiPhong> RoomTypeService
+@inject HotelService<HoaDon> BillService
+@inject HotelService<DatPhong> dpservice;
+@inject HotelService<TaiKhoan> nvservice;
+@inject HotelService<PhuongThucThanhToan> ptservice;
+@implements IDisposable 
+
+
+<div class="col-12">
+    <hr />   
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger">@errorMessage</div>
+    }
+    @if (!string.IsNullOrEmpty(successMessage))
+    {
+        <div class="alert alert-success">@successMessage</div>
+    }
+    @if (!string.IsNullOrEmpty(deleteMessage))
+    {
+        <div class="alert alert-danger">
+            @deleteMessage
+        </div>
+    }
+    @if (showDeleteConfirmation)
+    {
+        <div class="modal" style="display:block; background-color: rgba(0, 0, 0, 0.5);">
+            <div class="modal-dialog" style="max-width: 400px; margin-top: 150px;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirm Deletion</h5>
+                        <button type="button" class="close" @onclick="CancelDelete">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to delete this roomtype?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" @onclick="CancelDelete">No</button>
+                        <button class="btn btn-danger" @onclick="DeleteRoomType">Yes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <EditForm Model="@Type" OnValidSubmit="@SaveRoomType">
+        <DataAnnotationsValidator />
+        <div class="form-group">
+            <label for="MaPhong">Mã Loại Phòng :</label>
+            <input type="text" class="form-control" @bind="Type.MaLoaiPhong" name="MaLoaiPhong" readonly>
+        </div>
+
+        <div class="form-group">
+            <label for="TenLoaiPhong">Tên Loại Phòng:</label>
+            <input type="text" class="form-control" id="TenLoaiPhong" @bind="Type.TenLoaiPhong" name="TenLoaiPhong" >
+            <ValidationMessage For="@(() => Type.TenLoaiPhong)"/> 
+        </div>
+
+        <div class="form-group">
+            <label for="SoLuong">Nhập số lượng phòng:</label>
+            <input type="text" class="form-control" id="SoLuongPhong" @bind=Type.SoLuongPhong name="SoLuongPhong">
+            <ValidationMessage For="@(() => Type.SoLuongPhong)"/> 
+        </div>
+
+        <div class="form-group">
+            <label for="MoTa">Nhập Mô Tả:</label>
+            <input type="text" class="form-control" id="MoTa" @bind=Type.Mota name="MoTa">
+            <ValidationMessage For="@(() => Type.Mota)"/> 
+        </div>
+
+        <div class="form-group">
+            <label for="Gia">Nhập Giá Phòng:</label>
+            <input type="text" class="form-control" id="Gia" @bind=Type.Gia name="Gia">
+            <ValidationMessage For="@(() => Type.Gia)"/> 
+        </div>
+        <button type="submit" class="btn btn-primary">Tạo</button>
+    </EditForm>
+    <div class="search-box">
+        <b><label class="col-2 font-weight-bold">Search:</label></b>
+        <input type="text" class="form-control col-3" @bind="searchText" @oninput="OnSearchTextChanged" placeholder="Search RoomType" />
+    </div>
+</div>
+
+<div class="col-12">
+
+    <h3>Thông tin loại Phòng</h3>
+    @* <button class="btn btn-primary" @onclick="LoadRoomTypes">Refresh</button> *@
+    <SpinLoader IsLoading="isLoading">
+        <LoadingTemplate>
+            <div class="col-12" style="background-color: lightgray; height:400px; vertical-align:middle">
+                <br /><br />
+                <Chase Center="true" Color="#c21f13" Size="70px"></Chase>
+            </div>
+        </LoadingTemplate>
+        <ContentTemplate>
+            @if (loaiphong == null)
+            {
+                <p>Loading...</p>
+            }
+            else
+            {
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Mã Loại Phòng</th>
+                            <th>Tên Loại Phòng</th>
+                            <th>Số Lượng Phòng</th>
+                            <th>Mô Tả</th>
+                            <th>Giá</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var TypeRoom in filteredRoomTypeList)
+                        {
+                            <tr>
+                                <td>@TypeRoom.MaLoaiPhong</td>
+                                <td>@TypeRoom.TenLoaiPhong</td>
+                                <td>@TypeRoom.SoLuongPhong</td>
+                                <td>@TypeRoom.Mota</td
+                                <td>@TypeRoom.Gia</td>
+                                <td class ="action-links">
+                                    <a class="edit-link" @onclick="(() => EditRoomType(TypeRoom))">Edit</a> |
+                                    <a class="delete-link" @onclick="(() => ShowDeleteConfirmation(TypeRoom.MaLoaiPhong))">Delete</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                <div class="pagination-controls">
+                    <button class="btn btn-secondary" @onclick="PreviousPage" disabled="@IsFirstPage()">Previous</button>
+                    <span>Page @currentPage of @totalPages</span>
+                    <button class="btn btn-secondary" @onclick="NextPage" disabled="@IsLastPage()">Next</button>
+                </div>
+            }
+
+            <style>
+                /* Action links style */
+                .action-links {
+                display: flex;
+                gap: 10px;
+                }
+
+                table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 20px 0;
+                font-size: 16px;
+                text-align: left;
+                }
+
+                thead tr {
+                background-color: #06163C;
+                color: white;
+                }
+
+                th, td {
+                padding: 12px 15px;
+                border: 1px solid #ddd;
+                }
+
+                tbody tr:nth-child(even) {
+                background-color: #f2f2f2;
+                }
+
+                tbody tr:hover {
+                background-color: #f1f1f1;
+                }
+
+                a {
+                text-decoration: none;
+                color: blue;
+                font-weight: bold;
+                }
+
+                a:hover {
+                text-decoration: underline;
+                color: darkblue;
+                }
+
+                /* Search bar styling */
+                .search-bar {
+                margin-bottom: 20px;
+                display: flex;
+                gap: 10px;
+                align-items: center;
+                }
+
+                .search-bar input[type="text"] {
+                width: 300px;
+                padding: 8px;
+                font-size: 16px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                }
+
+                .search-bar button {
+                padding: 8px 15px;
+                font-size: 16px;
+                color: white;
+                background-color: #4CAF50;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                }
+
+                .search-bar button:hover {
+                background-color: #45a049;
+                }
+
+                /* Style for the search bar */
+                .search-bar {
+                margin-bottom: 20px;
+                display: flex;
+                gap: 10px;
+                align-items: center;
+                }
+
+                .search-bar input[type="text"] {
+                width: 300px;
+                padding: 8px;
+                font-size: 16px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                }
+
+                .search-bar button {
+                padding: 8px 15px;
+                font-size: 16px;
+                color: white;
+                background-color: #4CAF50;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                }
+
+                .search-bar button:hover {
+                background-color: #45a049;
+                }
+
+                /* Action link color changes */
+                .edit-link {
+                color: blue;
+                cursor: pointer;
+                }
+
+                .edit-link:hover {
+                text-decoration: underline;
+                }
+
+                .delete-link {
+                color: red;
+                cursor: pointer;
+                }
+
+                .delete-link:hover {
+                text-decoration: underline;
+                }
+
+                .pagination-controls {
+                display: flex;
+                justify-content: center;
+                gap: 10px;
+                margin-top: 20px;
+                }
+
+                .pagination-controls button {
+                padding: 8px 15px;
+                font-size: 16px;
+                border-radius: 4px;
+                }
+
+                .pagination-controls span {
+                font-size: 16px;
+                align-self: center;
+                }
+
+            </style>
+        </ContentTemplate>
+    </SpinLoader>
+</div>
+
+@code {
+    private IEnumerable<Phong> Rooms;
+    private IEnumerable<LoaiPhong> loaiphong;
+    private IEnumerable<HoaDon> bills;
+    private IEnumerable<DatPhong> reservations;
+    private IEnumerable<TaiKhoan> employees;
+    private IEnumerable<PhuongThucThanhToan> methods;
+    public IEnumerable<LoaiPhong> filteredRoomTypeList { get; set; }
+    public IEnumerable<Phong> filteredRoomList { get; set; }
+    public Phong png { get; set; }
+    public LoaiPhong Type { get; set; }
+    public bool IsVisible { get; set; }
+    public bool Result { get; set; }
+    public string RecordName { get; set; }
+    public bool IsGridViewFiltered { get; set; }
+    bool isLoading = true;
+    private string searchText = string.Empty ;
+
+    //Hộp thoại thông báo
+    private string errorMessage;
+    private string successMessage;
+    private string deleteMessage;
+    private bool showDeleteConfirmation = false;
+    private int RoomTypeIdToDelete;
+
+    //phân trang
+    private int currentPage = 1; // set number of first
+    private int itemsPerPage = 10; // Change this number based on your preference
+    private int totalRoomType = 0;  
+    private bool IsFirstPage() => currentPage == 1;
+    private bool IsLastPage() => currentPage == totalPages;
+    private int totalPages => (int)Math.Ceiling((double)loaiphong.Count() / itemsPerPage);
+
+    private void ShowDeleteConfirmation(int id)
+    {
+        RoomTypeIdToDelete = id; // Lưu lại ID loại phòng cần xóa
+        showDeleteConfirmation = true; // Hiển thị bảng xác nhận
+    }
+
+
+    protected async Task LoadRoomTypes()
+    {
+        isLoading = true;
+
+        try
+        {
+            loaiphong = await RoomTypeService.GetAllAsync("https://localhost:44359/api/RoomTypes/GetRoomTypes");
+            filteredRoomTypeList = loaiphong.ToList(); // Gán dữ liệu ban đầu cho filteredRoom
+            LoadRooms();
+            totalRoomType = loaiphong.Count();
+            Type = new LoaiPhong();
+            PaginateRoomTypes();
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine("Error loading RoomType: " + ex.Message);
+        }
+
+        isLoading = false;
+        successMessage = null;
+        errorMessage = null;
+        StateHasChanged(); // Cập nhật giao diện
+    }
+
+    protected override void OnInitialized()
+    {
+        Console.WriteLine("RoomType - OnInitialized");
+        base.OnInitialized();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Console.WriteLine("RoomType - OnInitializedAsync");
+
+        png = new Phong();
+        Type = new LoaiPhong();
+        //authorList = await authorService.GetAuthors();
+
+        await base.OnInitializedAsync();
+    }
+
+    protected override void OnParametersSet()
+    {
+        Console.WriteLine("RoomTypes - OnParametersSet");
+        base.OnParametersSet();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        Console.WriteLine("RoomTypes - OnParametersSetAsync");
+        await base.OnParametersSetAsync();
+    }
+
+    protected override bool ShouldRender()
+    {
+        base.ShouldRender();
+        Console.WriteLine("RoomTypes - ShouldRender");
+
+        return true;
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        Console.WriteLine("RoomTypes - OnAfterRender - firstRender = " + firstRender);
+        base.OnAfterRender(firstRender);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        Console.WriteLine("Authors - OnAfterRenderAsync - firstRender = " + firstRender);
+
+        if (firstRender)
+        {
+            await LoadRoomTypes();
+            await LoadRooms();
+            isLoading = false;
+            StateHasChanged();
+        }
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    public void Dispose()
+    {
+        Console.WriteLine("Rooms - Dispose");
+    }
+
+    private void CancelDelete()
+    {
+        showDeleteConfirmation = false; // Ẩn bảng xác nhận
+        StateHasChanged();
+    }
+
+    private async Task DeleteRoomType()
+    {
+        // foreach (var room in Rooms){
+        //     if (room.MaLoaiPhong == id)
+        //     {
+        //         deleteMessage = $"Phòng có mã loại phòng {id} được tìm thấy: {room.MaPhong}";
+        //         return;
+        //     }
+        // }
+        // await RoomTypeService.DeleteAsync("https://localhost:44359/api/RoomTypes/DeleteRoomType/", id);
+        // LoadRoomTypes();
+        // StateHasChanged();
+        try
+        {
+            // Kiểm tra xem khách hàng có đặt phòng hay không
+            var roomTypeDuplicated = Rooms.Where(r => r.MaLoaiPhong == RoomTypeIdToDelete);
+            if (roomTypeDuplicated.Any())
+            {
+                List<int> arr =[];
+                Rooms = await RoomService.GetAllAsync("https://localhost:44359/api/Rooms/GetRooms");
+                filteredRoomList = Rooms.ToList();
+                arr.AddRange(filteredRoomList.Where(r => r.MaLoaiPhong == RoomTypeIdToDelete).Select(r=>r.MaPhong));
+                // Nếu khách hàng có đặt phòng, hiển thị thông báo không thể xóa
+                errorMessage = $"Không xóa được!!! Tồn tại phòng {string.Join(", ", arr)} chứa mã loại phòng.";
+                successMessage = null; // Xóa thông báo thành công nếu có lỗi
+                showDeleteConfirmation = false; // Ẩn bảng xác nhận
+                StateHasChanged(); // Cập nhật giao diện
+                return; // Dừng việc xóa khách hàng
+            }
+
+            // Nếu không có phòng chứa mã
+            await RoomTypeService.DeleteAsync("https://localhost:44359/api/RoomTypes/DeleteRoomType/",RoomTypeIdToDelete);
+            await LoadRoomTypes(); // Làm mới danh sách khách hàng
+            showDeleteConfirmation = false; // Ẩn bảng xác nhận
+            successMessage = "Xóa loại phòng thành công."; // Thông báo thành công
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Không thể xóa loại phòng: " + ex.Message; // Hiển thị thông báo lỗi
+            showDeleteConfirmation = false; // Ẩn bảng xác nhận
+            StateHasChanged();
+        }
+    }
+
+    private void EditRoomType(LoaiPhong editroomtype)
+    {
+        Type = editroomtype;
+        StateHasChanged();
+    }
+
+    // Phương thức tìm kiếm
+    private void OnSearchTextChanged(ChangeEventArgs e)
+    {
+        string searchValue = e.Value.ToString().ToLower();
+
+        // Lọc danh sách theo tất cả các trường dữ liệu
+        filteredRoomTypeList = loaiphong.Where(roomType =>
+            roomType.MaLoaiPhong.ToString().Contains(searchValue) ||
+            roomType.TenLoaiPhong.ToString().ToLower().Contains(searchValue) ||
+            roomType.Mota.ToString().ToLower().Contains(searchValue)||
+            roomType.Gia.ToString().Contains(searchValue) ||
+            roomType.SoLuongPhong.ToString().Contains(searchValue)
+        ).ToList();
+
+        totalRoomType = filteredRoomTypeList.Count(); // Cập nhật tổng số loại phòng sau khi lọc dữ liệu
+        currentPage = 1; // Reset về trang đầu tiên
+
+        // Áp dụng phân trang cho danh sách đã lọc
+        filteredRoomTypeList = filteredRoomTypeList
+        .Skip((currentPage - 1) * itemsPerPage)
+        .Take(itemsPerPage)
+        .ToList();
+        StateHasChanged(); // Cập nhật lại giao diện
+    }
+
+    private void PaginateRoomTypes()
+    {
+        // Sử dụng danh sách phòng cho việc phân trang
+        filteredRoomTypeList = loaiphong
+            .Skip((currentPage - 1) * itemsPerPage)
+            .Take(itemsPerPage)
+            .ToList();
+    }
+
+    private void NextPage()
+    {
+        if (currentPage < totalPages)
+        {
+            currentPage++;
+            PaginateRoomTypes();
+            StateHasChanged(); // Cập nhật UI
+        }
+    }
+
+
+    private void PreviousPage()
+    {
+        if (currentPage > 1)
+        {
+            currentPage--;
+            PaginateRoomTypes();
+            StateHasChanged(); // Cập nhật UI
+        }
+    }
+
+    private async Task SaveRoomType()
+    {
+        // Call the service to save the bill
+        try
+        {
+            if (Type.phong == null) Type.phong = [];
+            if (Type.MaLoaiPhong == 0)
+            {
+                //  bill.CTHoaDon = null;
+                 LoaiPhong loaiPhong = await RoomTypeService.SaveAsync("https://localhost:44359/api/RoomTypes/CreateRoomType", Type);
+                 
+                if (loaiPhong != null)
+                {
+                    // Display success message using a modal or dialog
+                    //  await _modalService.Show<SuccessMessage>("Bill created successfully!");
+                    Type = new LoaiPhong();
+                    await LoadRoomTypes();
+                    StateHasChanged();
+                    // Clear the form
+                }
+            }
+            else
+            {
+                LoaiPhong loaiPhong = await RoomTypeService.UpdateAsync("https://localhost:44359/api/RoomTypes/UpdateRoomType/", Type.MaLoaiPhong, Type);
+                // Update the bill list
+                Type = new LoaiPhong();
+                 await LoadRoomTypes();
+                 successMessage = "Tạo loại phòng thành công";
+                 StateHasChanged();
+
+                // Clear the form
+               
+
+            }
+            // Handle successful save, e.g., display success message, clear form, etc.
+        }
+        catch (Exception ex)
+        {
+            // Handle errors, e.g., display error message to the user
+            Console.Error.WriteLine("Error saving bill: " + ex.Message);
+        }     
+    }
+     // protected async Task LoadReservations()
+     //     {
+     //     reservations = await dpservice.GetAllAsync("https:localhost:44359/api/DatPhong/GetDatPhong");
+     // }
+     protected async Task LoadRooms()
+         {
+        Rooms = await RoomService.GetAllAsync("https://localhost:44359/api/Rooms/GetRooms");
+     }
+    //  protected async Task LoadMethods()
+    //      {
+    //      methods = await ptservice.GetAllAsync("https:localhost:44359/api/PTTT/GetPTTT");
+    // }
+}

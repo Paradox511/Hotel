@@ -41,12 +41,17 @@ namespace Persistence.Context
                     .HasMaxLength(100)
                     .IsUnicode(false);
 
-
+			modelBuilder.Entity<LoaiPhong>().Property(p => p.Gia).HasColumnType("decimal(10,2)");
+			//modelBuilder.Entity<LoaiPhong>().Property(p => p.Gia).HasColumnType("int");
+			modelBuilder.Entity<DichVu>().Property(p => p.Gia).HasColumnType("decimal(10,2)");
+           
             });
+  
             modelBuilder.Entity<HoaDon>()
-           .HasMany(h => h.CTHoaDon)
-           .WithOne(ct => ct.HoaDon)
-           .HasForeignKey(ct => ct.MaHoaDon);
+         .HasMany(h => h.CTHoaDon)
+         .WithOne(ct => ct.HoaDon)
+         .HasForeignKey(ct => ct.MaHoaDon);
+
 
             modelBuilder.Entity<CTHoaDon>()
              .HasOne(ct => ct.HoaDon)
@@ -55,10 +60,31 @@ namespace Persistence.Context
 
             modelBuilder.Entity<CTHoaDon>()
                 .HasOne(ct => ct.dv)
-                .WithOne(dv => dv.cthd)
-                .HasForeignKey<CTHoaDon>(ct => ct.MaDichVu);
-            
-            base.OnModelCreating(modelBuilder);
+               .WithMany(dv => dv.cthds)
+               .HasForeignKey(ct => ct.MaDichVu);
+
+            //modelBuilder.Entity<DichVu>()
+            //    .HasMany(dv => dv.CTHoaDon)
+            modelBuilder.Entity<Phong>()
+                .HasOne(ct => ct.LoaiPhong)
+                .WithMany(lp => lp.phong)
+                .HasForeignKey(ct => ct.MaLoaiPhong);
+
+			modelBuilder.Entity<LoaiPhong>()
+		   .HasMany(h => h.phong)
+		   .WithOne(ct => ct.LoaiPhong)
+		   .HasForeignKey(ct => ct.MaLoaiPhong);
+
+            //base.OnModelCreating(modelBuilder);
+
+            //    .WithMany(dv => dv.cthd)
+            //    .HasForeignKey(ct => ct.MaDichVu);
+
+            //modelBuilder.Entity<DichVu>()
+            //    .HasMany(dv => dv.CTHoaDon)
+            //    .WithOne(ct => ct.dv)
+            //    .HasForeignKey(ct => ct.MaDichVu);
+
         }
         public virtual DbSet<HoaDon> hoadon { get; set; }
         public virtual DbSet<CTHoaDon> cthoadon { get; set; }
@@ -67,9 +93,8 @@ namespace Persistence.Context
         public virtual DbSet<LoaiPhong> loaiphong { get; set; }
         public virtual DbSet<DichVu> dichvu { get; set; }
         public virtual DbSet<KhachHang> khachhang { get; set; }
-        public virtual DbSet<NhanVien> nhanvien { get; set; }
-
         public virtual DbSet<TaiKhoan> taikhoan { get; set; }
+
         public virtual DbSet<PhuongThucThanhToan> ptthanhtoan { get; set; }
 
         public async Task<int> SaveChangesAsync()
