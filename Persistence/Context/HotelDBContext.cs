@@ -41,6 +41,7 @@ namespace Persistence.Context
                     .HasMaxLength(100)
                     .IsUnicode(false);
 
+
             });
             modelBuilder.Entity<HoaDon>()
            .HasMany(h => h.CTHoaDon)
