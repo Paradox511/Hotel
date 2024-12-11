@@ -175,5 +175,26 @@ namespace WebAPI.Controllers.V1
 			}
 		}
 
+		[HttpPost("CreateBillRoom")]
+		public async Task<IActionResult> AddHoaDon(HoaDon hoaDon)
+		{
+			try
+			{
+				if (ModelState.IsValid)
+				{
+					_context.hoadon.Add(hoaDon);
+					await _context.SaveChangesAsync();
+					return Ok(hoaDon);
+				}
+				return BadRequest(ModelState);
+			}
+			catch (DbUpdateException ex)
+			{
+				// Trích xuất thông báo lỗi từ inner exception
+				var errorMessage = "Lỗi khi thêm dữ liệu vào bảng DatPhong: " + ex.InnerException?.Message;
+				return StatusCode(500, errorMessage);
+			}
+		}
+
 	}
 }

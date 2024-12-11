@@ -121,23 +121,26 @@
 	[Parameter]
 	public int TypeRoomID { get; set; }
 
-	public int CustomerID { get; set; }
+	private int CustomerID { get; set; }
 
 	KhachHang khachHang { get; set; }
 	LoaiPhong loaiPhong { get; set; }
 	private DatPhong datPhong { get; set; }
-	public Phong room { get; set; }
+	private Phong room { get; set; }
+	private HoaDon hoaDon { get; set; }
 	private IEnumerable<PhuongThucThanhToan> methods;
 
 	PhuongThucThanhToan paymentMethod { get; set; }
 
-	public int countAvailableRooms { get; set; }
+	private int countAvailableRooms { get; set; }
 	private List<int> availableRoomCounts { get; set; }
 	List<string> AvailableRooms { get; set; }
-	public int NumberOfDays => (EndDate - StartDate).Days;
+	private int NumberOfDays => (EndDate - StartDate).Days;
 
 	private decimal ToltalPriceRoom;
 	private int selectedPaymentMethodId = 0;
+
+	private DateTime today = DateTime.Today;
 
 	protected async override Task OnInitializedAsync()
 	{
@@ -184,7 +187,7 @@
 		}
 	}
 	[JSInvokable]
-	public void updateTotalPrice(decimal total)
+	private void updateTotalPrice(decimal total)
 	{
 		JSRuntime.InvokeVoidAsync("updateTotalPriceElement", total);
 	}
