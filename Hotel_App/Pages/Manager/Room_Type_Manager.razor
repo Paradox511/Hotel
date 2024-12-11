@@ -561,12 +561,15 @@
 
             }
             // Handle successful save, e.g., display success message, clear form, etc.
+             
         }
         catch (Exception ex)
         {
             // Handle errors, e.g., display error message to the user
             Console.Error.WriteLine("Error saving bill: " + ex.Message);
-        }     
+        } 
+        await LoadRoomTypes();
+        StateHasChanged();
     }
      // protected async Task LoadReservations()
      //     {

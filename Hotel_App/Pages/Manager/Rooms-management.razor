@@ -9,6 +9,7 @@
 @inject HotelService<LoaiPhong> RoomTypeService
 @inject HotelService<HoaDon> BillService
 @inject HotelService<DatPhong> dpservice;
+@inject HotelService<TaiKhoan> nvservice;
 @inject HotelService<PhuongThucThanhToan> ptservice;
 @implements IDisposable
 
@@ -355,7 +356,7 @@
         {
             Rooms = await RoomService.GetAllAsync("https://localhost:44359/api/Rooms/GetRooms");
             filteredRoomList = Rooms.ToList();
-            filteredRoomTypeList = loaiphong.ToList();
+            //filteredRoomTypeList = loaiphong.ToList();
             totalRoom = Rooms.Count();
             png = new Phong();
             // Apply pagination to the employees
@@ -616,7 +617,7 @@
                 if (TPhong != null)
                 {
                     png = new Phong();
-                    await LoadRooms();
+                    LoadRooms();
                     StateHasChanged();
                     // Clear the form
                 }
@@ -640,8 +641,8 @@
             // Handle errors, e.g., display error message to the user
             Console.Error.WriteLine("Error saving room: " + ex.Message);
         }
-        await LoadRooms();
-        StateHasChanged();
+        // await LoadRooms();
+        // StateHasChanged();
     }
     // protected async Task LoadReservations()
     //     {
