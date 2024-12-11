@@ -7,9 +7,9 @@ using System.Text;
 
 namespace Hotel_App.Service
 {
-    public class HotelService<T> : IHotelService<T>
-    {
-        private readonly HttpClient _httpClient;
+	public class HotelService<T> : IHotelService<T>
+	{
+		private readonly HttpClient _httpClient;
 
         public HotelService(HttpClient httpClient)
         {
