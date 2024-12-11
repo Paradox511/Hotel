@@ -23,10 +23,7 @@
     <div class="col-12 row">
         <input type="password" class="form-control col-12" @bind="user.Password" placeholder="password" />
     </div>
-    <br />
-    <div class="col-12 row">
-        <input type="password" class="form-control col-12" @bind="user.ConfirmPassword" placeholder="confirm password" />
-    </div>
+  
     <br />
     <div class="col-12 row">
         <span class="col-12"></span>
@@ -51,11 +48,11 @@
     private async Task RegisterUser()
     {
         // Kiểm tra xem mật khẩu có khớp hay không
-        if (user.Password != user.ConfirmPassword)
-        {
-            LoginMessage = "Passwords do not match.";
-            return;
-        }
+        // if (user.Password != user.ConfirmPassword)
+        // {
+        //     LoginMessage = "Passwords do not match.";
+        //     return;
+        // }
 
         try
         {
@@ -65,9 +62,7 @@
             // Kiểm tra xem người dùng có hợp lệ không
             if (returnedUser != null && !string.IsNullOrEmpty(returnedUser.Username))
             {
-                // Lưu thông tin người dùng vào Local Storage
-                await localStorageService.SetItemAsync("accessToken", returnedUser.AccessToken);
-                await localStorageService.SetItemAsync("refreshToken", returnedUser.RefreshToken);
+
 
                 // Cập nhật trạng thái xác thực
                 ((CustomAuthenticationStateProvider)AuthenticationStateProvider).NotifyUserAuthentication(returnedUser.Username);

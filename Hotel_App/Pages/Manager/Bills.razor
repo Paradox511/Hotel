@@ -5,7 +5,7 @@
 @using Hotel_App.Shared
 @inject HotelService<HoaDon> BillService
 @inject HotelService<DatPhong> dpservice;
-@inject HotelService<NhanVien> nvservice;
+@inject HotelService<TaiKhoan> nvservice;
 @inject HotelService<PhuongThucThanhToan> ptservice;
 @implements IDisposable
 
@@ -70,13 +70,13 @@
 
         <div class="form-group">
             <label for="MaNhanVien">Nhân Viên:</label>
-            <select class="form-control" id="MaNhanVien" @bind="bill.MaNhanVien" name="MaNhanVien">
+            <select class="form-control" id="MaNhanVien" @bind="bill.MaTaiKhoan" name="MaNhanVien">
                 <option value="">Chọn Nhân Viên</option>
                 @if (employees != null)
                 {
                     @foreach (var nhanVien in employees)
                     {
-                        <option value="@nhanVien.MaNhanVien">@nhanVien.HoTen</option>
+                        <option value="@nhanVien.MaTaiKhoan">@nhanVien.HoTen</option>
                     }
                 }
 
@@ -315,7 +315,7 @@
 @code {
     private IEnumerable<HoaDon> bills;
     private IEnumerable<DatPhong> reservations;
-    private IEnumerable<NhanVien> employees;
+    private IEnumerable<TaiKhoan> employees;
     private IEnumerable<PhuongThucThanhToan> methods;
     private IEnumerable<CTHoaDon> cthd;
     public HoaDon bill { get; set; }

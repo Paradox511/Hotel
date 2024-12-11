@@ -42,39 +42,36 @@ namespace Persistence.Context
 					.HasMaxLength(100)
 					.IsUnicode(false);
 
-			});
-			modelBuilder.Entity<HoaDon>()
-		   .HasMany(h => h.CTHoaDon)
-		   .WithOne(ct => ct.HoaDon)
-		   .HasForeignKey(ct => ct.MaHoaDon);
+            });
+  
+            modelBuilder.Entity<HoaDon>()
+         .HasMany(h => h.CTHoaDon)
+         .WithOne(ct => ct.HoaDon)
+         .HasForeignKey(ct => ct.MaHoaDon);
 
-			modelBuilder.Entity<CTHoaDon>()
-			 .HasOne(ct => ct.HoaDon)
-			.WithMany(h => h.CTHoaDon)
-			 .HasForeignKey(ct => ct.MaHoaDon);
+
+            modelBuilder.Entity<CTHoaDon>()
+             .HasOne(ct => ct.HoaDon)
+            .WithMany(h => h.CTHoaDon)
+             .HasForeignKey(ct => ct.MaHoaDon);
 
 			modelBuilder.Entity<CTHoaDon>()
 				.HasOne(ct => ct.dv)
 				.WithMany(dv => dv.cthds)
 				.HasForeignKey(ct => ct.MaDichVu);
 
-			modelBuilder.Entity<Phong>()
-			   .HasOne(p => p.LoaiPhong)
-			   .WithMany()
-			   .HasForeignKey(p => p.MaLoaiPhong);
-			base.OnModelCreating(modelBuilder);
-		}
-		public virtual DbSet<HoaDon> hoadon { get; set; }
-		public virtual DbSet<CTHoaDon> cthoadon { get; set; }
-		public virtual DbSet<Phong> phong { get; set; }
-		public virtual DbSet<DatPhong> datphong { get; set; }
-		public virtual DbSet<LoaiPhong> loaiphong { get; set; }
-		public virtual DbSet<DichVu> dichvu { get; set; }
-		public virtual DbSet<KhachHang> khachhang { get; set; }
-		public virtual DbSet<NhanVien> nhanvien { get; set; }
+            base.OnModelCreating(modelBuilder);
+        }
+        public virtual DbSet<HoaDon> hoadon { get; set; }
+        public virtual DbSet<CTHoaDon> cthoadon { get; set; }
+        public virtual DbSet<Phong> phong { get; set; }
+        public virtual DbSet<DatPhong> datphong { get; set; }
+        public virtual DbSet<LoaiPhong> loaiphong { get; set; }
+        public virtual DbSet<DichVu> dichvu { get; set; }
+        public virtual DbSet<KhachHang> khachhang { get; set; }
+        public virtual DbSet<TaiKhoan> taikhoan { get; set; }
 
-		public virtual DbSet<TaiKhoan> taikhoan { get; set; }
-		public virtual DbSet<PhuongThucThanhToan> ptthanhtoan { get; set; }
+        public virtual DbSet<PhuongThucThanhToan> ptthanhtoan { get; set; }
 
 		public async Task<int> SaveChangesAsync()
 		{

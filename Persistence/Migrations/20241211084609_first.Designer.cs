@@ -12,8 +12,8 @@ using Persistence.Context;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(HotelDBContext))]
-    [Migration("20241209063947_dec2")]
-    partial class dec2
+    [Migration("20241211084609_first")]
+    partial class first
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -77,6 +77,9 @@ namespace Persistence.Migrations
                     b.Property<decimal?>("TongTien")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int>("TrangThai")
+                        .HasColumnType("int");
+
                     b.HasKey("MaDatPhong");
 
                     b.ToTable("datphong");
@@ -101,6 +104,9 @@ namespace Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("TrangThai")
+                        .HasColumnType("int");
+
                     b.HasKey("MaDichVu");
 
                     b.ToTable("dichvu");
@@ -117,10 +123,10 @@ namespace Persistence.Migrations
                     b.Property<int>("MaDatPhong")
                         .HasColumnType("int");
 
-                    b.Property<int>("MaNhanVien")
+                    b.Property<int>("MaPhuongThuc")
                         .HasColumnType("int");
 
-                    b.Property<int>("MaPhuongThuc")
+                    b.Property<int>("MaTaiKhoan")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("NgayTao")
@@ -128,6 +134,9 @@ namespace Persistence.Migrations
 
                     b.Property<decimal?>("TongSoTien")
                         .HasColumnType("decimal(10,2)");
+
+                    b.Property<int>("TrangThai")
+                        .HasColumnType("int");
 
                     b.HasKey("MaHoaDon");
 
@@ -154,9 +163,6 @@ namespace Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("MaTaiKhoan")
-                        .HasColumnType("int");
-
                     b.Property<DateTime?>("NgaySinh")
                         .HasColumnType("datetime2");
 
@@ -167,6 +173,9 @@ namespace Persistence.Migrations
                     b.Property<string>("SoDienThoai")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TrangThai")
+                        .HasColumnType("int");
 
                     b.HasKey("MaKhachHang");
 
@@ -195,42 +204,12 @@ namespace Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("TrangThai")
+                        .HasColumnType("int");
+
                     b.HasKey("MaLoaiPhong");
 
                     b.ToTable("loaiphong");
-                });
-
-            modelBuilder.Entity("Domain.Entities.NhanVien", b =>
-                {
-                    b.Property<int>("MaNhanVien")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaNhanVien"));
-
-                    b.Property<string>("DiaChi")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("HoTen")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SoDienThoai")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("MaNhanVien");
-
-                    b.ToTable("nhanvien");
                 });
 
             modelBuilder.Entity("Domain.Entities.Phong", b =>
@@ -248,6 +227,9 @@ namespace Persistence.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("SoPhong")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TrangThai")
                         .HasColumnType("int");
 
                     b.Property<int>("TrangThaiPhong")
@@ -286,12 +268,31 @@ namespace Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaTaiKhoan"));
 
+                    b.Property<string>("DiaChi")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("HoTen")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasMaxLength(100)
                         .IsUnicode(false)
                         .HasColumnType("varchar(100)")
                         .HasColumnName("password");
+
+                    b.Property<string>("SoDienThoai")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TrangThai")
+                        .HasColumnType("int");
 
                     b.Property<string>("Username")
                         .IsRequired()

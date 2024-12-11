@@ -26,7 +26,7 @@ namespace Hotel_App
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddHttpClient<HotelService<HoaDon>>();
-            services.AddHttpClient<HotelService<NhanVien>>();
+            services.AddHttpClient<HotelService<TaiKhoan>>();
             services.AddHttpClient<HotelService<PhuongThucThanhToan>>();
             services.AddHttpClient<HotelService<DatPhong>>();
             services.AddHttpClient<HotelService<DichVu>>();

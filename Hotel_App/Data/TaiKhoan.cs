@@ -1,21 +1,26 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System;
-
+using Hotel_App.Data;
 namespace Hotel_App.Data
 {
-    public partial class TaiKhoan
+    public class TaiKhoan
     {
         [Key]
         public int MaTaiKhoan { get; set; }
-        //[Required]
-        //public string Quyen { get; set; }
-        public string Username { get; set; }
+        [Required]
+        public string HoTen { get; set; }
+        [Required]
+        public string SoDienThoai { get; set; }
+        [Required]
+        public string Email { get; set; }
+        [Required]
+        public string DiaChi { get; set; }
+      
+        public string Username {  get; set; }
+        [Required]
         public string Password { get; set; }
-        //public int TrangThai { get; set; } = 1;
-        public string? ConfirmPassword { get; set; }
-        public string? AccessToken { get; set; }
-        public string? RefreshToken { get; set; }
+        public int TrangThai { get; set; }
 
-        
+
+        public TaiKhoan() { }
     }
 }
