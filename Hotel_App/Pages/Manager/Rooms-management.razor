@@ -5,11 +5,10 @@
 @using Blazored.LocalStorage
 @using Hotel_App.Shared
 @inject HotelService<Phong> RoomService
-@inject RoomService privateRoomService 
+@inject RoomService privateRoomService
 @inject HotelService<LoaiPhong> RoomTypeService
 @inject HotelService<HoaDon> BillService
 @inject HotelService<DatPhong> dpservice;
-@inject HotelService<TaiKhoan> nvservice;
 @inject HotelService<PhuongThucThanhToan> ptservice;
 @implements IDisposable
 
@@ -73,8 +72,8 @@
 
         <div class="form-group">
             <label for="SoLuong">Nhập số phòng:</label>
-            <input type="text" class="form-control" id="SoLuong" @bind=png.SoPhong name="SoLuong" >
-            <ValidationMessage For="@(() => png.SoPhong)"/>
+            <input type="text" class="form-control" id="SoLuong" @bind=png.SoPhong name="SoLuong">
+            <ValidationMessage For="@(() => png.SoPhong)" />
         </div>
 
         <div class="form-group">
@@ -118,14 +117,14 @@
                 <p>Loading...</p>
             }
             else
-            {            
+            {
                 <table>
                     <thead>
                         <tr>
                             <th>Mã Phòng</th>
                             <th>Trạng Thái Phòng</th>
                             <th>Số Phòng</th>
-                            <th>Mã Loại Phòng</th>                            
+                            <th>Mã Loại Phòng</th>
                             <th>Thao tác</th>
                         </tr>
                     </thead>
@@ -145,8 +144,8 @@
                                     }
                                 </td>
                                 <td>@room.SoPhong</td>
-                                <td>@room.MaLoaiPhong</td>                               
-                                <td class ="action-links">
+                                <td>@room.MaLoaiPhong</td>
+                                <td class="action-links">
                                     <a class="edit-link" @onclick="(() => EditRoom(room))">Edit</a> |
                                     <a class="delete-link" @onclick="(() => ShowDeleteConfirmation(room.MaPhong))">Delete</a>
                                 </td>
@@ -164,143 +163,143 @@
             <style>
                 /* Action links style */
                 .action-links {
-                display: flex;
-                gap: 10px;
+                    display: flex;
+                    gap: 10px;
                 }
 
                 table {
-                width: 100%;
-                border-collapse: collapse;
-                margin: 20px 0;
-                font-size: 16px;
-                text-align: left;
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin: 20px 0;
+                    font-size: 16px;
+                    text-align: left;
                 }
 
                 thead tr {
-                background-color: #06163C;
-                color: white;
+                    background-color: #06163C;
+                    color: white;
                 }
 
                 th, td {
-                padding: 12px 15px;
-                border: 1px solid #ddd;
+                    padding: 12px 15px;
+                    border: 1px solid #ddd;
                 }
 
                 tbody tr:nth-child(even) {
-                background-color: #f2f2f2;
+                    background-color: #f2f2f2;
                 }
 
                 tbody tr:hover {
-                background-color: #f1f1f1;
+                    background-color: #f1f1f1;
                 }
 
                 a {
-                text-decoration: none;
-                color: blue;
-                font-weight: bold;
+                    text-decoration: none;
+                    color: blue;
+                    font-weight: bold;
                 }
 
-                a:hover {
-                text-decoration: underline;
-                color: darkblue;
-                }
+                    a:hover {
+                        text-decoration: underline;
+                        color: darkblue;
+                    }
 
                 /* Search bar styling */
                 .search-bar {
-                margin-bottom: 20px;
-                display: flex;
-                gap: 10px;
-                align-items: center;
+                    margin-bottom: 20px;
+                    display: flex;
+                    gap: 10px;
+                    align-items: center;
                 }
 
-                .search-bar input[type="text"] {
-                width: 300px;
-                padding: 8px;
-                font-size: 16px;
-                border: 1px solid #ddd;
-                border-radius: 4px;
-                }
+                    .search-bar input[type="text"] {
+                        width: 300px;
+                        padding: 8px;
+                        font-size: 16px;
+                        border: 1px solid #ddd;
+                        border-radius: 4px;
+                    }
 
-                .search-bar button {
-                padding: 8px 15px;
-                font-size: 16px;
-                color: white;
-                background-color: #4CAF50;
-                border: none;
-                border-radius: 4px;
-                cursor: pointer;
-                }
+                    .search-bar button {
+                        padding: 8px 15px;
+                        font-size: 16px;
+                        color: white;
+                        background-color: #4CAF50;
+                        border: none;
+                        border-radius: 4px;
+                        cursor: pointer;
+                    }
 
-                .search-bar button:hover {
-                background-color: #45a049;
-                }
+                        .search-bar button:hover {
+                            background-color: #45a049;
+                        }
 
                 /* Style for the search bar */
                 .search-bar {
-                margin-bottom: 20px;
-                display: flex;
-                gap: 10px;
-                align-items: center;
+                    margin-bottom: 20px;
+                    display: flex;
+                    gap: 10px;
+                    align-items: center;
                 }
 
-                .search-bar input[type="text"] {
-                width: 300px;
-                padding: 8px;
-                font-size: 16px;
-                border: 1px solid #ddd;
-                border-radius: 4px;
-                }
+                    .search-bar input[type="text"] {
+                        width: 300px;
+                        padding: 8px;
+                        font-size: 16px;
+                        border: 1px solid #ddd;
+                        border-radius: 4px;
+                    }
 
-                .search-bar button {
-                padding: 8px 15px;
-                font-size: 16px;
-                color: white;
-                background-color: #4CAF50;
-                border: none;
-                border-radius: 4px;
-                cursor: pointer;
-                }
+                    .search-bar button {
+                        padding: 8px 15px;
+                        font-size: 16px;
+                        color: white;
+                        background-color: #4CAF50;
+                        border: none;
+                        border-radius: 4px;
+                        cursor: pointer;
+                    }
 
-                .search-bar button:hover {
-                background-color: #45a049;
-                }
+                        .search-bar button:hover {
+                            background-color: #45a049;
+                        }
 
                 /* Action link color changes */
                 .edit-link {
-                color: blue;
-                cursor: pointer;
+                    color: blue;
+                    cursor: pointer;
                 }
 
-                .edit-link:hover {
-                text-decoration: underline;
-                }
+                    .edit-link:hover {
+                        text-decoration: underline;
+                    }
 
                 .delete-link {
-                color: red;
-                cursor: pointer;
+                    color: red;
+                    cursor: pointer;
                 }
 
-                .delete-link:hover {
-                text-decoration: underline;
-                }
+                    .delete-link:hover {
+                        text-decoration: underline;
+                    }
 
                 .pagination-controls {
-                display: flex;
-                justify-content: center;
-                gap: 10px;
-                margin-top: 20px;
+                    display: flex;
+                    justify-content: center;
+                    gap: 10px;
+                    margin-top: 20px;
                 }
 
-                .pagination-controls button {
-                padding: 8px 15px;
-                font-size: 16px;
-                border-radius: 4px;
-                }
+                    .pagination-controls button {
+                        padding: 8px 15px;
+                        font-size: 16px;
+                        border-radius: 4px;
+                    }
 
-                .pagination-controls span {
-                font-size: 16px;
-                align-self: center;
-                }
+                    .pagination-controls span {
+                        font-size: 16px;
+                        align-self: center;
+                    }
 
             </style>
 
@@ -323,7 +322,7 @@
     private int RoomIdToDelete;
     private string errorMessage;
     private string successMessage;
-    private string searchText = string.Empty ;
+    private string searchText = string.Empty;
     private string deleteMessage;
 
     private bool showDeleteConfirmation = false;
@@ -333,7 +332,7 @@
     public bool IsGridViewFiltered { get; set; }
     private int currentPage = 1; // set number of first
     private int itemsPerPage = 10; // Change this number based on your preference
-    private int totalRoom = 0;  
+    private int totalRoom = 0;
     private bool IsFirstPage() => currentPage == 1;
     private bool IsLastPage() => currentPage == totalPages;
     private int totalPages => (int)Math.Ceiling((double)Rooms.Count() / itemsPerPage);
@@ -346,7 +345,7 @@
     {
         RoomIdToDelete = id; // Lưu lại ID khách hàng cần xóa
         showDeleteConfirmation = true; // Hiển thị bảng xác nhận
-    } 
+    }
 
     protected async Task LoadRooms()
     {
@@ -377,7 +376,7 @@
 
     private bool IsRoomNumberDuplicated(int RoomNumber)
     {
-        return filteredRoomList.Any(room => room.SoPhong == RoomNumber && (png.MaPhong == 0||room.MaPhong != png.MaPhong));
+        return filteredRoomList.Any(room => room.SoPhong == RoomNumber && (png.MaPhong == 0 || room.MaPhong != png.MaPhong));
     }
 
     private bool IsRoomLimitReached(int maLoaiPhong)
@@ -499,7 +498,7 @@
     }
 
     private async Task DeleteRoom()
-    {     
+    {
         //Phong TPhong = await privateRoomService.DeletePhongAsync(room,room.MaPhong);
         // RoomService.DeleteAsync("https:localhost:44359/api/Rooms/DeleteRoom/", id);
         // LoadRooms(); Làm mới danh sách khách hàng
@@ -603,7 +602,7 @@
     private async Task SaveRoom()
     {
         // Call the service to save the bill
-        
+
         try
         {
             //if (png.MaPhong == null) png.LoaiPhong = new LoaiPhong();
@@ -612,15 +611,15 @@
                 return; // Ngừng thực thi nếu không hợp lệ
             }
             if (png.MaPhong == 0)
-            {                
-                Phong TPhong = await RoomService.SaveAsync("https://localhost:44359/api/Rooms/CreateRoom", png);                   
+            {
+                Phong TPhong = await RoomService.SaveAsync("https://localhost:44359/api/Rooms/CreateRoom", png);
                 if (TPhong != null)
-                {                  
+                {
                     png = new Phong();
                     await LoadRooms();
                     StateHasChanged();
                     // Clear the form
-                }                
+                }
             }
             else
             {
@@ -631,7 +630,7 @@
                 StateHasChanged();
 
                 // Clear the form
-               
+
 
             }
             // Handle successful save, e.g., display success message, clear form, etc.
@@ -644,14 +643,14 @@
         await LoadRooms();
         StateHasChanged();
     }
-     // protected async Task LoadReservations()
-     //     {
-     //     reservations = await dpservice.GetAllAsync("https:localhost:44359/api/DatPhong/GetDatPhong");
-     // }
-     protected async Task Loadloaiphong()
-         {
+    // protected async Task LoadReservations()
+    //     {
+    //     reservations = await dpservice.GetAllAsync("https:localhost:44359/api/DatPhong/GetDatPhong");
+    // }
+    protected async Task Loadloaiphong()
+    {
         loaiphong = await RoomTypeService.GetAllAsync("https://localhost:44359/api/RoomTypes/GetRoomTypes");
-     }
+    }
     //  protected async Task LoadMethods()
     //      {
     //      methods = await ptservice.GetAllAsync("https:localhost:44359/api/PTTT/GetPTTT");
