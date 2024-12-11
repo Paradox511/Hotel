@@ -6,7 +6,7 @@
 @using Hotel_App.Shared
 @inject HotelService<HoaDon> BillService
 @inject HotelService<DatPhong> dpservice;
-@inject HotelService<NhanVien> nvservice;
+@inject HotelService<TaiKhoan> nvservice;
 @inject HotelService<PhuongThucThanhToan> ptservice;
 @inject HotelService<KhachHang> khservice;
 @inject HotelService<TaiKhoan> tkservice;
@@ -16,10 +16,10 @@
 
 @code {
     private IEnumerable<TaiKhoan> accounts;
-    private IEnumerable<NhanVien> employees;
+    private IEnumerable<TaiKhoan> employees;
     private IEnumerable<DatPhong> reservations;
-    public NhanVien employee { get; set; }
-    public IEnumerable<NhanVien> filteredEmployees { get; set; }
+    public TaiKhoan employee { get; set; }
+    public IEnumerable<TaiKhoan> filteredEmployees { get; set; }
     private IEnumerable<KhachHang> customers;
     public KhachHang customer { get; set; }
     public TaiKhoan account { get; set; }

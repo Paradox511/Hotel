@@ -9,7 +9,7 @@
 @inject HotelService<LoaiPhong> RoomTypeService
 @inject HotelService<HoaDon> BillService
 @inject HotelService<DatPhong> dpservice;
-@inject HotelService<NhanVien> nvservice;
+@inject HotelService<TaiKhoan> nvservice;
 @inject HotelService<PhuongThucThanhToan> ptservice;
 @implements IDisposable
 
@@ -312,7 +312,7 @@
     private IEnumerable<LoaiPhong> loaiphong;
     private IEnumerable<HoaDon> bills;
     private IEnumerable<DatPhong> reservations;
-    private IEnumerable<NhanVien> employees;
+    private IEnumerable<TaiKhoan> employees;
     public IEnumerable<Phong> filteredRoomList { get; set; }
     private IEnumerable<PhuongThucThanhToan> methods;
     public Phong png { get; set; }

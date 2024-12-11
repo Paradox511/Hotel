@@ -318,7 +318,7 @@
     public bool IsGridViewFiltered { get; set; }
     bool isLoading = true;
     private string searchText = string.Empty;
-    private List<Employees> lemployees = new List<Employees>();
+    //private List<Employees> lemployees = new List<Employees>();
     // Error messages for validation
     private string emailError;
     private string phoneError;
@@ -573,13 +573,13 @@
     // Kiểm tra email có trùng cho việc cập nhật (bỏ qua nhân viên hiện tại)
     private bool IsEmailDuplicatedForUpdate(string email, int currentEmployeeId)
     {
-        return employees.Any(emp => emp.Email.Equals(email, StringComparison.OrdinalIgnoreCase) && emp.MaNhanVien != currentEmployeeId);
+        return employees.Any(emp => emp.Email.Equals(email, StringComparison.OrdinalIgnoreCase) && emp.MaTaiKhoan != currentEmployeeId);
     }
 
     // Kiểm tra số điện thoại có trùng cho việc cập nhật (bỏ qua nhân viên hiện tại)
     private bool IsPhoneNumberDuplicatedForUpdate(string phoneNumber, int currentEmployeeId)
     {
-        return employees.Any(emp => emp.SoDienThoai.Equals(phoneNumber, StringComparison.OrdinalIgnoreCase) && emp.MaNhanVien != currentEmployeeId);
+        return employees.Any(emp => emp.SoDienThoai.Equals(phoneNumber, StringComparison.OrdinalIgnoreCase) && emp.MaTaiKhoan != currentEmployeeId);
     }
 
 

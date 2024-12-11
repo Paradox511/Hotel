@@ -16,7 +16,7 @@
 @inject HotelService<Phong> phongservice;
 @inject HotelService<LoaiPhong> lpservice;
 @inject IJSRuntime JSRuntime;
-    
+
 <div class="col-12" id="billDetails">
 
     <h3>Bill details</h3>
@@ -34,35 +34,35 @@
             }
             else
             {
-               
-                    
-                        <tr>
-                            <th>Mã hóa đơn:</th>
-                            <td>@bill.MaHoaDon</td>
+
+
+                <tr>
+                    <th>Mã hóa đơn:</th>
+                    <td>@bill.MaHoaDon</td>
                     <th>   &nbsp;	Mã đặt phòng:</th>
                     <td>          &nbsp;	@datPhong.MaDatPhong</td>
-                        </tr>
-                        <tr>
-                            <th>Ngày tạo:</th>
-                            <td>@bill.NgayTao</td>
+                </tr>
+                <tr>
+                    <th>Ngày tạo:</th>
+                    <td>@bill.NgayTao</td>
                     <th>   &nbsp;	Ngày check in:</th>
                     <td>          &nbsp;	@datPhong.CheckInDate</td>
-                        </tr>
-                        <tr>
+                </tr>
+                <tr>
                     <th>Mã phương thức</th>
                     <td>@pt.TenPhuongThuc</td>
-                            
+
                     <th>   &nbsp;	Ngày check out:</th>
                     <td>          &nbsp;	@datPhong.CheckOutDate</td>
-                        </tr>
-                        <tr>
+                </tr>
+                <tr>
                     <th>Nhân viên</th>
                     <td>@nhanVien.HoTen</td>
                     <th>   &nbsp;	Khách hàng:</th>
                     <td>          &nbsp;	@datPhong.MaKhachHang</td>
-                        </tr>
-                        <br />
-                <table class ="table table-bordered table-striped table-responsive-md">
+                </tr>
+                <br />
+                <table class="table table-bordered table-striped table-responsive-md">
                     <thead>
                         <tr>
                             <th>Mã dịch vụ</th>
@@ -87,10 +87,10 @@
                                 <td>@cthd.MaDichVu</td>
                                 <td>@cthd.dv.TenDichVu</td>
                                 <td>@cthd.dv.Gia</td>
-                                <td><input style="width:50px" type="number" @bind-value="@cthd.SoLuong"  /></td>
+                                <td><input style="width:50px" type="number" @bind-value="@cthd.SoLuong" /></td>
                                 <td>@cthd.TongTien</td>
                                 <td>
-                                    <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => EditBillDetail(BillId,cthd.dv.MaDichVu,cthd.SoLuong))">Edit</a> 
+                                    <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => EditBillDetail(BillId,cthd.dv.MaDichVu,cthd.SoLuong))">Edit</a>
                                     <a style="text-underline-position:below; cursor:pointer; color:red" @onclick="(() => DeleteBillDetail(cthd.Macthd))">Delete</a> |
                                 </td>
                             </tr>
@@ -101,7 +101,7 @@
             }
         </ContentTemplate>
     </SpinLoader>
-     <hr />
+    <hr />
     <button class="btn btn-primary" @onclick="PrintBillDetails">Print Bill</button>
 
 </div>
@@ -120,7 +120,8 @@
                 {
                     @foreach (var datPhong in dvlist)
                     {
-                        <option  value="@datPhong.MaDichVu">@datPhong.TenDichVu 
+                        <option value="@datPhong.MaDichVu">
+                            @datPhong.TenDichVu
                         </option>
                     }
                 }
@@ -163,13 +164,13 @@
     public DatPhong datPhong { get; set; }
     public HoaDon bill { get; set; }
     public DichVu dichVu { get; set; }
-    public CTHoaDon cthd{ get; set; }
+    public CTHoaDon cthd { get; set; }
     public KhachHang kh { get; set; }
     public Phong room { get; set; }
     public LoaiPhong loaiPhong { get; set; }
 
-    public IEnumerable<DichVu> dvlist{ get; set; }
-    public PhuongThucThanhToan pt{ get; set; }
+    public IEnumerable<DichVu> dvlist { get; set; }
+    public PhuongThucThanhToan pt { get; set; }
     public IEnumerable<CTHoaDon> cthdlist { get; set; }
     public bool IsVisible { get; set; }
     public bool Result { get; set; }
@@ -178,7 +179,7 @@
     public int newQuantity { get; set; }
     bool isLoading = true;
 
-    /*protected async override Task OnInitializedAsync()
+    protected async override Task OnInitializedAsync()
     {
         isLoading = true;
         var task = BillService.GetByIdAsync("https://localhost:44359/api/Bills/details/{0}", BillId);
@@ -239,9 +240,9 @@
         StateHasChanged();
         //throw new Exception("DeleteAuthor");
     }
-    private async Task EditBillDetail(int billID,int Id, int newQuantity)
+    private async Task EditBillDetail(int billID, int Id, int newQuantity)
     {
-        await CTHoaDonService.UpdateQuantity(BillId,Id, newQuantity);
+        await CTHoaDonService.UpdateQuantity(BillId, Id, newQuantity);
         // LoadBills();
         await UpdateTongTien();
         await ReloadDetails();
@@ -259,11 +260,11 @@
         dichVu = await dvservice.GetByIdAsync("https://localhost:44359/api/DichVu/GetById/{0}", cthd.MaDichVu);
         cthd.MaHoaDon = BillId;
 
-        foreach(var ct in bill.CTHoaDon)
+        foreach (var ct in bill.CTHoaDon)
         {
             if (ct.dv.MaDichVu == dichVu.MaDichVu)
             {
-                await EditBillDetail(BillId, dichVu.MaDichVu,ct.SoLuong + cthd.SoLuong);
+                await EditBillDetail(BillId, dichVu.MaDichVu, ct.SoLuong + cthd.SoLuong);
                 // Update the bill list
                 await ReloadDetails();
                 // Clear the form
@@ -293,7 +294,7 @@
     }
 }
 <script>
-    function printPage(){
+    function printPage() {
         window.print()
     }
     function printComponent(componentSelector) {
