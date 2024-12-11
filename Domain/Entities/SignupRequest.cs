@@ -1,4 +1,4 @@
-﻿namespace Hotel_App.Data
+﻿namespace Domain.Entities
 {
     public class SignupRequest
     {

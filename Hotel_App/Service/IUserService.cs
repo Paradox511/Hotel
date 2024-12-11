@@ -6,8 +6,5 @@ namespace Hotel_App.Service
     {
         Task<TaiKhoan> LoginAsync(TaiKhoan user);
         Task<TaiKhoan> RegisterUserAsync(TaiKhoan user);
-        //public Task<TaiKhoan> RegisterUserAsync(TaiKhoan user);
-        //public Task<TaiKhoan> GetUserByAccessTokenAsync(string accessToken);
-        //public Task<TaiKhoan> RefreshTokenAsync(RefreshRequest refreshRequest);
     }
 }

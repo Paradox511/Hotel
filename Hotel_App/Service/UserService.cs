@@ -27,7 +27,8 @@ namespace Hotel_App.Service
             var jsonContent = JsonConvert.SerializeObject(user);
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PostAsync("api/users/login", httpContent);
+            var response = await _httpClient.PostAsync("https://localhost:44359/api/Users/Login", httpContent);
+            var responsebody = await response.Content.ReadAsStringAsync();
             if (response.IsSuccessStatusCode)
             {
                 var responseData = await response.Content.ReadAsStringAsync();
@@ -36,14 +37,15 @@ namespace Hotel_App.Service
 
             // Xử lý lỗi nếu cần
             var errorMessage = await response.Content.ReadAsStringAsync();
-            throw new Exception($"Login failed: {errorMessage}");
+            throw new Exception($"Login failed: {errorMessage}*");
         }
         public async Task<TaiKhoan> RegisterUserAsync(TaiKhoan user)
         {
             var jsonContent = JsonConvert.SerializeObject(user);
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PostAsync("api/users/register", httpContent);
+            var response = await _httpClient.PostAsync("https://localhost:44359/api/Users/RegisterUser", httpContent);
+            var responsebody = await response.Content.ReadAsStringAsync();
             if (response.IsSuccessStatusCode)
             {
                 var responseData = await response.Content.ReadAsStringAsync();
@@ -54,20 +56,5 @@ namespace Hotel_App.Service
             var errorMessage = await response.Content.ReadAsStringAsync();
             throw new Exception($"Registration failed: {errorMessage}");
         }
-        //private string GenerateAccessToken(int userId)
-        //{
-        //    var tokenString = $"{userId}:{DateTime.UtcNow.Ticks}";
-        //    return Convert.ToBase64String(Encoding.UTF8.GetBytes(tokenString));
-        //}
-
-        //private UserWithToken GenerateRefreshToken()
-        //{
-        //    var randomNumber = new byte[32];
-        //    using (var rng = RandomNumberGenerator.Create())
-        //    {
-        //        rng.GetBytes(randomNumber);
-        //        return new UserWithToken { Token = Convert.ToBase64String(randomNumber) };
-        //    }
-        //}
     }
 }

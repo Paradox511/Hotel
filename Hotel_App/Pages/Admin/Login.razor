@@ -14,7 +14,7 @@
         <br /><br /><br /><br /><br />
     </div>
     <div>
-        <h3 style="font-weight:bold; color:purple">Hotel Login</h3>
+        <h3 style="font-weight:bold; color:blue">Hotel Login</h3>
     </div>
     <div>
         <br />
@@ -67,12 +67,6 @@
             // Kiểm tra xem người dùng có hợp lệ không
             if (returnedUser != null && !string.IsNullOrEmpty(returnedUser.Username))
             {
-
-
-                // Cập nhật trạng thái xác thực
-                ((CustomAuthenticationStateProvider)AuthenticationStateProvider).NotifyUserAuthentication(returnedUser.Username);
-
-                // Điều hướng đến trang chính
                 NavigationManager.NavigateTo("/index");
             }
             else
