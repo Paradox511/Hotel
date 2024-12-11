@@ -8,8 +8,10 @@
 
   <ItemGroup>
     <PackageReference Include="Blazor-ApexCharts" Version="4.0.1" />
+    <PackageReference Include="DevExpress.Xpo" Version="24.1.7" />
     <PackageReference Include="MediatR" Version="12.4.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
+    <PackageReference Include="Syncfusion.Blazor" Version="27.2.5" />
   </ItemGroup>
 
   <ItemGroup>

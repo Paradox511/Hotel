@@ -135,8 +135,9 @@
                                 <th>Ngày Sinh</th>
                                 <th>CCCD</th>
                                 <th>STK</th>
-                                <th>Password</th>
-                                <th>Status</th>
+                                @*<th>Password</th>*@
+                               <th>TrangThai</th>
+                                @*<th>Quyen</th>*@
                             </tr>
                         </thead>
                         <tbody>
@@ -150,8 +151,9 @@
                                     <td>@kh.NgaySinh</td>
                                     <td>@kh.CCCD</td>
                                     <td>@kh.STK</td>
-                                    <td>@kh.Password</td>
-                                    <td>@kh.Status</td>
+                                    @*<td>@kh.Password</td>*@
+                                    <td>@kh.TrangThai</td>
+                                    @*                                 <td>@kh.Quyen</td>*@
                                     <td>
                                         <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => EditCustomers(kh))">Edit</a> |
                                         <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => ShowDeleteConfirmation(kh.MaKhachHang))">Delete</a>
@@ -170,9 +172,6 @@
                 {
                     <p>No customers found.</p>
                 }
-
-
-
 
             }
         </ContentTemplate>
@@ -249,7 +248,7 @@
         {
             // Kiểm tra xem khách hàng có đặt phòng hay không
             var customerReservations = reservations.Where(r => r.MaKhachHang == customerIdToDelete);
-            if (customerReservations.Any())
+            /*if (customerReservations.Any())
             {
                 // Nếu khách hàng có đặt phòng, hiển thị thông báo không thể xóa
                 errorMessage = "không xóa được khách hàng khi đang đặt phòng.";
@@ -257,7 +256,7 @@
                 showDeleteConfirmation = false; // Ẩn bảng xác nhận
                 StateHasChanged(); // Cập nhật giao diện
                 return; // Dừng việc xóa khách hàng
-            }
+            }*/
 
             // Nếu không có đặt phòng, tiến hành xóa khách hàng
             await khservice.DeleteAsync("https://localhost:44359/api/Customers/DeleteCustomer/", customerIdToDelete);

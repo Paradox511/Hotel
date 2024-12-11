@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using System.Reflection.Metadata;
 
 namespace Domain.Entities
 {
@@ -18,7 +19,8 @@ namespace Domain.Entities
         public string CCCD { get; set; }
         public string STK { get; set; }
         public string Password { get; set; }
-        public int Status { get; set; } = 1;
+        public string Quyen { get; set; } = "1";
+        public int TrangThai { get; set; } = 1;
         public KhachHang() { }
     }
 }

@@ -20,7 +20,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using System.Reflection;
-
+using Syncfusion.Blazor;
 namespace Hotel_App
 {
     public class Startup
@@ -36,6 +36,7 @@ namespace Hotel_App
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddHttpClient<HotelService<HoaDon>>();

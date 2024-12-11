@@ -21,7 +21,8 @@ using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Context;
 using Application;
-
+using Syncfusion.Blazor;
+using ApexCharts;
 
 namespace WebAPI
 {
@@ -37,11 +38,13 @@ namespace WebAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("");
             services.AddApplication();
-
+            
             services.AddPersistence(Configuration);
            // services.AddPersistence(Configuration);
             services.AddControllers();
+            //services.AddSyncfusionBlazor();
             #region Swagger
             services.AddSwaggerGen(c =>
             {

@@ -67,6 +67,7 @@ namespace WebAPI.Controllers.V1
             {
                 return BadRequest("Invalid command data");
             }
+
             _context.khachhang.Add(command.Entity);
             await _context.SaveChangesAsync();
             return Ok("Customer created successfully");
@@ -92,7 +93,6 @@ namespace WebAPI.Controllers.V1
             {
                 return StatusCode(500, "Internal Server Error: DbContext not injected");
             }
-
             return Ok("Customer status updated to 0");
         }
         /// <summary>

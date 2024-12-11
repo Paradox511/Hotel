@@ -12,8 +12,10 @@
     <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
     <PackageReference Include="BlazorPro.Spinkit" Version="1.2.0" />
     <PackageReference Include="BootstrapBlazor" Version="9.0.1" />
+    <PackageReference Include="DevExpress.Xpo" Version="24.1.7" />
     <PackageReference Include="EmbeddedBlazorContent" Version="1.10.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Syncfusion.Blazor" Version="27.2.5" />
     <PackageReference Include="Syncfusion.Blazor.Navigations" Version="27.2.2" />
     <PackageReference Include="Syncfusion.Blazor.Themes" Version="27.2.2" />
   </ItemGroup>
