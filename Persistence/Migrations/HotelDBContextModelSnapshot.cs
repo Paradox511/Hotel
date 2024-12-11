@@ -160,9 +160,6 @@ namespace Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("MaTaiKhoan")
-                        .HasColumnType("int");
-
                     b.Property<DateTime?>("NgaySinh")
                         .HasColumnType("datetime2");
 

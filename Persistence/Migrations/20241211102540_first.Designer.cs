@@ -12,7 +12,7 @@ using Persistence.Context;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(HotelDBContext))]
-    [Migration("20241211094230_first")]
+    [Migration("20241211102540_first")]
     partial class first
     {
         /// <inheritdoc />
@@ -162,9 +162,6 @@ namespace Persistence.Migrations
                     b.Property<string>("HoTen")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("MaTaiKhoan")
-                        .HasColumnType("int");
 
                     b.Property<DateTime?>("NgaySinh")
                         .HasColumnType("datetime2");

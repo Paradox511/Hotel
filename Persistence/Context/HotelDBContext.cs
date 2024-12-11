@@ -64,6 +64,8 @@ namespace Persistence.Context
    .HasOne(p => p.LoaiPhong)
    .WithMany()
    .HasForeignKey(p => p.MaLoaiPhong);
+
+
 			base.OnModelCreating(modelBuilder);
 		}
 		public virtual DbSet<HoaDon> hoadon { get; set; }

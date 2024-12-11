@@ -197,7 +197,7 @@ namespace WebAPI.Controllers.V1
 		}
 
 		[HttpGet("GetCustomers")]
-		public async Task<IActionResult> GetAll()
+		public async Task<IActionResult> GetAllKhachHang()
 		{
 			if (_context == null)
 			{

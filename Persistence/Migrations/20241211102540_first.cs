@@ -75,8 +75,7 @@ namespace Persistence.Migrations
                     NgaySinh = table.Column<DateTime>(type: "datetime2", nullable: true),
                     CCCD = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     STK = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false),
-                    MaTaiKhoan = table.Column<int>(type: "int", nullable: false)
+                    Status = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {

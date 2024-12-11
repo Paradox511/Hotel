@@ -15,8 +15,6 @@ namespace Domain.Entities
 		public string CCCD { get; set; }
 		public string STK { get; set; }
 		public int Status { get; set; } = 1;
-		[Required]
-		public int MaTaiKhoan { get; set; }
 		public KhachHang() { }
 	}
 }

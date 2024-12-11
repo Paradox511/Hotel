@@ -131,6 +131,7 @@
 	private DatPhong datPhong { get; set; }
 	private Phong room { get; set; }
 	private HoaDon hoaDon { get; set; }
+	private List<KhachHang> listKhachHang { get; set; }
 	private IEnumerable<PhuongThucThanhToan> methods;
 
 	PhuongThucThanhToan paymentMethod { get; set; }
@@ -153,12 +154,14 @@
 		paymentMethod = new PhuongThucThanhToan();
 		availableRoomCounts = new List<int>();
 		AvailableRooms = new List<string>();
+		listKhachHang = new List<KhachHang>();
 
 		await RoomService.GetByIdAsync("https://localhost:44359/api/Room/GetRoomDetails/{0}/{1}/{2}{3}/{4}", RoomID, StartDate, EndDate, PriceRoom, TypeRoomID);
 		// khachHang = await RoomService.GetCustomerByIdAsync("https:localhost:44359/api/Room/api/Room/GetCustomerInfo/{0}", 1);
 		room = await RoomService.GetRoomByIdAsync("https://localhost:44359/api/Room/GetRoomInfo/{0}", RoomID);
 		loaiPhong = await RoomService.GetRoomTypeByIdAsync("https://localhost:44359/api/Room/GetRoomTypeInfo/{0}", TypeRoomID);
 		methods = await paymentMethodService.GetAllAsync("https://localhost:44359/api/PTTT/GetPTTT");
+		listKhachHang = await RoomService.GetCustomers();
 
 
 		await LoadAvailableRooms();
