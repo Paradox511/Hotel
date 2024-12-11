@@ -20,6 +20,9 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using System.Reflection;
+using Blazorise;
+using Blazorise.Charts;
+using Blazorise.Bootstrap;
 
 namespace Hotel_App
 {
@@ -43,6 +46,7 @@ namespace Hotel_App
             services.AddHttpClient<HotelService<PhuongThucThanhToan>>();
             services.AddHttpClient<HotelService<DatPhong>>();
             services.AddHttpClient<HotelService<TaiKhoan>>();
+            services.AddHttpClient<HotelService<KhachHang>>();
             services.AddHttpClient<HoaDonService>();
             services.AddSingleton<WeatherForecastService>();
             services.AddSingleton<UserService>();

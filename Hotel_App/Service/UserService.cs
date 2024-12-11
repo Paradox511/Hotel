@@ -37,7 +37,7 @@ namespace Hotel_App.Service
 
             // Xử lý lỗi nếu cần
             var errorMessage = await response.Content.ReadAsStringAsync();
-            throw new Exception($"Login failed: {errorMessage}");
+            throw new Exception($"Login failed: {errorMessage}*");
         }
         public async Task<TaiKhoan> RegisterUserAsync(TaiKhoan user)
         {
