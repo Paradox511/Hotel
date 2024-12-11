@@ -162,6 +162,11 @@
 		loaiPhong = await RoomService.GetRoomTypeByIdAsync("https://localhost:44359/api/Room/GetRoomTypeInfo/{0}", TypeRoomID);
 		methods = await paymentMethodService.GetAllAsync("https://localhost:44359/api/PTTT/GetPTTT");
 		listKhachHang = await RoomService.GetCustomers();
+		foreach (var item in listKhachHang)
+		{
+			Console.WriteLine($"Danh sach: {item}");
+
+		}
 
 
 		await LoadAvailableRooms();
