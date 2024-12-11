@@ -250,10 +250,12 @@
 			return;
 		}
 		datPhong = new DatPhong();
-		datPhong.MaKhachHang = 1;
+		datPhong.MaKhachHang = selectedCustomerID;
 		datPhong.CheckInDate = StartDate;
 		datPhong.CheckOutDate = EndDate;
 		datPhong.MaPhong = RoomID;
+		datPhong.TongTien = ToltalPriceRoom;
+		datPhong.TrangThai = 1;
 
 		var result = await RoomService.AddDatPhong(datPhong);
 		if (result != null)
