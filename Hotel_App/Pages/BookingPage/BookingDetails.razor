@@ -46,17 +46,20 @@
 	<h2 class="text-center">Xác nhận đặt phòng</h2>
 	<p class="text-center">Experience something new every moment.</p>
 	<div class="row">
-		<div class="col-md-6">
-			<img src="https://thumbs.dreamstime.com/b/hotel-room-23802674.jpg?w=768" class="img-fluid" alt="Hình ảnh phòng">
-		</div>
 		<div class="d-flex flex-column col-md-6 justify-content-between">
 			<div class="">
 				<h3>Thông tin khách hàng</h3>
 				<ul class="list-group">
-					<li class="list-group-item"><strong>Mã:</strong> @khachHang.MaKhachHang</li>
-					<li class="list-group-item"><strong>Tên:</strong> @khachHang.HoTen</li>
-					<li class="list-group-item"><strong>Số điện thoại:</strong> @khachHang.SoDienThoai</li>
-					<li class="list-group-item"><strong>Email:</strong> @khachHang.Email</li>
+					<li class="list-group-item d-flex flex-row align-items-baseline">
+						<select class="form-select" style="width: 300px" id="">
+							<option>Chọn khách hàng</option>
+							<option value="">Phan Quang Duy</option>
+						</select>
+					</li>
+					@* <li class="list-group-item"><strong>Mã:</strong> @khachHang.MaKhachHang</li> *@
+					@* <li class="list-group-item"><strong>Tên:</strong> @khachHang.HoTen</li> *@
+					@* <li class="list-group-item"><strong>Số điện thoại:</strong> @khachHang.SoDienThoai</li> *@
+					@* <li class="list-group-item"><strong>Email:</strong> @khachHang.Email</li> *@
 
 				</ul>
 				<h3 class="mt-1">Thông tin đặt phòng</h3>
@@ -152,10 +155,12 @@
 		AvailableRooms = new List<string>();
 
 		await RoomService.GetByIdAsync("https://localhost:44359/api/Room/GetRoomDetails/{0}/{1}/{2}{3}/{4}", RoomID, StartDate, EndDate, PriceRoom, TypeRoomID);
-		khachHang = await RoomService.GetCustomerByIdAsync("https://localhost:44359/api/Room/api/Room/GetCustomerInfo/{0}", 1);
+		// khachHang = await RoomService.GetCustomerByIdAsync("https:localhost:44359/api/Room/api/Room/GetCustomerInfo/{0}", 1);
 		room = await RoomService.GetRoomByIdAsync("https://localhost:44359/api/Room/GetRoomInfo/{0}", RoomID);
 		loaiPhong = await RoomService.GetRoomTypeByIdAsync("https://localhost:44359/api/Room/GetRoomTypeInfo/{0}", TypeRoomID);
 		methods = await paymentMethodService.GetAllAsync("https://localhost:44359/api/PTTT/GetPTTT");
+
+
 		await LoadAvailableRooms();
 	}
 

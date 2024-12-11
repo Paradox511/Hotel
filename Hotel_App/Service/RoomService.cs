@@ -150,5 +150,29 @@ namespace Hotel_App.Service
 				throw new HttpRequestException($"Lỗi khi gửi yêu cầu đến API: {ex.Message}");
 			}
 		}
+
+		public async Task<List<KhachHang>> GetCustomers()
+		{
+			try
+			{
+				HttpResponseMessage response = await _httpClient.GetAsync("https://localhost:44359/api/Room/GetCustomers\r\n");
+
+				if (response.IsSuccessStatusCode)
+				{
+					List<KhachHang> customers = await response.Content.ReadFromJsonAsync<List<KhachHang>>();
+					return customers;
+				}
+				else
+				{
+					// Xử lý lỗi khi API trả về không thành công
+					throw new HttpRequestException($"API trả về mã lỗi: {response.StatusCode}");
+				}
+			}
+			catch (Exception ex)
+			{
+				// Xử lý lỗi khi gửi yêu cầu đến API
+				throw new HttpRequestException($"Lỗi khi gửi yêu cầu đến API: {ex.Message}");
+			}
+		}
 	}
 }

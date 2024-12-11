@@ -196,5 +196,22 @@ namespace WebAPI.Controllers.V1
 			}
 		}
 
+		[HttpGet("GetCustomers")]
+		public async Task<IActionResult> GetAll()
+		{
+			if (_context == null)
+			{
+				return StatusCode(500, "Internal Server Error: DbContext not injected");
+			}
+
+			var customers = await _context.khachhang.Where(cus => cus.Status == 1).ToListAsync();
+			// Assuming your bills are stored in "hoadon" DbSet
+			if (customers == null)
+			{
+				return NotFound("No Customers found");
+			}
+
+			return Ok(customers);
+		}
 	}
 }
