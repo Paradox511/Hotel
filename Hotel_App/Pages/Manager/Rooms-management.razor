@@ -56,7 +56,7 @@
     }
 
     <EditForm Model="@png" OnValidSubmit="@SaveRoom">
-
+        <DataAnnotationsValidator />
         <div class="form-group">
             <label for="MaPhong">Mã Phòng :</label>
             <input type="text" class="form-control" @bind="png.MaPhong" name="MaPhong" readonly>
@@ -124,7 +124,7 @@
                             <th>Mã Phòng</th>
                             <th>Trạng Thái Phòng</th>
                             <th>Số Phòng</th>
-                            <th>Mã Loại Phòng</th>
+                            <th>Mã Loại Phòng</th>   
                             <th>Thao tác</th>
                         </tr>
                     </thead>
@@ -615,6 +615,8 @@
             // Handle errors, e.g., display error message to the user
             Console.Error.WriteLine("Error saving bill: " + ex.Message);
         }
+        await LoadRooms();
+        StateHasChanged();
     }
      // protected async Task LoadReservations()
      //     {
