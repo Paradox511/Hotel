@@ -81,9 +81,9 @@
                                 <td>@dichvu.TenDichVu</td>
                                 <td>@dichvu.Gia</td>
                                 <td>@dichvu.Mota</td>
-                                <td>
-                                    <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => EditService(dichvu))">Edit</a> |
-                                    <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => DeleteService(dichvu.MaDichVu))">Delete</a>
+                                <td class="action-links">
+                                    <a class="edit-link" @onclick="(() => EditService(dichvu))">Edit</a> |
+                                    <a class="delete-link" @onclick="(() => DeleteService(dichvu.MaDichVu))">Delete</a>
                                 </td>
                                 
                             </tr>
@@ -91,6 +91,148 @@
                     </tbody>
                 </table>
             }
+            <style>
+                /* Action links style */
+                .action-links {
+                    display: flex;
+                    gap: 10px;
+                }
+
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin: 20px 0;
+                    font-size: 16px;
+                    text-align: left;
+                }
+
+                thead tr {
+                    background-color: #06163C;
+                    color: white;
+                }
+
+                th, td {
+                    padding: 12px 15px;
+                    border: 1px solid #ddd;
+                }
+
+                tbody tr:nth-child(even) {
+                    background-color: #f2f2f2;
+                }
+
+                tbody tr:hover {
+                    background-color: #f1f1f1;
+                }
+
+                a {
+                    text-decoration: none;
+                    color: blue;
+                    font-weight: bold;
+                }
+
+                    a:hover {
+                        text-decoration: underline;
+                        color: darkblue;
+                    }
+
+                /* Search bar styling */
+                .search-bar {
+                    margin-bottom: 20px;
+                    display: flex;
+                    gap: 10px;
+                    align-items: center;
+                }
+
+                    .search-bar input[type="text"] {
+                        width: 300px;
+                        padding: 8px;
+                        font-size: 16px;
+                        border: 1px solid #ddd;
+                        border-radius: 4px;
+                    }
+
+                    .search-bar button {
+                        padding: 8px 15px;
+                        font-size: 16px;
+                        color: white;
+                        background-color: #4CAF50;
+                        border: none;
+                        border-radius: 4px;
+                        cursor: pointer;
+                    }
+
+                        .search-bar button:hover {
+                            background-color: #45a049;
+                        }
+
+                /* Style for the search bar */
+                .search-bar {
+                    margin-bottom: 20px;
+                    display: flex;
+                    gap: 10px;
+                    align-items: center;
+                }
+
+                    .search-bar input[type="text"] {
+                        width: 300px;
+                        padding: 8px;
+                        font-size: 16px;
+                        border: 1px solid #ddd;
+                        border-radius: 4px;
+                    }
+
+                    .search-bar button {
+                        padding: 8px 15px;
+                        font-size: 16px;
+                        color: white;
+                        background-color: #4CAF50;
+                        border: none;
+                        border-radius: 4px;
+                        cursor: pointer;
+                    }
+
+                        .search-bar button:hover {
+                            background-color: #45a049;
+                        }
+
+                /* Action link color changes */
+                .edit-link {
+                    color: blue;
+                    cursor: pointer;
+                }
+
+                    .edit-link:hover {
+                        text-decoration: underline;
+                    }
+
+                .delete-link {
+                    color: red;
+                    cursor: pointer;
+                }
+
+                    .delete-link:hover {
+                        text-decoration: underline;
+                    }
+
+                .pagination-controls {
+                    display: flex;
+                    justify-content: center;
+                    gap: 10px;
+                    margin-top: 20px;
+                }
+
+                    .pagination-controls button {
+                        padding: 8px 15px;
+                        font-size: 16px;
+                        border-radius: 4px;
+                    }
+
+                    .pagination-controls span {
+                        font-size: 16px;
+                        align-self: center;
+                    }
+
+            </style>
         </ContentTemplate>
     </SpinLoader>
 
@@ -208,7 +350,7 @@
         // Call the service to save the bill
         try
         {
-            if (dichVu.cthd == null) dichVu.cthd = [];
+            if (dichVu.cthds == null) dichVu.cthds = [];
             if (dichVu.MaDichVu == 0)
             {
                 //  bill.CTHoaDon = null;
@@ -225,6 +367,7 @@
                     dichVu = new DichVu();
                     successMessage = "Service create successfully!";
                 }
+
             }
             else
             {
@@ -237,6 +380,7 @@
                 successMessage = "Service update successfully!";
 
             }
+            await ReloadServices();
             // Handle successful save, e.g., display success message, clear form, etc.
         }
         catch (Exception ex)
@@ -253,6 +397,10 @@
         StateHasChanged();
 
     }
+    private async Task ReloadServices()
+    {
+        services = await dvservice.GetAllAsync("https://localhost:44359/api/DichVu/GetAll");
 
+    }
 
 }

@@ -17,7 +17,7 @@ namespace Domain.Entities
         public DateTime? NgaySinh { get; set; }
         public string CCCD { get; set; }
         public string STK { get; set; }
-        public string Password { get; set; }
+        public int TrangThai { get; set; }
 
         public KhachHang() { }
     }
