@@ -526,7 +526,6 @@
 
             // Nếu không có phòng chứa mã
             await RoomService.DeleteAsync("https://localhost:44359/api/Rooms/DeleteRoom/", RoomIdToDelete);
-            await LoadRooms(); // Làm mới danh sách khách hàng
             showDeleteConfirmation = false; // Ẩn bảng xác nhận
             successMessage = "Xóa phòng thành công."; // Thông báo thành công
             StateHasChanged();
