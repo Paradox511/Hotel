@@ -5,60 +5,50 @@
 @inject RoomService RoomService
 @inject HttpClient Http
 @using System.Net.Http.Json
-<header class="px-2 py-3" style="background-color: #2549ff">
-	<div class="">
-		<div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-			<a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-dark text-decoration-none">
-				<img src="/img/logoSGU.png" width="50" height="50" />
-			</a>
+@* <header class="px-2 py-3" style="background-color: #2549ff"> *@
+@* 	<div class=""> *@
+@* 		<div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start"> *@
+@* 			<a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-dark text-decoration-none"> *@
+@* 				<img src="/img/logoSGU.png" width="50" height="50" /> *@
+@* 			</a> *@
 
-			<ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-				<li><a href="#" class="nav-link px-2 link-secondary">Overview</a></li>
-				<li><a href="#" class="nav-link px-2 link-dark">Inventory</a></li>
-				<li><a href="#" class="nav-link px-2 link-dark">Customers</a></li>
-				<li><a href="#" class="nav-link px-2 link-dark">Products</a></li>
-			</ul>
+@* 			<ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0"> *@
+@* 				<li><a href="#" class="nav-link px-2 link-secondary">Overview</a></li> *@
+@* 				<li><a href="#" class="nav-link px-2 link-dark">Inventory</a></li> *@
+@* 				<li><a href="#" class="nav-link px-2 link-dark">Customers</a></li> *@
+@* 				<li><a href="#" class="nav-link px-2 link-dark">Products</a></li> *@
+@* 			</ul> *@
 
-			<form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3">
-				<input type="search" class="form-control" placeholder="Search..." aria-label="Search">
-			</form>
+@* 			<form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3"> *@
+@* 				<input type="search" class="form-control" placeholder="Search..." aria-label="Search"> *@
+@* 			</form> *@
 
-			@* kiểm tra khi khôgn có user sẽ hiển thị  *@
-			@if (khachHang == null)
-			{
-				<div class="d-none">
-					<button type="button" class="btn btn-outline-primary me-2"><a href="#" class="nav-link">Đăng nhập</a></button>
-					<button type="button" class="btn btn-primary"><a href="#" class="nav-link link-dark text-white">Đăng ký</a></button>
-				</div>
-			}
+@* 				<div class="d-none"> *@
+@* 					<button type="button" class="btn btn-outline-primary me-2"><a href="#" class="nav-link">Đăng nhập</a></button> *@
+@* 					<button type="button" class="btn btn-primary"><a href="#" class="nav-link link-dark text-white">Đăng ký</a></button> *@
+@* 				</div> *@
 
-			@if (khachHang == null)
-			{
 
-				<div class="dropdown text-end">
-					<a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-						<img src="https://github.com/mdo.png" alt="mdo" width="32" height="32" class="rounded-circle">
-					</a>
-					<ul class="dropdown-menu text-small" aria-labelledby="dropdownUser1">
-						<li><a class="dropdown-item" href="#">New project...</a></li>
-						<li><a class="dropdown-item" href="#">Settings</a></li>
-						<li><a class="dropdown-item" href="#">Profile</a></li>
-						<li><hr class="dropdown-divider"></li>
-						<li><a class="dropdown-item" href="#">Sign out</a></li>
-					</ul>
-				</div>
-			}
-		</div>
-	</div>
-</header>
+@* 				<div class="dropdown text-end"> *@
+@* 					<a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false"> *@
+@* 						<img src="https://github.com/mdo.png" alt="mdo" width="32" height="32" class="rounded-circle"> *@
+@* 					</a> *@
+@* 					<ul class="dropdown-menu text-small" aria-labelledby="dropdownUser1"> *@
+@* 						<li><a class="dropdown-item" href="#">New project...</a></li> *@
+@* 						<li><a class="dropdown-item" href="#">Settings</a></li> *@
+@* 						<li><a class="dropdown-item" href="#">Profile</a></li> *@
+@* 						<li><hr class="dropdown-divider"></li> *@
+@* 						<li><a class="dropdown-item" href="#">Sign out</a></li> *@
+@* 					</ul> *@
+@* 				</div> *@
+@* 		</div> *@
+@* 	</div> *@
+@* </header> *@
 
-<section class="h-auto" style="background-color: #f0f2f5">
-	<div>
-		<h1>Booking Hotel</h1>
-	</div>
-	<div class="px-2">
-
-		<h2 class="mt-2 border-top d-block">Phòng trống</h2>
+<section class="h-100" style="background-color: #f0f2f5">
+	<div class="px-2 ">
+		<h1>Quản lý đặt phòng</h1>
+		<h2 class="mt-2 border-top d-block">Danh sách phòng trống</h2>
 		<div class="d-flex justify-content-start my-2">
 			<div class="datepicker">
 				<label for="checkindate" class="form-label">Check-in Date:</label>
@@ -86,20 +76,10 @@
 								<img src="@randomImage" class="card-img-top" alt="Hình ảnh phòng khách sạn">
 								<div class="card-body">
 									<h5 class="card-title">@phong.LoaiPhong.TenLoaiPhong</h5>
-									@* <select class="form-select mb-3" style="width: 210px" aria-label="Default select example"> *@
-									@* 	<option selected>Chọn số lượng phòng</option> *@
-									@* 	@for (int i = 1; i <= countAvailableRooms; i++) *@
-									@* 	{ *@
-									@* 		<option value="@i">@i phòng</option> *@
-									@* 	} *@
-									@* </select> *@
-
 									<p class="card-text"><strong>Mô tả:</strong> @phong.LoaiPhong.Mota</p>
 									<p class="card-text"><strong>Giá:</strong> @phong.LoaiPhong.Gia đ/ngày</p>
 									<p class="card-text"><strong>Mã phòng:</strong> @phong.MaPhong</p>
 									<p class="card-text"><strong>Mã loại phòng:</strong> @phong.LoaiPhong.MaLoaiPhong</p>
-									@* <a href="#" class="btn btn-primary">Đặt phòng ngay</a> *@
-									@* <NavLink href=@string.Format("/booking/GetRoomDetails/{0}",phong.MaPhong) class="btn btn-primary">Đặt phòng ngay</NavLink> *@
 									<NavLink href=@string.Format("/booking/GetRoomDetails/{0}/{1}/{2}/{3}/{4}", phong.MaPhong, startDate.ToString("yyyy-MM-dd"), endDate.ToString("yyyy-MM-dd"), phong.LoaiPhong.Gia,phong.LoaiPhong.MaLoaiPhong) class="btn btn-primary">Đặt phòng ngay</NavLink>
 								</div>
 							</div>

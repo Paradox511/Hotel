@@ -1,4 +1,6 @@
 ﻿using Hotel_App.Data;
+using Newtonsoft.Json;
+using System.Text;
 
 namespace Hotel_App.Service
 {
@@ -172,6 +174,24 @@ namespace Hotel_App.Service
 			{
 				// Xử lý lỗi khi gửi yêu cầu đến API
 				throw new HttpRequestException($"Lỗi khi gửi yêu cầu đến API: {ex.Message}");
+			}
+		}
+
+		public async Task<HoaDon> AddHoaDonAsync(HoaDon hoaDon)
+		{
+			var hoaDonJson = JsonConvert.SerializeObject(hoaDon);
+			var content = new StringContent(hoaDonJson, Encoding.UTF8, "application/json");
+
+			var response = await _httpClient.PostAsync("CreateBillRoom", content);
+
+			if (response.IsSuccessStatusCode)
+			{
+				var responseContent = await response.Content.ReadAsStringAsync();
+				return JsonConvert.DeserializeObject<HoaDon>(responseContent);
+			}
+			else
+			{
+				throw new HttpRequestException($"Lỗi khi thêm hóa đơn, mã lỗi: {response.StatusCode}");
 			}
 		}
 	}

@@ -6,43 +6,39 @@
 	@inject NavigationManager NavigationManager
 	@inject IJSRuntime JSRuntime
 	@inject HotelService<HoaDon> BillService
-<header class="px-2 py-3" style="background-color: #2549ff">
-	<div class="">
-		<div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-			<a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-dark text-decoration-none">
-				<img src="/img/logoSGU.png" width="50" height="50" />
-			</a>
+@* <header class="px-2 py-3" style="background-color: #2549ff"> *@
+@* 	<div class="container"> *@
+@* 		<div class="d-flex flex-wrap align-items-center justify-content-between justify-content-lg-start"> *@
+@* 			<a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-dark text-decoration-none"> *@
+@* 				<img src="/img/logoSGU.png" width="50" height="50" alt="Logo"> *@
+@* 			</a> *@
 
-			<ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-				<li><a href="#" class="nav-link px-2 link-secondary">Overview</a></li>
-				<li><a href="#" class="nav-link px-2 link-dark">Inventory</a></li>
-				<li><a href="#" class="nav-link px-2 link-dark">Customers</a></li>
-				<li><a href="#" class="nav-link px-2 link-dark">Products</a></li>
-			</ul>
+@* 			<ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0"> *@
+@* 				<li class="nav-item"><a href="#" class="nav-link px-2 link-secondary">Overview</a></li> *@
+@* 				<li class="nav-item"><a href="#" class="nav-link px-2 link-dark">Inventory</a></li> *@
+@* 				<li class="nav-item"><a href="#" class="nav-link px-2 link-dark">Customers</a></li> *@
+@* 				<li class="nav-item"><a href="#" class="nav-link px-2 link-dark">Products</a></li> *@
+@* 			</ul> *@
 
-			<form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3">
-				<input type="search" class="form-control" placeholder="Search..." aria-label="Search">
-			</form>
+@* 			<form class="d-flex col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3"> *@
+@* 				<input type="search" class="form-control" placeholder="Search..." aria-label="Search"> *@
+@* 			</form> *@
 
-			@* <div class="d-none"> *@
-			@* 	<button type="button" class="btn btn-outline-primary me-2"><a href="#" class="nav-link">Đăng nhập</a></button> *@
-			@* 	<button type="button" class="btn btn-primary"><a href="#" class="nav-link link-dark text-white">Đăng ký</a></button> *@
-			@* </div> *@
-			<div class="dropdown text-end">
-				<a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-					<img src="https://github.com/mdo.png" alt="mdo" width="32" height="32" class="rounded-circle">
-				</a>
-				<ul class="dropdown-menu text-small" aria-labelledby="dropdownUser1">
-					<li><a class="dropdown-item" href="#">New project...</a></li>
-					<li><a class="dropdown-item" href="#">Settings</a></li>
-					<li><a class="dropdown-item" href="#">Profile</a></li>
-					<li><hr class="dropdown-divider"></li>
-					<li><a class="dropdown-item" href="#">Sign out</a></li>
-				</ul>
-			</div>
-		</div>
-	</div>
-</header>
+@* 			<div class="dropdown"> *@
+@* 				<a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false"> *@
+@* 					<img src="https://github.com/mdo.png" alt="User" width="32" height="32" class="rounded-circle"> *@
+@* 				</a> *@
+@* 				<ul class="dropdown-menu text-small" aria-labelledby="dropdownUser1"> *@
+@* 					<li><a class="dropdown-item" href="#">New project...</a></li> *@
+@* 					<li><a class="dropdown-item" href="#">Settings</a></li> *@
+@* 					<li><a class="dropdown-item" href="#">Profile</a></li> *@
+@* 					<li><hr class="dropdown-divider"></li> *@
+@* 					<li><a class="dropdown-item" href="#">Sign out</a></li> *@
+@* 				</ul> *@
+@* 			</div> *@
+@* 		</div> *@
+@* 	</div> *@
+@* </header> *@
 <div class="container mt-5">
 	<h2 class="text-center">Xác nhận đặt phòng</h2>
 	<p class="text-center">Experience something new every moment.</p>
@@ -64,11 +60,13 @@
 							}
 						</select>
 					</li>
-					<li class="list-group-item"><strong>Mã:</strong> @khachHang.MaKhachHang</li>
+					<li class="list-group-item"><strong>Mã khách hàng:</strong> @khachHang.MaKhachHang</li>
 					<li class="list-group-item"><strong>Tên:</strong> @khachHang.HoTen</li>
 					<li class="list-group-item"><strong>Số điện thoại:</strong> @khachHang.SoDienThoai</li>
 					<li class="list-group-item"><strong>Email:</strong> @khachHang.Email</li>
-
+					<li class="list-group-item"><strong>Ngày sinh:</strong> @khachHang.NgaySinh</li>
+					<li class="list-group-item"><strong>Số tài khoản:</strong> @khachHang.STK</li>
+					<li class="list-group-item"><strong>CCCD:</strong> @khachHang.CCCD</li>
 				</ul>
 			</div>
 			<div class="w-100">
@@ -110,6 +108,13 @@
 					<script>
 						window.updateTotalPriceElement = (total) => {
 						document.getElementById("totalPrice").innerText = ` ${total} VNĐ`;
+						};
+											 window.showPaymentStatus = (success) => {
+							if (success) {
+								alert("Thanh toán thành công!");
+							} else {
+								alert("Thanh toán thất bại!");
+							}
 						};
 					</script>
 				</ul>
@@ -160,6 +165,8 @@
 	public HoaDon bill { get; set; }
 
 	private string errorMessage = "";
+
+	private bool paymentSuccess = false;
 
 	protected async override Task OnInitializedAsync()
 	{
@@ -266,13 +273,24 @@
 			bill.MaPhuongThuc = selectedPaymentMethodId;
 			bill.MaTaiKhoan = 1;
 			bill.MaDatPhong = result.MaDatPhong;
-			HoaDon savedBill = await BillService.SaveAsync("https:localhost:44359/api/Bills/CreateBill", bill);
+			bill.TrangThai = 1;
+			HoaDon savedBill = await BillService.SaveAsync("https://localhost:44359/api/Bills/CreateBill", bill);
+			paymentSuccess = true;
+			// Hiển thị thông báo thành công
+			Console.WriteLine("Thanh toán thành công!");
+
+			JSRuntime.InvokeVoidAsync("showPaymentStatus", paymentSuccess);
+			await Task.Delay(2000);
+			NavigationManager.NavigateTo("/booking");
 		}
-		Console.WriteLine($"THong tin dat phong: {datPhong.MaKhachHang}");
-		Console.WriteLine($"THong tin dat phong: {datPhong.CheckInDate}");
-		Console.WriteLine($"THong tin dat phong: {datPhong.CheckOutDate}");
-		Console.WriteLine($"THong tin dat phong: {datPhong.MaPhong}");
-		Console.WriteLine($"Ma khach hang chon: {selectedCustomerID}");
-		Console.WriteLine($"Ma phuong thuc chon duoc: {selectedPaymentMethodId}");
+		else
+		{
+			// Xác định thanh toán thất bại
+			paymentSuccess = false;
+
+			// Hiển thị thông báo thất bại
+			Console.WriteLine("Thanh toán thất bại!");
+			JSRuntime.InvokeVoidAsync("showPaymentStatus", paymentSuccess);
+		}
 	}
 }
