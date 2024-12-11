@@ -1,202 +1,202 @@
-﻿@page "/chart"
-@using Blazorise.Charts
-@using Blazorise.Bootstrap
-@using Hotel_App.Service
-@using Hotel_App.Data
-@using Blazored.LocalStorage
-@using Hotel_App.Shared
-@inject HotelService<HoaDon> BillService
-@inject HotelService<DatPhong> dpservice;
-@inject HotelService<NhanVien> nvservice;
-@inject HotelService<PhuongThucThanhToan> ptservice;
-@inject HotelService<KhachHang> khservice;
-@inject HotelService<TaiKhoan> tkservice;
-@implements IDisposable
+﻿@* @page "/chart" *@
+@* @using Blazorise.Charts *@
+@* @using Blazorise.Bootstrap *@
+@* @using Hotel_App.Service *@
+@* @using Hotel_App.Data *@
+@* @using Blazored.LocalStorage *@
+@* @using Hotel_App.Shared *@
+@* @inject HotelService<HoaDon> BillService *@
+@* @inject HotelService<DatPhong> dpservice; *@
+@* @inject HotelService<NhanVien> nvservice; *@
+@* @inject HotelService<PhuongThucThanhToan> ptservice; *@
+@* @inject HotelService<KhachHang> khservice; *@
+@* @inject HotelService<TaiKhoan> tkservice; *@
+@* @implements IDisposable *@
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
-<div class="col-12">
-    <div class="container statistics-container">
-        <div class="header">Appointment Dashboard</div>
+@* <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script> *@
+@* <div class="col-12"> *@
+@*     <div class="container statistics-container"> *@
+@*         <div class="header">Appointment Dashboard</div> *@
 
-        <div class="grid statistics-grid">
-            <!-- Weekly Appointments -->
-            <div class="card">
-                <h6>Weekly Appointments</h6>
-                <LineChart TItem="double" Data="@weeklyAppointmentsData"  />
-            </div>
+@*         <div class="grid statistics-grid"> *@
+@*             <!-- Weekly Appointments --> *@
+@*             <div class="card"> *@
+@*                 <h6>Weekly Appointments</h6> *@
+@*                 <LineChart TItem="double" Data="@weeklyAppointmentsData"  /> *@
+@*             </div> *@
 
-            <!-- Weekly Revenue -->
-            <div class="card">
-                <h6>Weekly Revenue</h6>
-                <LineChart TItem="double" Data="@weeklyRevenueData"/>
-            </div>
+@*             <!-- Weekly Revenue --> *@
+@*             <div class="card"> *@
+@*                 <h6>Weekly Revenue</h6> *@
+@*                 <LineChart TItem="double" Data="@weeklyRevenueData"/> *@
+@*             </div> *@
 
-            <!-- Appointments by Type -->
-            <div class="card">
-                <BarChart TItem="double" Data="@appointmentsByTypeData"/>
-            </div>
-        </div>
-    </div>
-</div>
+@*             <!-- Appointments by Type --> *@
+@*             <div class="card"> *@
+@*                 <BarChart TItem="double" Data="@appointmentsByTypeData"/> *@
+@*             </div> *@
+@*         </div> *@
+@*     </div> *@
+@* </div> *@
 
-<style>
-    .statistics-container {
-        display: flex;
-        justify-content: center; /* Căn giữa theo chiều ngang */
-        align-items: center; /* Căn giữa theo chiều dọc */
-        height: 100vh; /* Chiều cao bằng 100% màn hình */
-        flex-direction: column; /* Bố trí theo chiều dọc */
-        text-align: center; /* Căn giữa văn bản */
-    }
+@* <style> *@
+@*     .statistics-container { *@
+@*         display: flex; *@
+@*         justify-content: center; /* Căn giữa theo chiều ngang */ *@
+@*         align-items: center; /* Căn giữa theo chiều dọc */ *@
+@*         height: 100vh; /* Chiều cao bằng 100% màn hình */ *@
+@*         flex-direction: column; /* Bố trí theo chiều dọc */ *@
+@*         text-align: center; /* Căn giữa văn bản */ *@
+@*     } *@
 
-    .statistics-grid {
-        display: flex;
-        justify-content: center; /* Căn giữa các card theo chiều ngang */
-        gap: 20px; /* Khoảng cách giữa các card */
-        margin-top: 20px; /* Tạo khoảng cách phía trên */
-    }
+@*     .statistics-grid { *@
+@*         display: flex; *@
+@*         justify-content: center; /* Căn giữa các card theo chiều ngang */ *@
+@*         gap: 20px; /* Khoảng cách giữa các card */ *@
+@*         margin-top: 20px; /* Tạo khoảng cách phía trên */ *@
+@*     } *@
 
-    .card {
-        width: 300px; /* Đặt chiều rộng cho từng card */
-        text-align: center; /* Căn giữa nội dung trong card */
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Thêm đổ bóng */
-        padding: 20px;
-        border-radius: 8px; /* Bo góc */
-        background-color: #fff; /* Màu nền trắng */
-    }
-</style>
+@*     .card { *@
+@*         width: 300px; /* Đặt chiều rộng cho từng card */ *@
+@*         text-align: center; /* Căn giữa nội dung trong card */ *@
+@*         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Thêm đổ bóng */ *@
+@*         padding: 20px; *@
+@*         border-radius: 8px; /* Bo góc */ *@
+@*         background-color: #fff; /* Màu nền trắng */ *@
+@*     } *@
+@* </style> *@
 
-@code {
-    private IEnumerable<TaiKhoan> accounts;
-    private IEnumerable<NhanVien> employees;
-    private IEnumerable<DatPhong> reservations;
-    public NhanVien employee { get; set; }
-    public IEnumerable<NhanVien> filteredEmployees { get; set; }
-    private IEnumerable<KhachHang> customers;
-    public KhachHang customer { get; set; }
-    public TaiKhoan account { get; set; }
-    public IEnumerable<KhachHang> filteredCustomersList { get; set; }
-    public bool IsVisible { get; set; }
-    public bool Result { get; set; }
-    public string RecordName { get; set; }
-    public bool IsGridViewFiltered { get; set; }
-    bool isLoading = true;
+@* @code { *@
+@*     private IEnumerable<TaiKhoan> accounts; *@
+@*     private IEnumerable<NhanVien> employees; *@
+@*     private IEnumerable<DatPhong> reservations; *@
+@*     public NhanVien employee { get; set; } *@
+@*     public IEnumerable<NhanVien> filteredEmployees { get; set; } *@
+@*     private IEnumerable<KhachHang> customers; *@
+@*     public KhachHang customer { get; set; } *@
+@*     public TaiKhoan account { get; set; } *@
+@*     public IEnumerable<KhachHang> filteredCustomersList { get; set; } *@
+@*     public bool IsVisible { get; set; } *@
+@*     public bool Result { get; set; } *@
+@*     public string RecordName { get; set; } *@
+@*     public bool IsGridViewFiltered { get; set; } *@
+@*     bool isLoading = true; *@
 
-    private string searchText = string.Empty;
-    private string errorMessage;
-    private string successMessage;
-    private string deleteMessage;
-    private bool showDeleteConfirmation = false;
-    private int customerIdToDelete;
+@*     private string searchText = string.Empty; *@
+@*     private string errorMessage; *@
+@*     private string successMessage; *@
+@*     private string deleteMessage; *@
+@*     private bool showDeleteConfirmation = false; *@
+@*     private int customerIdToDelete; *@
 
-    // Dữ liệu cho biểu đồ
-    public ChartData<double> weeklyAppointmentsData { get; set; }
-    public ChartData<double> weeklyRevenueData { get; set; }
-    public ChartData<double> appointmentsByTypeData { get; set; }
+@*     // Dữ liệu cho biểu đồ *@
+@*     public ChartData<double> weeklyAppointmentsData { get; set; } *@
+@*     public ChartData<double> weeklyRevenueData { get; set; } *@
+@*     public ChartData<double> appointmentsByTypeData { get; set; } *@
 
 
 
-    protected override async Task OnInitializedAsync()
-    {
-        Console.WriteLine("Statistics - OnInitializedAsync");
+@*     protected override async Task OnInitializedAsync() *@
+@*     { *@
+@*         Console.WriteLine("Statistics - OnInitializedAsync"); *@
 
-        // await base.OnInitializedAsync();
-        await LoadChartData();
-    }
+@*         // await base.OnInitializedAsync(); *@
+@*         await LoadChartData(); *@
+@*     } *@
 
-    // protected override void OnParametersSet()
-    // {
-    //     Console.WriteLine("Statistics - OnParametersSet");
-    //     base.OnParametersSet();
-    // }
+@*     // protected override void OnParametersSet() *@
+@*     // { *@
+@*     //     Console.WriteLine("Statistics - OnParametersSet"); *@
+@*     //     base.OnParametersSet(); *@
+@*     // } *@
 
-    // protected override async Task OnParametersSetAsync()
-    // {
-    //     Console.WriteLine("Statistics - OnParametersSetAsync");
-    //     await base.OnParametersSetAsync();
-    // }
+@*     // protected override async Task OnParametersSetAsync() *@
+@*     // { *@
+@*     //     Console.WriteLine("Statistics - OnParametersSetAsync"); *@
+@*     //     await base.OnParametersSetAsync(); *@
+@*     // } *@
 
-    // protected override bool ShouldRender()
-    // {
-    //     base.ShouldRender();
-    //     Console.WriteLine("Statistics - ShouldRender");
+@*     // protected override bool ShouldRender() *@
+@*     // { *@
+@*     //     base.ShouldRender(); *@
+@*     //     Console.WriteLine("Statistics - ShouldRender"); *@
 
-    //     return true;
-    // }
+@*     //     return true; *@
+@*     // } *@
 
-    // protected override void OnAfterRender(bool firstRender)
-    // {
-    //     Console.WriteLine("Statistics - OnAfterRender - firstRender = " + firstRender);
-    //     base.OnAfterRender(firstRender);
-    // }
+@*     // protected override void OnAfterRender(bool firstRender) *@
+@*     // { *@
+@*     //     Console.WriteLine("Statistics - OnAfterRender - firstRender = " + firstRender); *@
+@*     //     base.OnAfterRender(firstRender); *@
+@*     // } *@
 
-    // protected override async Task OnAfterRenderAsync(bool firstRender)
-    // {
-    //     Console.WriteLine("Statistics - OnAfterRenderAsync - firstRender = " + firstRender);
+@*     // protected override async Task OnAfterRenderAsync(bool firstRender) *@
+@*     // { *@
+@*     //     Console.WriteLine("Statistics - OnAfterRenderAsync - firstRender = " + firstRender); *@
 
-    //     if (firstRender)
-    //     {
-    //         isLoading = false;
-    //         StateHasChanged();
-    //     }
+@*     //     if (firstRender) *@
+@*     //     { *@
+@*     //         isLoading = false; *@
+@*     //         StateHasChanged(); *@
+@*     //     } *@
 
-    //     await base.OnAfterRenderAsync(firstRender);
-    // }
+@*     //     await base.OnAfterRenderAsync(firstRender); *@
+@*     // } *@
 
-    public void Dispose()
-    {
-        Console.WriteLine("Statistics - Dispose");
-    }
+@*     public void Dispose() *@
+@*     { *@
+@*         Console.WriteLine("Statistics - Dispose"); *@
+@*     } *@
 
-    private async Task LoadChartData()
-    {
-        // Tạo dữ liệu cho Weekly Appointments
-        weeklyAppointmentsData = new ChartData<double>
-            {
-                Labels = new List<object> { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" },
-                Datasets = new List<ChartDataset<double>>
-            {
-                new LineChartDataset<double>
-                {
-                    Label = "Appointments",
-                    Data = new List<double> { 30, 50, 70, 90, 60, 80, 100 },
-                    Fill = true,
-                    BorderColor = "rgba(75, 192, 192, 1)",
-                    BackgroundColor = "rgba(75, 192, 192, 0.2)",
-                }
-            }
-        };
-        // Tạo dữ liệu cho Weekly Revenue
-        weeklyRevenueData = new ChartData<double>
-            {
-                Labels = new List<object> { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" },
-                Datasets = new List<ChartDataset<double>>
-            {
-                new LineChartDataset<double>
-                {
-                    Label = "Revenue",
-                    Data = new List<double> { 500, 700, 800, 1000, 950, 1100, 1200 },
-                    Fill = true,
-                    BorderColor = "rgba(255, 99, 132, 1)",
-                    BackgroundColor = "rgba(255, 99, 132, 0.2)",
-                }
-            }
-        };
-        appointmentsByTypeData = new ChartData<double>
-            {
-                Labels = new List<object> { "Type A", "Type B", "Type C", "Type D" },
-                Datasets = new List<ChartDataset<double>>
-            {
-                new BarChartDataset<double>
-                {
-                    Label = "Appointments by Type",
-                    Data = new List<double> { 40, 30, 20, 10 },
-                    BackgroundColor = new List<string> { "rgba(54, 162, 235, 0.2)", "rgba(255, 206, 86, 0.2)", "rgba(75, 192, 192, 0.2)", "rgba(153, 102, 255, 0.2)" },
-                    BorderColor = new List<string> { "rgba(54, 162, 235, 1)", "rgba(255, 206, 86, 1)", "rgba(75, 192, 192, 1)", "rgba(153, 102, 255, 1)" },
-                    BorderWidth = 1
-                }
-            }
-        };
-        await Task.CompletedTask;
-    }
-}
+@*     private async Task LoadChartData() *@
+@*     { *@
+@*         // Tạo dữ liệu cho Weekly Appointments *@
+@*         weeklyAppointmentsData = new ChartData<double> *@
+@*             { *@
+@*                 Labels = new List<object> { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" }, *@
+@*                 Datasets = new List<ChartDataset<double>> *@
+@*             { *@
+@*                 new LineChartDataset<double> *@
+@*                 { *@
+@*                     Label = "Appointments", *@
+@*                     Data = new List<double> { 30, 50, 70, 90, 60, 80, 100 }, *@
+@*                     Fill = true, *@
+@*                     BorderColor = "rgba(75, 192, 192, 1)", *@
+@*                     BackgroundColor = "rgba(75, 192, 192, 0.2)", *@
+@*                 } *@
+@*             } *@
+@*         }; *@
+@*         // Tạo dữ liệu cho Weekly Revenue *@
+@*         weeklyRevenueData = new ChartData<double> *@
+@*             { *@
+@*                 Labels = new List<object> { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" }, *@
+@*                 Datasets = new List<ChartDataset<double>> *@
+@*             { *@
+@*                 new LineChartDataset<double> *@
+@*                 { *@
+@*                     Label = "Revenue", *@
+@*                     Data = new List<double> { 500, 700, 800, 1000, 950, 1100, 1200 }, *@
+@*                     Fill = true, *@
+@*                     BorderColor = "rgba(255, 99, 132, 1)", *@
+@*                     BackgroundColor = "rgba(255, 99, 132, 0.2)", *@
+@*                 } *@
+@*             } *@
+@*         }; *@
+@*         appointmentsByTypeData = new ChartData<double> *@
+@*             { *@
+@*                 Labels = new List<object> { "Type A", "Type B", "Type C", "Type D" }, *@
+@*                 Datasets = new List<ChartDataset<double>> *@
+@*             { *@
+@*                 new BarChartDataset<double> *@
+@*                 { *@
+@*                     Label = "Appointments by Type", *@
+@*                     Data = new List<double> { 40, 30, 20, 10 }, *@
+@*                     BackgroundColor = new List<string> { "rgba(54, 162, 235, 0.2)", "rgba(255, 206, 86, 0.2)", "rgba(75, 192, 192, 0.2)", "rgba(153, 102, 255, 0.2)" }, *@
+@*                     BorderColor = new List<string> { "rgba(54, 162, 235, 1)", "rgba(255, 206, 86, 1)", "rgba(75, 192, 192, 1)", "rgba(153, 102, 255, 1)" }, *@
+@*                     BorderWidth = 1 *@
+@*                 } *@
+@*             } *@
+@*         }; *@
+@*         await Task.CompletedTask; *@
+@*     } *@
+@* } *@
