@@ -103,7 +103,7 @@
 <div class="col-12">
 
     <h3>Thông tin phòng</h3>
-    <button class="btn btn-primary" @onclick="LoadRooms">Refresh</button>
+    @* <button class="btn btn-primary" @onclick="LoadRooms">Refresh</button> *@
     <SpinLoader IsLoading="isLoading">
         <LoadingTemplate>
             <div class="col-12" style="background-color: lightgray; height:400px; vertical-align:middle">
@@ -124,7 +124,7 @@
                             <th>Mã Phòng</th>
                             <th>Trạng Thái Phòng</th>
                             <th>Số Phòng</th>
-                            <th>Mã Loại Phòng</th>   
+                            <th>Mã Loại Phòng</th>                            
                             <th>Thao tác</th>
                         </tr>
                     </thead>
@@ -144,7 +144,7 @@
                                     }
                                 </td>
                                 <td>@room.SoPhong</td>
-                                <td>@room.MaLoaiPhong</td>
+                                <td>@room.MaLoaiPhong</td>                               
                                 <td class ="action-links">
                                     <a class="edit-link" @onclick="(() => EditRoom(room))">Edit</a> |
                                     <a class="delete-link" @onclick="(() => DeleteRoom(room.MaPhong))">Delete</a>
@@ -466,10 +466,10 @@
     private async Task DeleteRoom(int id)
     {     
         //Phong TPhong = await privateRoomService.DeletePhongAsync(room,room.MaPhong);
-        await RoomService.DeleteAsync("https://localhost:44359/api/Rooms/DeleteRoom/", id);
+        RoomService.DeleteAsync("https://localhost:44359/api/Rooms/DeleteRoom/", id);
         LoadRooms(); // Làm mới danh sách khách hàng
-        showDeleteConfirmation = false; // Ẩn bảng xác nhận
-        successMessage = "Xóa phòng thành công."; // Thông báo thành công
+        //showDeleteConfirmation = false; // Ẩn bảng xác nhận
+        //successMessage = "Xóa phòng thành công."; // Thông báo thành công
         StateHasChanged();
     }
 
@@ -486,54 +486,6 @@
             .Skip((currentPage - 1) * itemsPerPage)
             .Take(itemsPerPage)
             .ToList();
-    }
-
-    private async Task SearchAll()
-    {
-        isLoading = true;
-        try
-        {
-            if (string.IsNullOrEmpty(searchText))
-            {
-                filteredRoomList = Rooms.ToList();
-            }
-            else
-            {
-                if (int.TryParse(searchText, out int Roomid))
-                {
-                    filteredRoomList = Rooms
-                        .Where(c => c.MaPhong == Roomid)
-                        .ToList();
-                }
-                else
-                {
-                    if (int.TryParse(searchText, out int RoomTypeid))
-                    {
-                        filteredRoomList = Rooms
-                            .Where(c => c.MaLoaiPhong == RoomTypeid)
-                            .ToList();
-                    }
-                    else{
-                        if (int.TryParse(searchText, out int RoomNumberid))
-                        {
-                            filteredRoomList = Rooms
-                                .Where(c => c.MaLoaiPhong == RoomNumberid)
-                                .ToList();
-                        }
-                    }
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine("Error searching customers: " + ex.Message);
-            errorMessage = "Có lỗi xảy ra khi tìm kiếm.";
-        }
-        finally
-        {
-            isLoading = false;
-            StateHasChanged();
-        }
     }
 
     private void NextPage()
@@ -587,14 +539,13 @@
             //if (png.MaPhong == null) png.LoaiPhong = new LoaiPhong();
             if (png.MaPhong == 0)
             {                
-                Phong TPhong = await RoomService.SaveAsync("https://localhost:44359/api/Rooms/CreateRoom", png);             
+                Phong TPhong = await RoomService.SaveAsync("https://localhost:44359/api/Rooms/CreateRoom", png);                   
                 if (TPhong != null)
                 {                  
                     png = new Phong();
-                    await LoadRooms();                   
-                    StateHasChanged();
+                    
                     // Clear the form
-                }
+                }                
             }
             else
             {
