@@ -12,7 +12,7 @@ using Persistence.Context;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(HotelDBContext))]
-    [Migration("20241211084609_first")]
+    [Migration("20241211094230_first")]
     partial class first
     {
         /// <inheritdoc />
@@ -163,6 +163,9 @@ namespace Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("MaTaiKhoan")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("NgaySinh")
                         .HasColumnType("datetime2");
 
@@ -174,7 +177,7 @@ namespace Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TrangThai")
+                    b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.HasKey("MaKhachHang");
@@ -220,9 +223,6 @@ namespace Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaPhong"));
 
-                    b.Property<int>("LoaiPhongMaLoaiPhong")
-                        .HasColumnType("int");
-
                     b.Property<int>("MaLoaiPhong")
                         .HasColumnType("int");
 
@@ -237,7 +237,7 @@ namespace Persistence.Migrations
 
                     b.HasKey("MaPhong");
 
-                    b.HasIndex("LoaiPhongMaLoaiPhong");
+                    b.HasIndex("MaLoaiPhong");
 
                     b.ToTable("phong");
                 });
@@ -256,7 +256,7 @@ namespace Persistence.Migrations
 
                     b.HasKey("MaPhuongThuc");
 
-                    b.ToTable("ptthanhtoan");
+                    b.ToTable("PhuongThucThanhToan");
                 });
 
             modelBuilder.Entity("Domain.Entities.TaiKhoan", b =>
@@ -332,7 +332,7 @@ namespace Persistence.Migrations
                 {
                     b.HasOne("Domain.Entities.LoaiPhong", "LoaiPhong")
                         .WithMany()
-                        .HasForeignKey("LoaiPhongMaLoaiPhong")
+                        .HasForeignKey("MaLoaiPhong")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

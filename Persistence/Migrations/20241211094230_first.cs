@@ -75,7 +75,8 @@ namespace Persistence.Migrations
                     NgaySinh = table.Column<DateTime>(type: "datetime2", nullable: true),
                     CCCD = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     STK = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    TrangThai = table.Column<int>(type: "int", nullable: false)
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    MaTaiKhoan = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -100,7 +101,7 @@ namespace Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ptthanhtoan",
+                name: "PhuongThucThanhToan",
                 columns: table => new
                 {
                     MaPhuongThuc = table.Column<int>(type: "int", nullable: false)
@@ -109,7 +110,7 @@ namespace Persistence.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ptthanhtoan", x => x.MaPhuongThuc);
+                    table.PrimaryKey("PK_PhuongThucThanhToan", x => x.MaPhuongThuc);
                 });
 
             migrationBuilder.CreateTable(
@@ -169,15 +170,14 @@ namespace Persistence.Migrations
                     TrangThaiPhong = table.Column<int>(type: "int", nullable: false),
                     SoPhong = table.Column<int>(type: "int", nullable: false),
                     MaLoaiPhong = table.Column<int>(type: "int", nullable: false),
-                    LoaiPhongMaLoaiPhong = table.Column<int>(type: "int", nullable: false),
                     TrangThai = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_phong", x => x.MaPhong);
                     table.ForeignKey(
-                        name: "FK_phong_loaiphong_LoaiPhongMaLoaiPhong",
-                        column: x => x.LoaiPhongMaLoaiPhong,
+                        name: "FK_phong_loaiphong_MaLoaiPhong",
+                        column: x => x.MaLoaiPhong,
                         principalTable: "loaiphong",
                         principalColumn: "MaLoaiPhong",
                         onDelete: ReferentialAction.Cascade);
@@ -194,9 +194,9 @@ namespace Persistence.Migrations
                 column: "MaHoaDon");
 
             migrationBuilder.CreateIndex(
-                name: "IX_phong_LoaiPhongMaLoaiPhong",
+                name: "IX_phong_MaLoaiPhong",
                 table: "phong",
-                column: "LoaiPhongMaLoaiPhong");
+                column: "MaLoaiPhong");
         }
 
         /// <inheritdoc />
@@ -215,7 +215,7 @@ namespace Persistence.Migrations
                 name: "phong");
 
             migrationBuilder.DropTable(
-                name: "ptthanhtoan");
+                name: "PhuongThucThanhToan");
 
             migrationBuilder.DropTable(
                 name: "TaiKhoan");

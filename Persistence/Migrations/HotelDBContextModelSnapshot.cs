@@ -160,6 +160,9 @@ namespace Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("MaTaiKhoan")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("NgaySinh")
                         .HasColumnType("datetime2");
 
@@ -171,7 +174,7 @@ namespace Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TrangThai")
+                    b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.HasKey("MaKhachHang");
@@ -250,7 +253,7 @@ namespace Persistence.Migrations
 
                     b.HasKey("MaPhuongThuc");
 
-                    b.ToTable("ptthanhtoan");
+                    b.ToTable("PhuongThucThanhToan");
                 });
 
             modelBuilder.Entity("Domain.Entities.TaiKhoan", b =>
