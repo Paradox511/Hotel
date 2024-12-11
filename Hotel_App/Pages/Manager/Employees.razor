@@ -44,15 +44,17 @@
         </div>
     }
     <EditForm Model="@employee" OnValidSubmit="@CreateEmployees">
+        <DataAnnotationsValidator />
         <div class="form-group">
             <label for="MaTaiKhoan">Mã Nhân Viên:</label>
             <input type="text" class="form-control" id="MaTaiKhoan" @bind="employee.MaTaiKhoan" name="MaTaiKhoan" readonly>
+
         </div>
 
         <div class="form-group">
             <label for="TenNhanVien">Tên Nhân Viên:</label>
             <input type="text" class="form-control" id="TenNhanVien" @bind="employee.HoTen" name="TenNhanVien">
-
+            <ValidationMessage For="@(() => employee.HoTen)" />
         </div>
 
         <div class="form-group">
@@ -62,6 +64,7 @@
             {
                 <span class="text-danger">@phoneError</span>
             }
+            <ValidationMessage For="@(() => employee.SoDienThoai)" />
         </div>
 
         <div class="form-group">
@@ -71,16 +74,25 @@
             {
                 <span class="text-danger">@emailError</span>
             }
+            <ValidationMessage For="@(() => employee.Email)" />
         </div>
 
         <div class="form-group">
             <label for="DiaChi">Địa Chỉ:</label>
             <input type="text" class="form-control" id="DiaChi" @bind="employee.DiaChi" name="DiaChi">
+            <ValidationMessage For="@(() => employee.DiaChi)" />
+        </div>
+
+        <div class="form-group">
+            <label for="UserName">Username:</label>
+            <input type="text" class="form-control" id="Username" @bind="employee.Username" name="DiaChi">
+            <ValidationMessage For="@(() => employee.Username)" />
         </div>
 
         <div class="form-group">
             <label for="Password">Password:</label>
             <input type="text" class="form-control" id="Password" @bind="employee.Password" name="Password">
+            <ValidationMessage For="@(() => employee.Password)" />
         </div>
         <br />
         <button type="submit" class="btn btn-primary ">Tạo</button>
@@ -122,6 +134,7 @@
                                 <th>Số điện thoại</th>
                                 <th>Email</th>
                                 <th>Địa Chỉ</th>
+                                <th>Username</th>
                                 <th>Password</th>
                                 <th>Thao Tác</th>
                             </tr>
@@ -135,6 +148,7 @@
                                     <td>@nv.SoDienThoai</td>
                                     <td>@nv.Email</td>
                                     <td>@nv.DiaChi</td>
+                                    <td>@nv.Username</td>
                                     <td>@nv.Password</td>
                                     <td class="action-links">
                                         <a class="edit-link" @onclick="(() => EditEmployees(nv))">Edit</a> |
@@ -349,7 +363,7 @@
         try
         {
             // Fetch all employees (no filtering applied yet)
-            var allEmployees = await nvservice.GetAllAsync("https://localhost:44359/api/NhanVien/GetNhanVien");
+            var allEmployees = await nvservice.GetAllAsync("https://localhost:44359/api/TaiKhoan/GetTaiKhoan");
 
             employees = allEmployees; // Store all employees for search filtering later
             filteredEmployees = employees; // Initially, no filtering
@@ -420,6 +434,13 @@
                 errorMessage = "Số điện thoại này đã tồn tại.";
                 return;
             }
+
+            if (IsUsernameDuplicated(employee.Username))
+            {
+                errorMessage = "Username này đã tồn tại.";
+                return;
+            }
+
         }
         else
         {
@@ -435,6 +456,12 @@
                 errorMessage = "Số điện thoại này đã tồn tại.";
                 return;
             }
+
+            if (IsUsernameDuplicatedForUpdate(employee.Username, employee.MaTaiKhoan))
+            {
+                errorMessage = "Username này đã tồn tại.";
+                return;
+            }
         }
 
         // Thực hiện lưu hoặc cập nhật nhân viên
@@ -443,7 +470,7 @@
             if (employee.MaTaiKhoan == 0)
             {
                 // Thêm nhân viên mới
-                var createdEmployee = await nvservice.SaveAsync("https://localhost:44359/api/NhanVien/CreateNhanVien", employee);
+                var createdEmployee = await nvservice.SaveAsync("https://localhost:44359/api/TaiKhoan/CreateTaiKhoan", employee);
                 if (createdEmployee != null)
                 {
                     successMessage = "Nhân viên đã được thêm thành công!";
@@ -457,7 +484,7 @@
             else
             {
                 // Cập nhật nhân viên
-                var updatedEmployee = await nvservice.UpdateAsync("https://localhost:44359/api/NhanVien/UpdateNhanVien/", employee.MaTaiKhoan, employee);
+                var updatedEmployee = await nvservice.UpdateAsync("https://localhost:44359/api/TaiKhoan/UpdateTaiKhoan/", employee.MaTaiKhoan, employee);
                 if (updatedEmployee != null)
                 {
                     successMessage = "Nhân viên đã được cập nhật thành công!";
@@ -494,7 +521,7 @@
                  StateHasChanged(); // Cập nhật giao diện
                  return; // Dừng việc xóa khách hàng
              }*/
-            await nvservice.DeleteAsync("https://localhost:44359/api/NhanVien/DeleteNhanVien/", employeesIdToDelete);
+            await nvservice.DeleteAsync("https://localhost:44359/api/TaiKhoan/DeleteTaiKhoan/", employeesIdToDelete);
             await LoadEmployees();
             showDeleteConfirmation = false; // Ẩn bảng xác nhận
             successMessage = "Xóa nhân viên thành công."; // Thông báo thành công
@@ -531,6 +558,7 @@
                 SoDienThoai = employeeToEdit.SoDienThoai,
                 Email = employeeToEdit.Email,
                 DiaChi = employeeToEdit.DiaChi,
+                Username = employeeToEdit.Username,
                 Password = employeeToEdit.Password
             };
         successMessage = string.Empty;
@@ -582,6 +610,12 @@
         return employees.Any(emp => emp.SoDienThoai.Equals(phoneNumber, StringComparison.OrdinalIgnoreCase) && emp.MaTaiKhoan != currentEmployeeId);
     }
 
+    // Kiểm tra username có trùng cho việc cập nhật (bỏ qua nhân viên hiện tại)
+    private bool IsUsernameDuplicatedForUpdate(string username, int currentEmployeeId)
+    {
+        return employees.Any(emp => emp.Username.Equals(username, StringComparison.OrdinalIgnoreCase) && emp.MaTaiKhoan != currentEmployeeId);
+    }
+
 
     // Kiểm tra email có trùng trong danh sách hay không
     private bool IsEmailDuplicated(string email)
@@ -593,6 +627,11 @@
     private bool IsPhoneNumberDuplicated(string phoneNumber)
     {
         return employees.Any(emp => emp.SoDienThoai.Equals(phoneNumber, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private bool IsUsernameDuplicated(string Username)
+    {
+        return employees.Any(emp => emp.Username.Equals(Username, StringComparison.OrdinalIgnoreCase));
     }
 
     private void NextPage()

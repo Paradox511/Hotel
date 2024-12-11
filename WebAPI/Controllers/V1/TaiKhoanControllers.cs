@@ -28,8 +28,8 @@ namespace WebAPI.Controllers.V1
             {
                 return StatusCode(500, "Internal Server Error: DbContext not injected");
             }
-
-            var customers = await _context.taikhoan.ToListAsync(); // Assuming your bills are stored in "hoadon" DbSet
+            var customers = await _context.taikhoan.Where(cus => cus.TrangThai == 1).ToListAsync();
+            // Assuming your bills are stored in "hoadon" DbSet
             if (customers == null)
             {
                 return NotFound("No Accounts found");
@@ -39,7 +39,7 @@ namespace WebAPI.Controllers.V1
         }
 
 
-        [HttpPost("CreateAccount")]
+        [HttpPost("CreateTaiKhoan")]
         public async Task<IActionResult> CreateAccount([FromBody] CreateCommand<TaiKhoan> command)
         {
             if (command == null || command.Entity == null)
@@ -53,17 +53,24 @@ namespace WebAPI.Controllers.V1
 
 
 
-        [HttpDelete("DeleteCustomer")]
+        [HttpDelete("DeleteTaiKhoan/{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            if (id == null)
+            var employee = await _context.taikhoan.FindAsync(id);
+            if (employee == null)
             {
                 return BadRequest("Invalid command data");
             }
-            var entity = _context.taikhoan.Find(id);
-            _context.taikhoan.Remove(entity);
-            await _context.SaveChangesAsync();
-            return Ok(entity); // No content to return on successful deletion
+            employee.TrangThai = 0;
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal Server Error: DbContext not injected");
+            }
+            return Ok("employee status updated to 0");
         }
         /// <summary>
         /// Updates the Product Entity based on Id.   
@@ -96,6 +103,34 @@ namespace WebAPI.Controllers.V1
             }
             return NoContent(); // No content to return on successful update
         }
+
+        [HttpPut("UpdateTaiKhoan/{id}")]
+        public async Task<IActionResult> Update(int id, TaiKhoan employee)
+        {
+            if (id != employee.MaTaiKhoan)
+            {
+                return BadRequest("Invalid command data");
+            }
+            _context.taikhoan.Entry(employee).State = EntityState.Modified;
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (employee == null)
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return Ok(employee); // No content to return on successful update
+        }
+
+
 
     }
 }

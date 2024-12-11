@@ -6,19 +6,19 @@ namespace Hotel_App.Data
     {
         [Key]
         public int MaTaiKhoan { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Họ tên không được để trống.")]
         public string HoTen { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Số điện thoại không được để trống.")]
         public string SoDienThoai { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Email không được để trống.")]
         public string Email { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Địa chỉ không được để trống.")]
         public string DiaChi { get; set; }
-      
+        [Required(ErrorMessage = "Username không được để trống.")]
         public string Username {  get; set; }
-        [Required]
+        [Required(ErrorMessage = "Password không được để trống.")]
         public string Password { get; set; }
-        public int TrangThai { get; set; }
+        public int TrangThai { get; set; } = 1;
 
 
         public TaiKhoan() { }
