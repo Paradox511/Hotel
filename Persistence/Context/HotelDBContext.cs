@@ -42,10 +42,12 @@ namespace Persistence.Context
                     .IsUnicode(false);
 
             });
+  
             modelBuilder.Entity<HoaDon>()
-           .HasMany(h => h.CTHoaDon)
-           .WithOne(ct => ct.HoaDon)
-           .HasForeignKey(ct => ct.MaHoaDon);
+         .HasMany(h => h.CTHoaDon)
+         .WithOne(ct => ct.HoaDon)
+         .HasForeignKey(ct => ct.MaHoaDon);
+
 
             modelBuilder.Entity<CTHoaDon>()
              .HasOne(ct => ct.HoaDon)
@@ -66,9 +68,8 @@ namespace Persistence.Context
         public virtual DbSet<LoaiPhong> loaiphong { get; set; }
         public virtual DbSet<DichVu> dichvu { get; set; }
         public virtual DbSet<KhachHang> khachhang { get; set; }
-        public virtual DbSet<NhanVien> nhanvien { get; set; }
-
         public virtual DbSet<TaiKhoan> taikhoan { get; set; }
+
         public virtual DbSet<PhuongThucThanhToan> ptthanhtoan { get; set; }
 
         public async Task<int> SaveChangesAsync()

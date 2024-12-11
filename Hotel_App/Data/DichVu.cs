@@ -12,6 +12,7 @@ namespace Hotel_App.Data
         [DataType(DataType.Currency)]
         public decimal Gia { get; set; }
         public DichVu() { }
+        public int TrangThai { get; set; }
 
 
         [Required]

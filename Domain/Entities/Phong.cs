@@ -12,6 +12,8 @@ namespace Domain.Entities
         [Required]
         public int MaLoaiPhong { get; set; }
         public LoaiPhong LoaiPhong { get; set; }
+        public int TrangThai { get; set; }
+
         public Phong() { }
     }
 }

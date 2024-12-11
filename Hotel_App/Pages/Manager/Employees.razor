@@ -5,7 +5,7 @@
 @using Hotel_App.Shared
 @inject HotelService<HoaDon> BillService
 @inject HotelService<DatPhong> dpservice;
-@inject HotelService<NhanVien> nvservice;
+@inject HotelService<TaiKhoan> nvservice;
 @inject HotelService<PhuongThucThanhToan> ptservice;
 @implements IDisposable
 
@@ -45,8 +45,8 @@
     }
     <EditForm Model="@employee" OnValidSubmit="@CreateEmployees">
         <div class="form-group">
-            <label for="MaNhanVien">Mã Nhân Viên:</label>
-            <input type="text" class="form-control" id="MaNhanVien" @bind="employee.MaNhanVien" name="MaNhanVien" readonly>
+            <label for="MaTaiKhoan">Mã Nhân Viên:</label>
+            <input type="text" class="form-control" id="MaTaiKhoan" @bind="employee.MaTaiKhoan" name="MaTaiKhoan" readonly>
         </div>
 
         <div class="form-group">
@@ -130,7 +130,7 @@
                             @foreach (var nv in filteredEmployees)
                             {
                                 <tr>
-                                    <td>@nv.MaNhanVien</td>
+                                    <td>@nv.MaTaiKhoan</td>
                                     <td>@nv.HoTen</td>
                                     <td>@nv.SoDienThoai</td>
                                     <td>@nv.Email</td>
@@ -138,7 +138,7 @@
                                     <td>@nv.Password</td>
                                     <td class="action-links">
                                         <a class="edit-link" @onclick="(() => EditEmployees(nv))">Edit</a> |
-                                        <a class="delete-link" @onclick="(() => ShowDeleteConfirmation(nv.MaNhanVien))">Delete</a>
+                                        <a class="delete-link" @onclick="(() => ShowDeleteConfirmation(nv.MaTaiKhoan))">Delete</a>
                                     </td>
                                 </tr>
                             }
@@ -307,11 +307,11 @@
 </div>
 @code {
 
-    private IEnumerable<NhanVien> employees;
+    private IEnumerable<TaiKhoan> employees;
     private IEnumerable<HoaDon> bills;
     public HoaDon hd { get; set; }
-    public NhanVien employee { get; set; }
-    public IEnumerable<NhanVien> filteredEmployees { get; set; }
+    public TaiKhoan employee { get; set; }
+    public IEnumerable<TaiKhoan> filteredEmployees { get; set; }
     public bool IsVisible { get; set; }
     public bool Result { get; set; }
     public string RecordName { get; set; }
@@ -376,7 +376,7 @@
 
         // Lọc danh sách theo tất cả các trường dữ liệu
         filteredEmployees = employees.Where(emp =>
-            emp.MaNhanVien.ToString().Contains(searchValue) ||
+            emp.MaTaiKhoan.ToString().Contains(searchValue) ||
             emp.HoTen.ToLower().Contains(searchValue)
         ).ToList();
 
@@ -407,7 +407,7 @@
         }
 
         // Kiểm tra email và số điện thoại có trùng trong danh sách không khi tạo mới
-        if (employee.MaNhanVien == 0)
+        if (employee.MaTaiKhoan == 0)
         {
             if (IsEmailDuplicated(employee.Email))
             {
@@ -424,13 +424,13 @@
         else
         {
             // Khi cập nhật, bỏ qua việc kiểm tra trùng cho nhân viên hiện tại
-            if (IsEmailDuplicatedForUpdate(employee.Email, employee.MaNhanVien))
+            if (IsEmailDuplicatedForUpdate(employee.Email, employee.MaTaiKhoan))
             {
                 errorMessage = "Email này đã tồn tại.";
                 return;
             }
 
-            if (IsPhoneNumberDuplicatedForUpdate(employee.SoDienThoai, employee.MaNhanVien))
+            if (IsPhoneNumberDuplicatedForUpdate(employee.SoDienThoai, employee.MaTaiKhoan))
             {
                 errorMessage = "Số điện thoại này đã tồn tại.";
                 return;
@@ -440,14 +440,14 @@
         // Thực hiện lưu hoặc cập nhật nhân viên
         try
         {
-            if (employee.MaNhanVien == 0)
+            if (employee.MaTaiKhoan == 0)
             {
                 // Thêm nhân viên mới
                 var createdEmployee = await nvservice.SaveAsync("https://localhost:44359/api/NhanVien/CreateNhanVien", employee);
                 if (createdEmployee != null)
                 {
                     successMessage = "Nhân viên đã được thêm thành công!";
-                    employee = new NhanVien(); // Reset form
+                    employee = new TaiKhoan(); // Reset form
                 }
                 else
                 {
@@ -457,7 +457,7 @@
             else
             {
                 // Cập nhật nhân viên
-                var updatedEmployee = await nvservice.UpdateAsync("https://localhost:44359/api/NhanVien/UpdateNhanVien/", employee.MaNhanVien, employee);
+                var updatedEmployee = await nvservice.UpdateAsync("https://localhost:44359/api/NhanVien/UpdateNhanVien/", employee.MaTaiKhoan, employee);
                 if (updatedEmployee != null)
                 {
                     successMessage = "Nhân viên đã được cập nhật thành công!";
@@ -484,7 +484,7 @@
     {
         try
         {
-            var employeesReservations = bills.Where(h => h.MaNhanVien == employeesIdToDelete);
+            var employeesReservations = bills.Where(h => h.MaTaiKhoan == employeesIdToDelete);
             if (employeesReservations.Any())
             {
                 // Nếu khách hàng có đặt phòng, hiển thị thông báo không thể xóa
@@ -522,11 +522,11 @@
 
 
     // Edit employee
-    private void EditEmployees(NhanVien employeeToEdit)
+    private void EditEmployees(TaiKhoan employeeToEdit)
     {
-        employee = new NhanVien
+        employee = new TaiKhoan
             {
-                MaNhanVien = employeeToEdit.MaNhanVien,
+                MaTaiKhoan= employeeToEdit.MaTaiKhoan,
                 HoTen = employeeToEdit.HoTen,
                 SoDienThoai = employeeToEdit.SoDienThoai,
                 Email = employeeToEdit.Email,
@@ -573,13 +573,13 @@
     // Kiểm tra email có trùng cho việc cập nhật (bỏ qua nhân viên hiện tại)
     private bool IsEmailDuplicatedForUpdate(string email, int currentEmployeeId)
     {
-        return filteredEmployees.Any(emp => emp.Email.Equals(email, StringComparison.OrdinalIgnoreCase) && emp.MaNhanVien != currentEmployeeId);
+        return filteredEmployees.Any(emp => emp.Email.Equals(email, StringComparison.OrdinalIgnoreCase) && emp.MaTaiKhoan != currentEmployeeId);
     }
 
     // Kiểm tra số điện thoại có trùng cho việc cập nhật (bỏ qua nhân viên hiện tại)
     private bool IsPhoneNumberDuplicatedForUpdate(string phoneNumber, int currentEmployeeId)
     {
-        return filteredEmployees.Any(emp => emp.SoDienThoai.Equals(phoneNumber, StringComparison.OrdinalIgnoreCase) && emp.MaNhanVien != currentEmployeeId);
+        return filteredEmployees.Any(emp => emp.SoDienThoai.Equals(phoneNumber, StringComparison.OrdinalIgnoreCase) && emp.MaTaiKhoan != currentEmployeeId);
     }
 
 
@@ -634,7 +634,7 @@
     {
         Console.WriteLine("Authors - OnInitializedAsync");
 
-        employee = new NhanVien();
+        employee = new TaiKhoan();
         await LoadEmployees();
         //authorList = await authorService.GetAuthors();
 

@@ -10,7 +10,7 @@
 @inject HotelService<CTHoaDon> cthdservice;
 @inject HotelService<KhachHang> khservice;
 @inject HotelService<DichVu> dvservice;
-@inject HotelService<NhanVien> nvservice;
+@inject HotelService<TaiKhoan> nvservice;
 @inject HotelService<DatPhong> dpservice;
 @inject HotelService<PhuongThucThanhToan> ptservice;
 @inject HotelService<Phong> phongservice;
@@ -99,11 +99,11 @@
                 </table>
                 <b>Tổng tiền: </b> <a>@bill.TongSoTien</a>
             }
-            <button class="btn btn-primary" @onclick="PrintBillDetails">Print Bill</button>
         </ContentTemplate>
     </SpinLoader>
      <hr />
-    
+    <button class="btn btn-primary" @onclick="PrintBillDetails">Print Bill</button>
+
 </div>
 <div class="col-12">
     <EditForm Model="@cthd" OnValidSubmit="@SaveDetail">
@@ -159,7 +159,7 @@
 @code {
     [Parameter]
     public int BillId { get; set; }
-    public NhanVien nhanVien { get; set; }
+    public TaiKhoan nhanVien { get; set; }
     public DatPhong datPhong { get; set; }
     public HoaDon bill { get; set; }
     public DichVu dichVu { get; set; }
@@ -289,28 +289,24 @@
     }
     private async Task PrintBillDetails()
     {
-        await JSRuntime.InvokeVoidAsync("printPage");
+        await JSRuntime.InvokeVoidAsync("printComponent", "#billDetails");
     }
 }
 <script>
     function printPage(){
         window.print()
     }
-    function printElement(elementId) {
-        const element = document.getElementById(elementId);
-
-        if (!element) {
-            console.error(`Element with ID "${elementId}" not found.`);
-            return;
+    function printComponent(componentSelector) {
+        var elementToPrint = document.querySelector(componentSelector);
+        if (elementToPrint) {
+            var printWindow = window.open('', '_blank');
+            printWindow.document.open();
+            printWindow.document.write('<html><head><title>Print</title></head><body>');
+            printWindow.document.write(elementToPrint.innerHTML);
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            printWindow.print();
+            printWindow.close();
         }
-
-        const printContents = element.innerHTML;
-        const originalBodyContent = document.body.innerHTML;
-
-        document.body.innerHTML = printContents;
-
-        window.print();
-
-        document.body.innerHTML = originalBodyContent;
     }
 </script>
