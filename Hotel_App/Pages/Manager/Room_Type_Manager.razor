@@ -436,14 +436,14 @@
         // StateHasChanged();
         try
         {
-            // Kiểm tra xem khách hàng có đặt phòng hay không
+            // Kiểm tra xem phòng có tồn tại mã phòng hay không
             var roomTypeDuplicated = Rooms.Where(r => r.MaLoaiPhong == RoomTypeIdToDelete);
             if (roomTypeDuplicated.Any())
             {
                 List<int> arr =[];
                 Rooms = await RoomService.GetAllAsync("https://localhost:44359/api/Rooms/GetRooms");
                 filteredRoomList = Rooms.ToList();
-                arr.AddRange(filteredRoomList.Where(r => r.MaLoaiPhong == RoomTypeIdToDelete).Select(r=>r.MaPhong));
+                arr.AddRange(filteredRoomList.Where(r => r.MaLoaiPhong == RoomTypeIdToDelete && r.TrangThai==1).Select(r=>r.SoPhong));
                 // Nếu khách hàng có đặt phòng, hiển thị thông báo không thể xóa
                 errorMessage = $"Không xóa được!!! Tồn tại phòng {string.Join(", ", arr)} chứa mã loại phòng.";
                 successMessage = null; // Xóa thông báo thành công nếu có lỗi
