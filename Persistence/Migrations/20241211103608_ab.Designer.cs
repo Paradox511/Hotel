@@ -12,8 +12,8 @@ using Persistence.Context;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(HotelDBContext))]
-    [Migration("20241211091843_abc")]
-    partial class abc
+    [Migration("20241211103608_ab")]
+    partial class ab
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

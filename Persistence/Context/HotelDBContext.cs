@@ -75,7 +75,7 @@ namespace Persistence.Context
 		   .WithOne(ct => ct.LoaiPhong)
 		   .HasForeignKey(ct => ct.MaLoaiPhong);
 
-            //base.OnModelCreating(modelBuilder);
+            base.OnModelCreating(modelBuilder);
 
             //    .WithMany(dv => dv.cthd)
             //    .HasForeignKey(ct => ct.MaDichVu);

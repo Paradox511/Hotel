@@ -1,4 +1,5 @@
 ﻿@page "/login"
+@using BootstrapBlazor.Components
 @using Hotel_App.Data
 @using Newtonsoft.Json
 @using Hotel_App.Service
@@ -27,20 +28,11 @@
         <input type="password" class="form-control col-12" @bind="user.Password" placeholder="password" />
     </div>
     <br />
-    <div class="form-group">
-        <label for="MaNhanVien">Vai tro:</label>
-        <select class="form-control" id="MaNhanVien" name="MaNhanVien">
-            <option value="">admin</option>
-            <option value="">khach hang</option>
-            <option value=""> Nhân Viên</option>
-
-               
-
-        </select>
-    </div>
+    
     <div class="col-12 row">
         <span class="col-12"></span>
         <input type="submit" class="form-control col-6 btn btn-primary" value="Login" />
+         @* <NavLink href=@string.Format("/index/{0}",user.MaTaiKhoan)>View Details</NavLink> *@
         @* <a href="/signup" class="col-3">Sign up</a> *@
     </div>
     <br />
@@ -65,7 +57,7 @@
         {
             NavigationManager.NavigateTo("/index");
         }
-        
+
     }
 
     private async Task ValidateUser()
@@ -73,12 +65,12 @@
         try
         {
             // Gọi dịch vụ đăng nhập để xác thực thông tin người dùng
-            var returnedUser = await userService.LoginAsync(user);
-
+            var returnedUser = await userService.LoginAsync(user.Username,user.Password);
+            // var id = await returnedUser.MaTaiKhoan;
             // Kiểm tra xem người dùng có hợp lệ không
             if (returnedUser != null && !string.IsNullOrEmpty(returnedUser.Username))
             {
-                NavigationManager.NavigateTo("/account");
+                NavigationManager.NavigateTo($"/index/{returnedUser.MaTaiKhoan}");
             }
             else
             {

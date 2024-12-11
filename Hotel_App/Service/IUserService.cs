@@ -4,7 +4,7 @@ namespace Hotel_App.Service
 {
     public interface IUserService
     {
-        Task<TaiKhoan> LoginAsync(TaiKhoan user);
-        Task<TaiKhoan> RegisterUserAsync(TaiKhoan user);
+        Task<TaiKhoan> LoginAsync(String users, String pass);
+        
     }
 }

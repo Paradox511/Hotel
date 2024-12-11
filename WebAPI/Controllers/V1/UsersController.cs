@@ -57,16 +57,22 @@ namespace WebAPI.Controllers.V1
         }
 
         [HttpPost("Login")]
-        public async Task<ActionResult<TaiKhoan>> Login([FromBody] TaiKhoan taiKhoan)
+        public async Task<ActionResult<TaiKhoan>> Login(String users , String pass)
         {
-            if (taiKhoan == null || string.IsNullOrWhiteSpace(taiKhoan.Username) || string.IsNullOrWhiteSpace(taiKhoan.Password))
-            {
-                return BadRequest("Invalid login credentials.");
-            }
+
+            //if (taiKhoan == null || string.IsNullOrWhiteSpace(taiKhoan.Username) || string.IsNullOrWhiteSpace(taiKhoan.Password))
+            //{
+            //    return BadRequest("Invalid login credentials.");
+            //}
 
             //var hashedPassword = Hotel_App.Utility.Encrypt(taiKhoan.Password);
-            var user = await _context.taikhoan.FirstOrDefaultAsync(u => u.Username == taiKhoan.Username && u.Password == taiKhoan.Password);
-
+            //var user = await _context.taikhoan.FirstOrDefaultAsync(u => u.Username == taiKhoan.Username 
+            //                                                        && u.Password == taiKhoan.Password
+            //                                                        .Where(u => u.EmailAddress == user.EmailAddress
+            //                                    && u.Password == user.Password).FirstOrDefaultAsync()
+            //                                                        );
+            var user = await _context.taikhoan.Where(u => u.Username == users
+                                                && u.Password == pass).FirstOrDefaultAsync();
             if (user == null)
             {
                 return Unauthorized("Invalid username or password.");
