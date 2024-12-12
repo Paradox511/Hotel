@@ -15,7 +15,7 @@ namespace Hotel_App.Data
 
 		public int TrangThai { get; set; } = 1;
 
-		public LoaiPhong? LoaiPhong { get; set; }
+		public LoaiPhong LoaiPhong { get; set; }
 
 		public Phong() { }
     }

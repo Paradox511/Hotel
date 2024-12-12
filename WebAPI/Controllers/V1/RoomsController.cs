@@ -103,7 +103,7 @@ namespace WebAPI.Controllers.V1
 			return Ok(rooms); // No content to return on successful update
 		}
 
-		[HttpPut("DeleteRoom/{id}")]
+		[HttpDelete("DeleteRoom/{id}")]
 			public async Task<IActionResult> Delete(int id)
 			{
 			var room = await _context.phong.FindAsync(id);			
