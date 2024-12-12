@@ -482,6 +482,9 @@
     }
     private async Task SaveBill()
     {
+        bill.TrangThai = 1;
+        bill.TongSoTien = 0;
+
         // Call the service to save the bill
         try
         {
@@ -537,7 +540,7 @@
     }
     protected async Task LoadEmployees()
     {
-        employees = await nvservice.GetAllAsync("https://localhost:44359/api/NhanVien/GetNhanVien");
+        employees = await nvservice.GetAllAsync("https://localhost:44359/api/taikhoan/Gettaikhoan");
     }
     protected async Task LoadMethods()
     {

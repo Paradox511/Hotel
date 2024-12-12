@@ -29,12 +29,15 @@ namespace WebAPI.Controllers.V1
         [HttpGet("GetBills")]
         public async Task<IActionResult> GetAll()
         {
+          
             if (_context == null)
             {
                 return StatusCode(500, "Internal Server Error: DbContext not injected");
             }
 
-            var bills = await _context.hoadon.ToListAsync(); // Assuming your bills are stored in "hoadon" DbSet
+            var bills = await _context.hoadon
+                .Where(hd => hd.TrangThai == 1)
+                .ToListAsync(); // Assuming your bills are stored in "hoadon" DbSet
             if (bills == null)
             {
                 return NotFound("No bills found");
@@ -74,24 +77,31 @@ namespace WebAPI.Controllers.V1
             await _context.SaveChangesAsync();
             return Ok("Bill created successfully");
         }
-        
+
         // Similar methods for updating and deleting KhachHang
         /// <summary>
         /// Deletes Product Entity based on Id.
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpDelete("DeleteBill/{id}")]
-        public async Task<IActionResult> Delete(int id)
+        [HttpPut("UpdateBillStatus/{id}")]
+        public async Task<IActionResult> UpdateStatus(int id)
         {
             if (id == null)
             {
                 return BadRequest("Invalid command data");
             }
-            var entity = _context.hoadon.Find(id);
-            _context.hoadon.Remove(entity);
+
+            var entity = await _context.hoadon.FindAsync(id);
+            if (entity == null)
+            {
+                return NotFound();
+            }
+
+            entity.TrangThai = 0; // Set the TrangThai to 0
             await _context.SaveChangesAsync();
-            return Ok(entity); // No content to return on successful deletion
+
+            return Ok(entity);
         }
         /// <summary>
         /// Updates the Product Entity based on Id.   
@@ -124,10 +134,35 @@ namespace WebAPI.Controllers.V1
             }
             return Ok(bill); // No content to return on successful update
         }
-        
-            // ... other actions ...
+        [HttpPut("DisableBill/{id}")]
+        public async Task<IActionResult> Disable(int id, HoaDon bill)
+        {
+            if (id != bill.MaHoaDon)
+            {
+                return BadRequest("Invalid command data");
+            }
+            _context.hoadon.Entry(bill).State = EntityState.Modified;
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (bill == null)
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return Ok(bill); // No content to return on successful update
+        }
 
-            [HttpPut("update-total/{id}")]
+        // ... other actions ...
+
+        [HttpPut("update-total/{id}")]
             public async Task<IActionResult> UpdateTotal(int id, decimal newTotal)
             {
                 // Retrieve the HoaDon entity from the database

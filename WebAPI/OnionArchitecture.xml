@@ -4,7 +4,7 @@
         <name>WebAPI</name>
     </assembly>
     <members>
-        <member name="M:WebAPI.Controllers.V1.BillsController.Delete(System.Int32)">
+        <member name="M:WebAPI.Controllers.V1.BillsController.UpdateStatus(System.Int32)">
             <summary>
             Deletes Product Entity based on Id.
             </summary>
@@ -12,6 +12,14 @@
             <returns></returns>
         </member>
         <member name="M:WebAPI.Controllers.V1.BillsController.Update(System.Int32,Domain.Entities.HoaDon)">
+            <summary>
+            Updates the Product Entity based on Id.   
+            </summary>
+            <param name="id"></param>
+            <param name="command"></param>
+            <returns></returns>
+        </member>
+        <member name="M:WebAPI.Controllers.V1.CustomersController.Update(System.Int32,Domain.Entities.KhachHang)">
             <summary>
             Updates the Product Entity based on Id.   
             </summary>

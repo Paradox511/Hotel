@@ -67,6 +67,7 @@ namespace Hotel_App.Service
                 Console.WriteLine("Error updating total: " + ex.Message);
             }
         }
+
     
 }
 }
