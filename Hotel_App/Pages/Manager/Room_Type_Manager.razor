@@ -421,17 +421,7 @@
     }
 
     private async Task DeleteRoomType()
-    {
-        // foreach (var room in Rooms){
-        //     if (room.MaLoaiPhong == id)
-        //     {
-        //         deleteMessage = $"Phòng có mã loại phòng {id} được tìm thấy: {room.MaPhong}";
-        //         return;
-        //     }
-        // }
-        // await RoomTypeService.DeleteAsync("https://localhost:44359/api/RoomTypes/DeleteRoomType/", id);
-        // LoadRoomTypes();
-        // StateHasChanged();
+    {        
         try
         {
             // Kiểm tra xem phòng có tồn tại mã phòng hay không
@@ -447,12 +437,12 @@
                 successMessage = null; // Xóa thông báo thành công nếu có lỗi
                 showDeleteConfirmation = false; // Ẩn bảng xác nhận
                 StateHasChanged(); // Cập nhật giao diện
-                return; // Dừng việc xóa khách hàng
+                return; // Dừng việc xóa loại phòng
             }
 
             // Nếu không có phòng chứa mã
             await RoomTypeService.DeleteAsync("https://localhost:44359/api/RoomTypes/DeleteRoomType/",RoomTypeIdToDelete);
-            await LoadRoomTypes(); // Làm mới danh sách khách hàng
+            await LoadRoomTypes(); // Làm mới danh sách loại phòng
             showDeleteConfirmation = false; // Ẩn bảng xác nhận
             successMessage = "Xóa loại phòng thành công."; // Thông báo thành công
             StateHasChanged();
@@ -526,12 +516,35 @@
         }
     }
 
+     private bool ValidateRoomType()
+    {
+        // Kiểm tra email trùng lặp
+        if (IsRoomTypeNameDuplicated(Type.TenLoaiPhong))
+        {
+            errorMessage = "Tên phòng này đã tồn tại.";
+            successMessage = null; // Xóa thông báo thành công nếu có lỗi
+            return false;
+        }      
+        successMessage = "Lưu thành công";
+        errorMessage = null; // Xóa thông báo lỗi nếu không có lỗi
+        return true; // Dữ liệu hợp lệ
+    }
+
+    private bool IsRoomTypeNameDuplicated(string tenloaiphong)
+    {
+        return filteredRoomTypeList.Any(roomType=> roomType.TenLoaiPhong.Equals(tenloaiphong, StringComparison.OrdinalIgnoreCase) && (Type.MaLoaiPhong == 0 || roomType.MaLoaiPhong != Type.MaLoaiPhong));
+    }
+
     private async Task SaveRoomType()
     {
         // Call the service to save the bill
         try
         {
             if (Type.phong == null) Type.phong = [];
+            if (!ValidateRoomType())
+            {
+                return; //Ngừng thực thi nếu không hợp lệ
+            }
             if (Type.MaLoaiPhong == 0)
             {
                 //  bill.CTHoaDon = null;

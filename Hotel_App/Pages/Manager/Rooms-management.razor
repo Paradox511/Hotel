@@ -80,12 +80,14 @@
         <div class="form-group">
             <label for="MaLoaiPhong">Mã Loại Phòng :</label>
             <select class="form-control" id="MaLoaiPhong" @bind="png.MaLoaiPhong" name="MaLoaiPhong">
-                @* <option value="">Chọn mã loại phòng</option>  *@
                 @if (loaiphong != null)
                 {
                     @foreach (var type in loaiphong)
                     {
-                        <option value=@type.MaLoaiPhong>@type.MaLoaiPhong-@type.TenLoaiPhong-@type.SoLuongPhong-@type.Mota-@type.Gia                         </option>
+                        @if(type.TrangThai==1)
+                        {
+                            <option value=@type.MaLoaiPhong>@type.MaLoaiPhong-@type.TenLoaiPhong-@type.SoLuongPhong-@type.Mota-@type.Gia                         </option>
+                        }
                     }
                 }
             </select>
@@ -164,143 +166,143 @@
             <style>
                 /* Action links style */
                 .action-links {
-                    display: flex;
-                    gap: 10px;
+                display: flex;
+                gap: 10px;
                 }
 
                 table {
-                    width: 100%;
-                    border-collapse: collapse;
-                    margin: 20px 0;
-                    font-size: 16px;
-                    text-align: left;
+                width: 100%;
+                border-collapse: collapse;
+                margin: 20px 0;
+                font-size: 16px;
+                text-align: left;
                 }
 
                 thead tr {
-                    background-color: #06163C;
-                    color: white;
+                background-color: #06163C;
+                color: white;
                 }
 
                 th, td {
-                    padding: 12px 15px;
-                    border: 1px solid #ddd;
+                padding: 12px 15px;
+                border: 1px solid #ddd;
                 }
 
                 tbody tr:nth-child(even) {
-                    background-color: #f2f2f2;
+                background-color: #f2f2f2;
                 }
 
                 tbody tr:hover {
-                    background-color: #f1f1f1;
+                background-color: #f1f1f1;
                 }
 
                 a {
-                    text-decoration: none;
-                    color: blue;
-                    font-weight: bold;
+                text-decoration: none;
+                color: blue;
+                font-weight: bold;
                 }
 
-                    a:hover {
-                        text-decoration: underline;
-                        color: darkblue;
-                    }
+                a:hover {
+                text-decoration: underline;
+                color: darkblue;
+                }
 
                 /* Search bar styling */
                 .search-bar {
-                    margin-bottom: 20px;
-                    display: flex;
-                    gap: 10px;
-                    align-items: center;
+                margin-bottom: 20px;
+                display: flex;
+                gap: 10px;
+                align-items: center;
                 }
 
-                    .search-bar input[type="text"] {
-                        width: 300px;
-                        padding: 8px;
-                        font-size: 16px;
-                        border: 1px solid #ddd;
-                        border-radius: 4px;
-                    }
+                .search-bar input[type="text"] {
+                width: 300px;
+                padding: 8px;
+                font-size: 16px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                }
 
-                    .search-bar button {
-                        padding: 8px 15px;
-                        font-size: 16px;
-                        color: white;
-                        background-color: #4CAF50;
-                        border: none;
-                        border-radius: 4px;
-                        cursor: pointer;
-                    }
+                .search-bar button {
+                padding: 8px 15px;
+                font-size: 16px;
+                color: white;
+                background-color: #4CAF50;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                }
 
-                        .search-bar button:hover {
-                            background-color: #45a049;
-                        }
+                .search-bar button:hover {
+                background-color: #45a049;
+                }
 
                 /* Style for the search bar */
                 .search-bar {
-                    margin-bottom: 20px;
-                    display: flex;
-                    gap: 10px;
-                    align-items: center;
+                margin-bottom: 20px;
+                display: flex;
+                gap: 10px;
+                align-items: center;
                 }
 
-                    .search-bar input[type="text"] {
-                        width: 300px;
-                        padding: 8px;
-                        font-size: 16px;
-                        border: 1px solid #ddd;
-                        border-radius: 4px;
-                    }
+                .search-bar input[type="text"] {
+                width: 300px;
+                padding: 8px;
+                font-size: 16px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                }
 
-                    .search-bar button {
-                        padding: 8px 15px;
-                        font-size: 16px;
-                        color: white;
-                        background-color: #4CAF50;
-                        border: none;
-                        border-radius: 4px;
-                        cursor: pointer;
-                    }
+                .search-bar button {
+                padding: 8px 15px;
+                font-size: 16px;
+                color: white;
+                background-color: #4CAF50;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                }
 
-                        .search-bar button:hover {
-                            background-color: #45a049;
-                        }
+                .search-bar button:hover {
+                background-color: #45a049;
+                }
 
                 /* Action link color changes */
                 .edit-link {
-                    color: blue;
-                    cursor: pointer;
+                color: blue;
+                cursor: pointer;
                 }
 
-                    .edit-link:hover {
-                        text-decoration: underline;
-                    }
+                .edit-link:hover {
+                text-decoration: underline;
+                }
 
                 .delete-link {
-                    color: red;
-                    cursor: pointer;
+                color: red;
+                cursor: pointer;
                 }
 
-                    .delete-link:hover {
-                        text-decoration: underline;
-                    }
+                .delete-link:hover {
+                text-decoration: underline;
+                }
 
                 .pagination-controls {
-                    display: flex;
-                    justify-content: center;
-                    gap: 10px;
-                    margin-top: 20px;
+                display: flex;
+                justify-content: center;
+                gap: 10px;
+                margin-top: 20px;
                 }
 
-                    .pagination-controls button {
-                        padding: 8px 15px;
-                        font-size: 16px;
-                        border-radius: 4px;
-                    }
+                .pagination-controls button {
+                padding: 8px 15px;
+                font-size: 16px;
+                border-radius: 4px;
+                }
 
-                    .pagination-controls span {
-                        font-size: 16px;
-                        align-self: center;
-                    }
+                .pagination-controls span {
+                font-size: 16px;
+                align-self: center;
+                }
 
             </style>
 
@@ -356,7 +358,6 @@
         {
             Rooms = await RoomService.GetAllAsync("https://localhost:44359/api/Rooms/GetRooms");
             filteredRoomList = Rooms.ToList();
-            //filteredRoomTypeList = loaiphong.ToList();
             totalRoom = Rooms.Count();
             png = new Phong();
             // Apply pagination to the employees
@@ -526,6 +527,7 @@
 
             // Nếu không có phòng chứa mã
             await RoomService.DeleteAsync("https://localhost:44359/api/Rooms/DeleteRoom/", RoomIdToDelete);
+            await LoadRooms();
             showDeleteConfirmation = false; // Ẩn bảng xác nhận
             successMessage = "Xóa phòng thành công."; // Thông báo thành công
             StateHasChanged();
