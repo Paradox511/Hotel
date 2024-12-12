@@ -5,12 +5,9 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Persistence.Migrations
 {
-    /// <inheritdoc />
-<<<<<<<< HEAD:Persistence/Migrations/20241211161347_zpt.cs
-    public partial class zpt : Migration
-========
+  
     public partial class ab : Migration
->>>>>>>> endo:Persistence/Migrations/20241211103608_ab.cs
+
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

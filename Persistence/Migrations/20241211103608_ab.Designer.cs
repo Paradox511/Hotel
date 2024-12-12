@@ -12,13 +12,9 @@ using Persistence.Context;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(HotelDBContext))]
-<<<<<<<< HEAD:Persistence/Migrations/20241211161347_zpt.Designer.cs
-    [Migration("20241211161347_zpt")]
-    partial class zpt
-========
     [Migration("20241211103608_ab")]
     partial class ab
->>>>>>>> endo:Persistence/Migrations/20241211103608_ab.Designer.cs
+
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
