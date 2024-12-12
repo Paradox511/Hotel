@@ -5,6 +5,8 @@ using System.Text;
 using System.Net.Http.Json;
 using System.Security.Claims;
 using System.Security.Cryptography;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace Hotel_App.Service
 {
@@ -22,52 +24,34 @@ namespace Hotel_App.Service
             _httpClient = httpClient;
         }
 
-        public async Task<TaiKhoan> LoginAsync(TaiKhoan user)
+        public async Task<TaiKhoan> LoginAsync(String users, String pass)
         {
-            var jsonContent = JsonConvert.SerializeObject(user);
-            var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+           // var jsonContent = JsonConvert.SerializeObject(user);
+            //var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PostAsync("api/users/login", httpContent);
+            var response = await _httpClient.PostAsync($"https://localhost:44359/api/Users/Login?users={users}&pass={pass}",null);
+            var responsebody = await response.Content.ReadAsStringAsync();
             if (response.IsSuccessStatusCode)
             {
                 var responseData = await response.Content.ReadAsStringAsync();
+                //var id = await response.Content.Where<TaiKhoan>(u=>u.responseData.MaTaiKhoan==u.id);
+                //var id = await responsebody.Where(u => u.tai.MaTaiKhoan == u.id).FirstOrDefaultAsync();
                 return JsonConvert.DeserializeObject<TaiKhoan>(responseData);
             }
 
             // Xử lý lỗi nếu cần
             var errorMessage = await response.Content.ReadAsStringAsync();
-            throw new Exception($"Login failed: {errorMessage}");
+            throw new Exception($"Login failed: {errorMessage}*");
         }
-        public async Task<TaiKhoan> RegisterUserAsync(TaiKhoan user)
+        public async Task<TaiKhoan> GetByIdAsync(int id)
         {
-            var jsonContent = JsonConvert.SerializeObject(user);
-            var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+            var response = await _httpClient.GetAsync($"https://localhost:44359/api/Users/Login?id={id}");
+            var responseBody = await response.Content.ReadAsStringAsync();
 
-            var response = await _httpClient.PostAsync("api/users/register", httpContent);
-            if (response.IsSuccessStatusCode)
-            {
-                var responseData = await response.Content.ReadAsStringAsync();
-                return JsonConvert.DeserializeObject<TaiKhoan>(responseData);
-            }
+            response.EnsureSuccessStatusCode();
 
-            // Xử lý lỗi nếu cần
-            var errorMessage = await response.Content.ReadAsStringAsync();
-            throw new Exception($"Registration failed: {errorMessage}");
+            var data = await response.Content.ReadFromJsonAsync<TaiKhoan>();
+            return data;
         }
-        //private string GenerateAccessToken(int userId)
-        //{
-        //    var tokenString = $"{userId}:{DateTime.UtcNow.Ticks}";
-        //    return Convert.ToBase64String(Encoding.UTF8.GetBytes(tokenString));
-        //}
-
-        //private UserWithToken GenerateRefreshToken()
-        //{
-        //    var randomNumber = new byte[32];
-        //    using (var rng = RandomNumberGenerator.Create())
-        //    {
-        //        rng.GetBytes(randomNumber);
-        //        return new UserWithToken { Token = Convert.ToBase64String(randomNumber) };
-        //    }
-        //}
     }
 }

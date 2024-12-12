@@ -12,8 +12,9 @@ using Persistence.Context;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(HotelDBContext))]
-    [Migration("20241211084609_first")]
-    partial class first
+    [Migration("20241211103608_ab")]
+    partial class ab
+
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -220,9 +221,6 @@ namespace Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaPhong"));
 
-                    b.Property<int>("LoaiPhongMaLoaiPhong")
-                        .HasColumnType("int");
-
                     b.Property<int>("MaLoaiPhong")
                         .HasColumnType("int");
 
@@ -237,7 +235,7 @@ namespace Persistence.Migrations
 
                     b.HasKey("MaPhong");
 
-                    b.HasIndex("LoaiPhongMaLoaiPhong");
+                    b.HasIndex("MaLoaiPhong");
 
                     b.ToTable("phong");
                 });
@@ -331,8 +329,8 @@ namespace Persistence.Migrations
             modelBuilder.Entity("Domain.Entities.Phong", b =>
                 {
                     b.HasOne("Domain.Entities.LoaiPhong", "LoaiPhong")
-                        .WithMany()
-                        .HasForeignKey("LoaiPhongMaLoaiPhong")
+                        .WithMany("phong")
+                        .HasForeignKey("MaLoaiPhong")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -347,6 +345,11 @@ namespace Persistence.Migrations
             modelBuilder.Entity("Domain.Entities.HoaDon", b =>
                 {
                     b.Navigation("CTHoaDon");
+                });
+
+            modelBuilder.Entity("Domain.Entities.LoaiPhong", b =>
+                {
+                    b.Navigation("phong");
                 });
 #pragma warning restore 612, 618
         }

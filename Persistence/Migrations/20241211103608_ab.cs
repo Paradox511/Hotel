@@ -5,8 +5,9 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Persistence.Migrations
 {
-    /// <inheritdoc />
-    public partial class first : Migration
+  
+    public partial class ab : Migration
+
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -169,15 +170,14 @@ namespace Persistence.Migrations
                     TrangThaiPhong = table.Column<int>(type: "int", nullable: false),
                     SoPhong = table.Column<int>(type: "int", nullable: false),
                     MaLoaiPhong = table.Column<int>(type: "int", nullable: false),
-                    LoaiPhongMaLoaiPhong = table.Column<int>(type: "int", nullable: false),
                     TrangThai = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_phong", x => x.MaPhong);
                     table.ForeignKey(
-                        name: "FK_phong_loaiphong_LoaiPhongMaLoaiPhong",
-                        column: x => x.LoaiPhongMaLoaiPhong,
+                        name: "FK_phong_loaiphong_MaLoaiPhong",
+                        column: x => x.MaLoaiPhong,
                         principalTable: "loaiphong",
                         principalColumn: "MaLoaiPhong",
                         onDelete: ReferentialAction.Cascade);
@@ -194,9 +194,9 @@ namespace Persistence.Migrations
                 column: "MaHoaDon");
 
             migrationBuilder.CreateIndex(
-                name: "IX_phong_LoaiPhongMaLoaiPhong",
+                name: "IX_phong_MaLoaiPhong",
                 table: "phong",
-                column: "LoaiPhongMaLoaiPhong");
+                column: "MaLoaiPhong");
         }
 
         /// <inheritdoc />
