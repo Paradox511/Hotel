@@ -35,10 +35,7 @@
                     <div class="modal-body">
                         <p>Are you sure you want to delete this customer?</p>
                     </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" @onclick="CancelDelete">No</button>
-                        <button class="btn btn-danger" @onclick="DeleteBill">Yes</button>
-                    </div>
+
                 </div>
             </div>
         </div>
@@ -131,8 +128,8 @@
                             <th>Mã hóa đơn</th>
                             <th>Ngày tạo</th>
                             <th>Tổng tiền</th>
-                            <th>Hành động</th>
                             <th>Chi tiết hóa đơn</th>
+
                         </tr>
                     </thead>
                     <tbody>
@@ -143,10 +140,6 @@
                                 <td>@bill.MaHoaDon</td>
                                 <td>@bill.NgayTao</td>
                                 <td>@bill.TongSoTien</td>
-                                    <td class="action-links">
-                                        <a class="edit-link" @onclick="(() => EditBill(bill))">Edit</a> 
-                                        <a class="delete-link" @onclick="(() => ShowDeleteConfirmation(bill.MaHoaDon))">Delete</a>
-                                    </td>
                                 <td>
                                     <NavLink href=@string.Format("/bills/details/{0}",bill.MaHoaDon)>View Details</NavLink>
                                 </td>
@@ -446,40 +439,9 @@
     {
         Console.WriteLine("Authors - Dispose");
     }
-    private async Task DeleteBill()
-    {
-        try
-        {
-            var billReservations = cthd.Where(cthd => cthd.MaHoaDon == billIdToDelete);
-            if (billReservations.Any())
-            {
-                // Nếu khách hàng có đặt phòng, hiển thị thông báo không thể xóa
-                errorMessage = "không xóa được hóa đơn";
-                successMessage = null; // Xóa thông báo thành công nếu có lỗi
-                showDeleteConfirmation = false; // Ẩn bảng xác nhận
-                StateHasChanged(); // Cập nhật giao diện
-                return; // Dừng việc xóa khách hàng
-            }
-            await BillService.DeleteAsync("https://localhost:44359/api/Bills/DeleteBill/", billIdToDelete);
-            await LoadEmployees();
-            showDeleteConfirmation = false; // Ẩn bảng xác nhận
-            successMessage = "Xóa hóa đơn thành công."; // Thông báo thành công
-            StateHasChanged();
-        }
-        catch (Exception ex)
-        {
-            errorMessage = "Không thể xóa hóa đơn: " + ex.Message; // Hiển thị thông báo lỗi
-            showDeleteConfirmation = false; // Ẩn bảng xác nhận
-            StateHasChanged();
-        }
-    }
 
-    private void EditBill(HoaDon savedbill)
-    {
-        bill = savedbill;
-        StateHasChanged();
 
-    }
+
     private async Task SaveBill()
     {
         bill.TrangThai = 1;
@@ -532,6 +494,7 @@
             // Handle errors, e.g., display error message to the user
             Console.Error.WriteLine("Error saving bill: " + ex.Message);
         }
+        await LoadBills();
 
     }
     protected async Task LoadReservations()

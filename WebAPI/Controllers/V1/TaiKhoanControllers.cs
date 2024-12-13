@@ -4,6 +4,8 @@ using Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace WebAPI.Controllers.V1
 {
@@ -37,7 +39,25 @@ namespace WebAPI.Controllers.V1
 
             return Ok(customers);
         }
+        [HttpGet("GetByID/{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var employees = await _context.taikhoan
+                .FirstOrDefaultAsync(h => h.MaTaiKhoan == id);
+            //.ThenInclude(ct => ct.dv)// Include related CTHoaDon entities
+            //.FirstOrDefaultAsync(h => h.MaHoaDon == id);
 
+            if (employees == null)
+            {
+                return NotFound("Employees not found");
+            }
+            var options = new JsonSerializerOptions
+            {
+                ReferenceHandler = ReferenceHandler.IgnoreCycles
+            };
+
+            return Ok(JsonSerializer.Serialize(employees, options));
+        }
 
         [HttpPost("CreateTaiKhoan")]
         public async Task<IActionResult> CreateAccount([FromBody] CreateCommand<TaiKhoan> command)

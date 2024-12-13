@@ -5,10 +5,14 @@
 @using Hotel_App.Shared
 @using System;
 @using Microsoft.JSInterop
+@using System.Globalization
 @inject HotelService<HoaDon> BillService
 @inject HoaDonService CTHoaDonService
 @inject HotelService<CTHoaDon> cthdservice;
 @inject HotelService<KhachHang> khservice;
+@inject HotelService<Phong> pservice;
+@inject HotelService<LoaiPhong> lpservice;
+@inject RoomService rservice;
 @inject HotelService<DichVu> dvservice;
 @inject HotelService<TaiKhoan> nvservice;
 @inject HotelService<DatPhong> dpservice;
@@ -16,7 +20,7 @@
 @inject HotelService<Phong> phongservice;
 @inject HotelService<LoaiPhong> lpservice;
 @inject IJSRuntime JSRuntime;
-
+@inject NavigationManager NavigationManager;
 <div class="col-12" id="billDetails">
 
     <h3>Bill details</h3>
@@ -76,19 +80,19 @@
                     <tbody>
                         <tr>
                             <td></td>
-                            <td>@datPhong.MaPhong</td>
-                            <td><i>Gia phong</i></td>
-                            <td>1</td>
-                            <td>@datPhong.TongTien</td>
+                            <td>@loaiPhong.TenLoaiPhong</td>
+                            <td><i>@FormatMoney(@loaiPhong.Gia) VND</i></td>
+                            <td>@rent ngày</td>
+                            <td>@FormatMoney(@datPhong.TongTien) VND</td>
                         </tr>
                         @foreach (var cthd in bill.CTHoaDon)
                         {
                             <tr>
                                 <td>@cthd.MaDichVu</td>
                                 <td>@cthd.dv.TenDichVu</td>
-                                <td>@cthd.dv.Gia</td>
+                                <td>@FormatMoney(@cthd.dv.Gia) VND</td>
                                 <td><input style="width:50px" type="number" @bind-value="@cthd.SoLuong" /></td>
-                                <td>@cthd.TongTien</td>
+                                <td>@FormatMoney(@cthd.TongTien) VND</td>
                                 <td>
                                     <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => EditBillDetail(BillId,cthd.dv.MaDichVu,cthd.SoLuong))">Edit</a>
                                     <a style="text-underline-position:below; cursor:pointer; color:red" @onclick="(() => DeleteBillDetail(cthd.Macthd))">Delete</a> |
@@ -97,13 +101,13 @@
                         }
                     </tbody>
                 </table>
-                <b>Tổng tiền: </b> <a>@bill.TongSoTien</a>
+                <b>Tổng tiền: </b> <a>@FormatMoney(@bill.TongSoTien) VND</a>
             }
         </ContentTemplate>
     </SpinLoader>
      <hr />
 
-    <button class="btn btn-primary" @string.Format(" /bills/details/{0}",bill.MaHoaDon)>Print Bill</button>
+    <button class="btn btn-primary" @onclick="() => NavigateToBillDetails(bill.MaHoaDon)">Print Bill</button>
 
 </div>
 <div class="col-12">
@@ -116,7 +120,7 @@
         <div class="form-group">
             <label for="MaDichVu">Mã dịch vụ:</label>
             <select class="form-control" id="MaDichVu" @bind="cthd.MaDichVu" name="MaDichVu">
-                <option value="">Chọn Dịch vụ</option>
+                <option>Chọn dịch vụ</option>
                 @if (dvlist != null)
                 {
                     @foreach (var datPhong in dvlist)
@@ -169,7 +173,7 @@
     public KhachHang kh { get; set; }
     public Phong room { get; set; }
     public LoaiPhong loaiPhong { get; set; }
-
+    public int rent{ get; set; }
     public IEnumerable<DichVu> dvlist { get; set; }
     public PhuongThucThanhToan pt { get; set; }
     public IEnumerable<CTHoaDon> cthdlist { get; set; }
@@ -182,34 +186,46 @@
 
     protected async override Task OnInitializedAsync()
     {
-        isLoading = true;
-        var task = BillService.GetByIdAsync("https://localhost:44359/api/Bills/details/{0}", BillId);
+        cthd = new CTHoaDon();
         GetAllServices();
 
-        cthd = new CTHoaDon();
-        bill = await task;
-        GetDetails();
+        isLoading = true;
 
+        bill = await BillService.GetByIdAsync("https://localhost:44359/api/Bills/details/{0}", BillId);
+        await GetDetails();
 
         if (bill != null)
         {
             cthdlist = await CTHoaDonService.GetCTHoaDonByMaHoaDon(bill.MaHoaDon);
         }
 
-        isLoading = false; // Set loading indicator to false
+        isLoading = false;
+        StateHasChanged();
+
     }
 
     protected async Task GetDetails()
     {
         datPhong = await dpservice.GetByIdAsync("https://localhost:44359/api/DatPhong/GetByID/{0}", bill.MaDatPhong);
-        nhanVien = await nvservice.GetByIdAsync("https://localhost:44359/api/taikhoan/GetByID/{0}", bill.MaTaiKhoan);
+        nhanVien = await nvservice.GetByIdAsync("https://localhost:44359/api/TaiKhoan/GetByID/{0}", bill.MaTaiKhoan);
         pt = await ptservice.GetByIdAsync("https://localhost:44359/api/PTTT/GetByID/{0}", bill.MaPhuongThuc);
         kh = await khservice.GetByIdAsync("https://localhost:44359/api/Customers/GetByID/{0}", datPhong.MaKhachHang);
+        room = await pservice.GetByIdAsync("https://localhost:44359/api/Room/GetRoomDetails/{0}", datPhong.MaPhong);
+        loaiPhong = await lpservice.GetByIdAsync("https://localhost:44359/api/RoomTypes/GetRoomType/{0}", room.LoaiPhong.MaLoaiPhong);
+        TimeSpan duration = datPhong.CheckOutDate - datPhong.CheckInDate;
+
+        rent = (int)duration.TotalDays;
 
 
 
     }
+    public string FormatMoney(decimal amount)
+    {
+        NumberFormatInfo numberFormatInfo = new NumberFormatInfo();
+        numberFormatInfo.NumberGroupSeparator = ",";
 
+        return amount.ToString("N", numberFormatInfo);
+    }
     protected async Task GetAllServices()
     {
         dvlist = await dvservice.GetAllAsync("https://localhost:44359/api/DichVu/GetAll");
@@ -224,8 +240,13 @@
         {
             sum += cthd.TongTien;
         }
+        decimal newPrice = rent * loaiPhong.Gia;
         sum += datPhong.TongTien;
+        await rservice.UpdateTotal(datPhong.MaDatPhong, newPrice);
         await CTHoaDonService.UpdateTotal(BillId, sum);
+        StateHasChanged();
+        await ReloadDetails();
+
     }
     protected async Task ReloadDetails()
     {
@@ -269,6 +290,7 @@
                 // Update the bill list
                 await ReloadDetails();
                 // Clear the form
+                await UpdateTongTien();
                 cthd = new CTHoaDon();
                 return;
             }
@@ -292,6 +314,10 @@
     private async Task PrintBillDetails()
     {
         await JSRuntime.InvokeVoidAsync("printComponent", "#billDetails");
+    }
+    private void NavigateToBillDetails(int billId)
+    {
+        NavigationManager.NavigateTo($"/bills/details/print/{billId}");
     }
 }
 <script>

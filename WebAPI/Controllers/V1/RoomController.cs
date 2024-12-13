@@ -214,6 +214,27 @@ namespace WebAPI.Controllers.V1
             return Ok(customers);
         }
 
+        [HttpPut("update-total/{id}")]
+        public async Task<IActionResult> UpdateTotal(int id, decimal newTotal)
+        {
+            // Retrieve the HoaDon entity from the database
+            var hoaDon = await _context.datphong.FindAsync(id);
 
+            if (hoaDon == null)
+            {
+                return NotFound();
+            }
+
+            // Update the TongSoTien property
+
+            hoaDon.TongTien = newTotal;
+
+
+            // Save the changes to the database
+            _context.datphong.Entry(hoaDon).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return Ok(hoaDon);
+        }
     }
 }

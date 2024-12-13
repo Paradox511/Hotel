@@ -77,6 +77,23 @@ namespace Hotel_App.Service
 			//throw new Exception($"Room failed: {errorMessage}*");
 
 		}
+        public async Task UpdateTotal(int id, decimal newTotal)
+        {
+            try
+            {
+                var baseUrl = "https://localhost:44359/api";
+                var url = $"{baseUrl}/Room/update-total/{id}?newTotal={newTotal}";
 
-	}
+                // No need to create an object and serialize it, as the query parameter will be used directly in the URL
+
+                var response = await _httpClient.PutAsync(url, null); // No content needed for this PUT request
+                response.EnsureSuccessStatusCode();
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions here
+                Console.WriteLine("Error updating total: " + ex.Message);
+            }
+        }
+    }
 }

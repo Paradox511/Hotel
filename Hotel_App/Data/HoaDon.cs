@@ -9,7 +9,7 @@ namespace Hotel_App.Data
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int MaHoaDon { get; set; }
         public DateTime? NgayTao { get; set; }
-        public decimal? TongSoTien { get; set; }
+        public decimal TongSoTien { get; set; }
         [Required]
         public int MaPhuongThuc { get; set; }
         public int MaTaiKhoan { get; set; }
