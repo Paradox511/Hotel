@@ -1,4 +1,4 @@
-﻿
+
 using Blazored.LocalStorage;
 using Newtonsoft.Json;
 using System;
@@ -7,17 +7,24 @@ using System.Text;
 
 namespace Hotel_App.Service
 {
-    public class HotelService<T> : IHotelService<T>
-    {
-        private readonly HttpClient _httpClient;
+	public class HotelService<T> : IHotelService<T>
+	{
+		private readonly HttpClient _httpClient;
 
         public HotelService(HttpClient httpClient)
         {
             _httpClient = httpClient;
         }
-        public Task<bool> DeleteAsync(string requestUri, int Id)
+        public async Task<bool> DeleteAsync(string requestUri, int Id)
         {
-            throw new NotImplementedException();
+            var requestMessage = new HttpRequestMessage(HttpMethod.Delete, requestUri + Id);
+            string url = requestUri + Id;
+           
+            var response = await _httpClient.SendAsync(requestMessage);
+            var responsebody = await response.Content.ReadAsStringAsync();
+            var responseStatusCode = response.StatusCode;
+
+            return await Task.FromResult(true);
         }
 
         public async Task<IEnumerable<T>> GetAllAsync(string requestUri)
@@ -25,6 +32,8 @@ namespace Hotel_App.Service
             try
             {
                 var response = await _httpClient.GetAsync(requestUri);
+                var responsebody = response.Content.ReadAsStringAsync();
+
                 response.EnsureSuccessStatusCode();
                 var data = await response.Content.ReadFromJsonAsync<IEnumerable<T>>();
                 return data;
@@ -42,7 +51,10 @@ namespace Hotel_App.Service
             try
             {
                 var response = await _httpClient.GetAsync(string.Format(requestUri, Id));
+                var responseBody = await response.Content.ReadAsStringAsync();
+
                 response.EnsureSuccessStatusCode();
+
                 var data = await response.Content.ReadFromJsonAsync<T>();
                 return data;
             }
@@ -77,11 +89,11 @@ namespace Hotel_App.Service
 
             return await Task.FromResult(returnedObj);
         }
-        public async Task<T> UpdateAsync(string requestUri, int Id, T obj)
+        public async Task<T> UpdateAsync(string requestUri,int id, T obj)
         {
             string serializedUser = JsonConvert.SerializeObject(obj);
 
-            var requestMessage = new HttpRequestMessage(HttpMethod.Put, requestUri + Id);
+            var requestMessage = new HttpRequestMessage(HttpMethod.Put, requestUri + id);
           
          
             requestMessage.Content = new StringContent(serializedUser);

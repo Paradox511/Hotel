@@ -1,5 +1,8 @@
-﻿<div class="top-row pl-4 navbar navbar-dark">
-    <a class="navbar-brand" href="">Book Stores</a>
+﻿@inject NavigationManager NavigationManager
+@inject Blazored.LocalStorage.ILocalStorageService localStorageService
+
+<div class="top-row pl-4 navbar navbar-dark">
+    <a class="navbar-brand" href="">.NET Hotel</a>
     <button class="navbar-toggler" @onclick="ToggleNavMenu">
         <span class="navbar-toggler-icon"></span>
     </button>
@@ -8,65 +11,63 @@
 <div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
     <ul class="nav flex-column">
         <li class="nav-item px-3">
-            <NavLink class="nav-link" href="Home">
+            <NavLink class="nav-link" href="/index">
                 <span class="oi oi-home" aria-hidden="true"></span> Home
             </NavLink>
         </li>
-        <li class="nav-item px-3 dropdown">
-            <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <span class= "oi oi-infinity" aria-hidden="true"></span> Service
-            </a>
-            <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="booking">Booking</a></li>
-                <li><a class="dropdown-item" href="rooms-layout">Rooms</a></li>
-                <li><a class="dropdown-item" href="service-booking">Service</a></li>
-            </ul>
-        </li>
         <li class="nav-item px-3">
-            <NavLink class="nav-link" href="account-management">
-                <span class="oi oi-account-login" aria-hidden="true"></span> Account Management
+            <NavLink class="nav-link" href="/booking">
+                <span class="oi oi-home" aria-hidden="true"></span> Booking
             </NavLink>
         </li>
+        
         <li class="nav-item px-3">
-            <NavLink class="nav-link" href="employees" Match="NavLinkMatch.All">
+            <NavLink class="nav-link" href="/employees" Match="NavLinkMatch.All">
                 <span class="oi oi-people" aria-hidden="true"></span> Employees
             </NavLink>
         </li>
         <li class="nav-item px-3">
-            <NavLink class="nav-link" href="customers">
+            <NavLink class="nav-link" href="/customers">
                 <span class="oi oi-person" aria-hidden="true"></span> Customer
             </NavLink>
         </li>
         <li class="nav-item px-3">
-            <NavLink class="nav-link" href="rooms">
+            <NavLink class="nav-link" href="/rooms">
                 <span class="oi oi-book" aria-hidden="true"></span> Room Management
             </NavLink>
         </li>
         <li class="nav-item px-3">
-            <NavLink class="nav-link" href="services-management">
+            <NavLink class="nav-link" href="/services-management">
                 <span class="oi oi-book" aria-hidden="true"></span> Service Management
             </NavLink>
         </li>
         <li class="nav-item px-3">
-            <NavLink class="nav-link" href="bills">
+            <NavLink class="nav-link" href="/bills">
                 <span class="oi oi-book" aria-hidden="true"></span> Bills Management
             </NavLink>
         </li>
+
+      
         <li class="nav-item fixed-bottom px-3">
-            <NavLink class="nav-link" href="account">
-                <span class="oi oi-info" aria-hidden="true"></span> Account
+            <NavLink class="nav-link" href="/login">
+                <span class="oi oi-account-login" aria-hidden="true" @onclick="@(() => Logout())"></span> Log Out
             </NavLink>
         </li>
     </ul>
 </div>
 
 @code {
-    private bool collapseNavMenu = true;
+	private bool collapseNavMenu = true;
 
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+	private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
+    }
+    private async Task Logout()
+    {
+        await localStorageService.RemoveItemAsync("userData");
+        NavigationManager.NavigateTo("/login"); // Or redirect to login page
     }
 }

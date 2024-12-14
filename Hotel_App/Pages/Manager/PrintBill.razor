@@ -1,0 +1,277 @@
+﻿@page "/bills/details/print/{billId:int}"
+@using Hotel_App.Service
+@using Hotel_App.Data
+@using Blazored.LocalStorage
+@using Hotel_App.Shared
+@using System;
+@using Microsoft.JSInterop
+@using System.Globalization
+@inject HotelService<HoaDon> BillService
+@inject HoaDonService CTHoaDonService
+@inject HotelService<CTHoaDon> cthdservice;
+@inject HotelService<KhachHang> khservice;
+@inject HotelService<Phong> pservice;
+@inject HotelService<LoaiPhong> lpservice;
+@inject RoomService rservice;
+@inject HotelService<DichVu> dvservice;
+@inject HotelService<TaiKhoan> nvservice;
+@inject HotelService<DatPhong> dpservice;
+@inject HotelService<PhuongThucThanhToan> ptservice;
+@inject HotelService<Phong> phongservice;
+@inject HotelService<LoaiPhong> lpservice;
+@inject IJSRuntime JSRuntime;
+
+<div id="billDetails" class="myDiv" >
+
+    <h1><b>Thông tin hóa đơn</b></h1>
+    <SpinLoader IsLoading="isLoading">
+        <LoadingTemplate>
+            <div class="col-12" style="background-color: lightgray; height:400px; vertical-align:middle">
+                <br /><br />
+                <Chase Center="true" Color="#c21f13" Size="70px"></Chase>
+            </div>
+        </LoadingTemplate>
+        <ContentTemplate>
+            @if (bill == null || nhanVien == null)
+            {
+                <p>No bill found.</p>
+            }
+            else
+            {
+
+
+                <tr>
+                    <th><h3><b>Mã hóa đơn:</b></h3></th>
+                    <td><h4>@bill.MaHoaDon</h4></td>
+                    <th><h3><b>Mã đặt phòng:</b></h3></th>
+                    <td><h4>@datPhong.MaDatPhong</h4></td>
+                </tr>
+                <tr>
+                    <th><h3><b>Ngày tạo:</b></h3></th>
+                    <td><h4>@bill.NgayTao</h4></td>
+                    <th><h3><b>Ngày check in:</b></h3></th>
+                    <td><h4>@datPhong.CheckInDate</h4></td>
+                </tr>
+                <tr>
+                    <th><h3><b>Phương thức:</b></h3></th>
+                    <td><h4>@pt.TenPhuongThuc</h4></td>
+                    <th><h3><b>Ngày check out:</b></h3></th>
+                    <td><h4>@datPhong.CheckOutDate</h4></td>
+                </tr>
+                <tr>
+                    <th><h3><b>Nhân viên:</b></h3></th>
+                    <td><h4>@nhanVien.HoTen</h4></td>
+
+                    <th><h3><b>Khách hàng:</b></h3></th>
+                    <td><h4> @kh.HoTen</h4></td>
+                </tr>
+                <br />
+                <table class="table table-bordered table-striped table-responsive-md">
+                    <thead>
+                        <tr>
+                            <th>Mã dịch vụ</th>
+                            <th>Tên dịch vụ</th>
+                            <th>Đơn giá</th>
+                            <th>Số lượng</th>
+                            <th>Tổng tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td></td>
+                            <td>@loaiPhong.TenLoaiPhong</td>
+                            <td>@FormatMoney(@loaiPhong.Gia) VND / ngày</td>
+                            <td>@rent ngày</td>
+                            <td>@FormatMoney(@datPhong.TongTien) VND</td>
+                        </tr>
+                        @foreach (var cthd in bill.CTHoaDon)
+                        {
+                            <tr>
+                                <td>@cthd.MaDichVu</td>
+                                <td>@cthd.dv.TenDichVu</td>
+                                <td>@FormatMoney(@cthd.dv.Gia) VND</td>
+                                <td>@cthd.SoLuong</td>
+                                <td>@FormatMoney(@cthd.TongTien) VND</td>
+                              
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                <h5><b>Tổng tiền:</b><a>@FormatMoney(@bill.TongSoTien) VND</a></h5>
+            }
+        </ContentTemplate>
+    </SpinLoader>
+    <hr />
+    </div>
+
+    <style >
+    body {
+        margin: 0;
+        padding: 0;
+    }
+    .myDiv {
+        border-collapse: collapse;
+        width: 100%;
+    }
+    tr:nth-child(even) {
+  background-color: #D6EEEE;
+}
+
+    td, th {
+        padding: 5px;
+    }
+        th{
+            font-size: 20px;
+            width:fit-content;
+        }
+        tbody{
+            font-size:16px;
+        }
+        tr{
+            width: fit-content;
+        }
+        table{
+        font-family: 'Times New Roman', Times, serif;
+        width:100%;
+        border-collapse: collapse;
+    }
+   
+        h1{
+            text-align:center;
+            font-family:'Times New Roman', Times, serif;
+        }
+        h3{
+        font-family: 'Times New Roman', Times, serif;
+        text-align:right;
+            width: 15vw;
+            font-size:20px;
+    }
+        h4{
+        font-family: 'Times New Roman', Times, serif;
+        font-size:16px;
+        }
+        h5{
+        font-family: 'Times New Roman', Times, serif;
+        text-align: right;
+        width: 50vw;
+        font-size: 20px;
+        text-align-last:right;
+        }
+        a{
+            padding-left:25px;
+        }
+    #billDetails {
+        
+        /* Add your desired print styles here */
+        width: 100%;
+        height: 100%;
+        font-size: 14px;
+        line-height: 1.5;
+        page-break-after: always; /* Force page break after the div */
+    }
+    print {
+  table.table-bordered.table-striped.table-responsive-md {
+    /* Add your desired print styles here */
+    font-size: 12px; /* Adjust font size for better readability */
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+
+    table tr {
+        page-break-inside: avoid;
+    }
+}
+    </style>
+@code {
+    [Parameter]
+    public int BillId { get; set; }
+    public TaiKhoan nhanVien { get; set; }
+    public DatPhong datPhong { get; set; }
+    public HoaDon bill { get; set; }
+    public DichVu dichVu { get; set; }
+    public CTHoaDon cthd { get; set; }
+    public KhachHang kh { get; set; }
+    public Phong room { get; set; }
+    public LoaiPhong loaiPhong { get; set; }
+    public int rent { get; set; }
+    public IEnumerable<DichVu> dvlist { get; set; }
+    public PhuongThucThanhToan pt { get; set; }
+    public IEnumerable<CTHoaDon> cthdlist { get; set; }
+    public bool IsVisible { get; set; }
+    public bool Result { get; set; }
+    public string RecordName { get; set; }
+    public bool IsGridViewFiltered { get; set; }
+    public int newQuantity { get; set; }
+    bool isLoading = true;
+
+    protected async override Task OnInitializedAsync()
+    {
+
+        isLoading = true;
+
+        bill = await BillService.GetByIdAsync("https://localhost:44359/api/Bills/details/{0}", BillId);
+        await GetDetails();
+
+        isLoading = false;
+        StateHasChanged();
+        await JSRuntime.InvokeVoidAsync("printToPdf");
+
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+        }
+    }
+    protected async Task GetDetails()
+    {
+        datPhong = await dpservice.GetByIdAsync("https://localhost:44359/api/DatPhong/GetByID/{0}", bill.MaDatPhong);
+        nhanVien = await nvservice.GetByIdAsync("https://localhost:44359/api/TaiKhoan/GetByID/{0}", bill.MaTaiKhoan);
+        pt = await ptservice.GetByIdAsync("https://localhost:44359/api/PTTT/GetByID/{0}", bill.MaPhuongThuc);
+        kh = await khservice.GetByIdAsync("https://localhost:44359/api/Customers/GetByID/{0}", datPhong.MaKhachHang);
+        room = await pservice.GetByIdAsync("https://localhost:44359/api/Room/GetRoomDetails/{0}", datPhong.MaPhong);
+        loaiPhong = await lpservice.GetByIdAsync("https://localhost:44359/api/RoomTypes/GetRoomType/{0}", room.LoaiPhong.MaLoaiPhong);
+        TimeSpan duration = datPhong.CheckOutDate - datPhong.CheckInDate;
+
+        rent = (int)duration.TotalDays;
+
+
+
+    }
+    public string FormatMoney(decimal amount)
+    {
+        NumberFormatInfo numberFormatInfo = new NumberFormatInfo();
+        numberFormatInfo.NumberGroupSeparator = ",";
+
+        return amount.ToString("N", numberFormatInfo);
+    }
+    protected async Task GetAllServices()
+    {
+        dvlist = await dvservice.GetAllAsync("https://localhost:44359/api/DichVu/GetAll");
+    }
+ 
+    protected async Task ReloadDetails()
+    {
+        bill = await BillService.GetByIdAsync("https://localhost:44359/api/Bills/details/{0}", BillId);
+        StateHasChanged();
+    }
+  
+   
+}
+<script>
+
+    function printToPdf() {
+        const element = document.getElementById('billDetails');
+        const opt = {
+            margin: 1,
+            filename: 'bill_details.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: {
+                format: 'a4',
+                orientation: 'portrait' // or 'landscape'
+            }
+        };
+        html2pdf().from(element).set(opt).save();
+    }
+</script>

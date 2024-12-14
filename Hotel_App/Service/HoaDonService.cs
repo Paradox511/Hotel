@@ -1,5 +1,7 @@
 ﻿using Hotel_App.Data;
 using System.Net.Http;
+using System.Text;
+using System.Text.Json;
 
 namespace Hotel_App.Service
 {
@@ -29,5 +31,43 @@ namespace Hotel_App.Service
                 return Enumerable.Empty<CTHoaDon>();
             }
         }
-    }
+        public async Task UpdateTotal(int id,decimal newTotal)
+        {
+            try
+            {
+                var baseUrl = "https://localhost:44359/api";
+                var url = $"{baseUrl}/Bills/update-total/{id}?newTotal={newTotal}";
+
+                // No need to create an object and serialize it, as the query parameter will be used directly in the URL
+
+                var response = await _httpClient.PutAsync(url, null); // No content needed for this PUT request
+                response.EnsureSuccessStatusCode();
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions here
+                Console.WriteLine("Error updating total: " + ex.Message);
+            }
+        }
+        public async Task UpdateQuantity(int billid,int id, int newQuantity)
+        {
+            try
+            {
+                var baseUrl = "https://localhost:44359/api";
+                var url = $"{baseUrl}/BillDetails/update-quantity/{id}?billid={billid}&newQuantity={newQuantity}";
+
+                // No need to create an object and serialize it, as the query parameter will be used directly in the URL
+
+                var response = await _httpClient.PutAsync(url, null); // No content needed for this PUT request
+                response.EnsureSuccessStatusCode();
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions here
+                Console.WriteLine("Error updating total: " + ex.Message);
+            }
+        }
+
+    
+}
 }

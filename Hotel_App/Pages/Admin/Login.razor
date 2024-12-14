@@ -1,0 +1,89 @@
+﻿@page "/login"
+@using BootstrapBlazor.Components
+@using Hotel_App.Data
+@using Newtonsoft.Json
+@using Hotel_App.Service
+@using System.Security.Claims
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject Blazored.LocalStorage.ILocalStorageService localStorageService
+@inject IUserService userService
+@inject IJSRuntime jsRunTime
+
+<EditForm Model="@user" OnValidSubmit="@ValidateUser">
+    <div>
+        <br /><br /><br /><br /><br />
+    </div>
+    <div>
+        <h3 style="font-weight:bold; color:blue">Hotel Login</h3>
+    </div>
+    <div>
+        <br />
+    </div>
+    <div class="col-12 row">
+        <input class="form-control col-12" @bind="user.Username" placeholder="username" />
+    </div>
+    <br />
+    <div class="col-12 row">
+        <input type="password" class="form-control col-12" @bind="user.Password" placeholder="password" />
+    </div>
+    <br />
+
+    <div class="col-12 row">
+        <span class="col-12"></span>
+        <input type="submit" class="form-control col-6 btn btn-primary" value="Login" />
+        @* <NavLink href=@string.Format("/index/{0}",user.MaTaiKhoan)>View Details</NavLink> *@
+        @* <a href="/signup" class="col-3">Sign up</a> *@
+    </div>
+    <br />
+    <div class="col-12 row" style="text-align:left; font-weight:bold">
+        <span class="col-12">@LoginMesssage</span>
+    </div>
+</EditForm>
+
+@code {
+    private TaiKhoan user = new TaiKhoan();
+    public string LoginMesssage { get; set; } = string.Empty;
+    ClaimsPrincipal claimsPrincipal;
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        claimsPrincipal = (await authenticationStateTask).User;
+
+        if (claimsPrincipal.Identity.IsAuthenticated)
+        {
+            NavigationManager.NavigateTo("/index");
+        }
+
+    }
+
+    private async Task ValidateUser()
+    {
+        try
+        {
+            // Gọi dịch vụ đăng nhập để xác thực thông tin người dùng
+            var returnedUser = await userService.LoginAsync(user.Username, user.Password);
+            // var id = await returnedUser.MaTaiKhoan;
+            // Kiểm tra xem người dùng có hợp lệ không
+            if (returnedUser != null && !string.IsNullOrEmpty(returnedUser.Username))
+            {
+                await localStorageService.SetItemAsync("userData", JsonConvert.SerializeObject(returnedUser));
+
+                NavigationManager.NavigateTo($"/index");
+            }
+            else
+            {
+                // Thông báo lỗi nếu thông tin đăng nhập không hợp lệ
+                LoginMesssage = "Invalid username or password";
+            }
+        }
+        catch (Exception ex)
+        {
+            // Xử lý ngoại lệ và thông báo lỗi
+            LoginMesssage = $"An error occurred: {ex.Message}";
+        }
+    }
+}

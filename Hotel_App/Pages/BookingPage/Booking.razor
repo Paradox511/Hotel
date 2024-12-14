@@ -1,0 +1,138 @@
+﻿@page "/booking"
+@using Hotel_App.Data
+@using Hotel_App.Service
+@inject NavigationManager NavigationManager
+@inject RoomService RoomService
+@inject HttpClient Http
+@using System.Net.Http.Json
+
+
+@* <header class="px-2 py-3" style="background-color: #2549ff"> *@
+@* 	<div class=""> *@
+@* 		<div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start"> *@
+@* 			<a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-dark text-decoration-none"> *@
+@* 				<img src="/img/logoSGU.png" width="50" height="50" /> *@
+@* 			</a> *@
+
+@* 			<ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0"> *@
+@* 				<li><a href="#" class="nav-link px-2 link-secondary">Overview</a></li> *@
+@* 				<li><a href="#" class="nav-link px-2 link-dark">Inventory</a></li> *@
+@* 				<li><a href="#" class="nav-link px-2 link-dark">Customers</a></li> *@
+@* 				<li><a href="#" class="nav-link px-2 link-dark">Products</a></li> *@
+@* 			</ul> *@
+
+@* 			<form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3"> *@
+@* 				<input type="search" class="form-control" placeholder="Search..." aria-label="Search"> *@
+@* 			</form> *@
+
+@* 				<div class="d-none"> *@
+@* 					<button type="button" class="btn btn-outline-primary me-2"><a href="#" class="nav-link">Đăng nhập</a></button> *@
+@* 					<button type="button" class="btn btn-primary"><a href="#" class="nav-link link-dark text-white">Đăng ký</a></button> *@
+@* 				</div> *@
+
+
+@* 				<div class="dropdown text-end"> *@
+@* 					<a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false"> *@
+@* 						<img src="https://github.com/mdo.png" alt="mdo" width="32" height="32" class="rounded-circle"> *@
+@* 					</a> *@
+@* 					<ul class="dropdown-menu text-small" aria-labelledby="dropdownUser1"> *@
+@* 						<li><a class="dropdown-item" href="#">New project...</a></li> *@
+@* 						<li><a class="dropdown-item" href="#">Settings</a></li> *@
+@* 						<li><a class="dropdown-item" href="#">Profile</a></li> *@
+@* 						<li><hr class="dropdown-divider"></li> *@
+@* 						<li><a class="dropdown-item" href="#">Sign out</a></li> *@
+@* 					</ul> *@
+@* 				</div> *@
+@* 		</div> *@
+@* 	</div> *@
+@* </header> *@
+
+<style>
+    
+</style>
+<section class="h-100" style="background-color: white">
+	<div class="px-2 ">
+        <h1><b>Quản lý đặt phòng</b></h1>
+		<h2 class="mt-2 border-top d-block">Danh sách phòng trống</h2>
+		<div class="d-flex justify-content-start my-2">
+			<div class="datepicker">
+				<label for="checkindate" class="form-label">Check-in Date:</label>
+				<input min="@DateTime.Now.ToString("yyyy-MM-dd")" type="date" id="checkindate" @bind="startDate" class="form-control" placeholder="Ngày nhận phòng">
+			</div>
+			<div class="datepicker">
+				<label for="checkoutdate" class="form-label">Check-out Date:</label>
+				<input min="@startDate.AddDays(1).ToString("yyyy-MM-dd")" type="date" id="checkoutdate" @bind="endDate" class="form-control" placeholder="Ngày trả phòng">
+			</div>
+			<button @onclick="SearchRooms" class="btn btn-primary">Search</button>
+		</div>
+
+		@if (phongs != null && phongs.Any())
+		{
+			<div class="container">
+				<div class="row row-cols-1 row-cols-md-2 g-4">
+					@foreach (var phong in phongs.Where(p => p.TrangThaiPhong == 1))
+					{
+						var randomImageIndex = new Random().Next(0, listImage.Count);
+						var randomImage = listImage[randomImageIndex];
+						
+
+						<div class="col">
+							<div class="card w-75">
+								<img src="@randomImage" class="card-img-top" alt="Hình ảnh phòng khách sạn">
+								<div class="card-body">
+									<h5 class="card-title">@phong.LoaiPhong.TenLoaiPhong</h5>
+									<p class="card-text"><strong>Mô tả:</strong> @phong.LoaiPhong.Mota</p>
+									<p class="card-text"><strong>Giá:</strong> @phong.LoaiPhong.Gia đ/ngày</p>
+									<p class="card-text"><strong>Mã phòng:</strong> @phong.MaPhong</p>
+									<p class="card-text"><strong>Mã loại phòng:</strong> @phong.LoaiPhong.MaLoaiPhong</p>
+									<NavLink href=@string.Format("/booking/GetRoomDetails/{0}/{1}/{2}/{3}/{4}", phong.MaPhong, startDate.ToString("yyyy-MM-dd"), endDate.ToString("yyyy-MM-dd"), phong.LoaiPhong.Gia,phong.LoaiPhong.MaLoaiPhong) class="btn btn-primary">Đặt phòng ngay</NavLink>
+								</div>
+							</div>
+						</div>
+					}
+				</div>
+			</div>
+		}
+	</div>
+</section>
+
+<footer></footer>
+
+@code {
+	List<string> listImage = new List<string>
+	{
+		"https://thumbs.dreamstime.com/b/hotel-room-23802674.jpg?w=768",
+		"https://thumbs.dreamstime.com/b/luxury-hotel-room-master-bedroom-creative-ai-design-background-instagram-facebook-wall-painting-photo-wallpaper-backgrounds-325040660.jpg?w=1400",
+		"https://thumbs.dreamstime.com/b/hotel-room-bright-modern-interior-condominium-37608904.jpg?w=992",
+		"https://thumbs.dreamstime.com/b/modern-hotel-room-floral-wall-mural-large-bed-white-linens-plush-gold-footrest-desk-city-view-ai-generative-decor-326849892.jpg?w=1400"
+	};
+	List<Phong> phongs = new List<Phong>();
+	KhachHang khachHang;
+	DateTime startDate = DateTime.Today;
+	DateTime endDate = DateTime.Today.AddDays(1);
+	// public int countAvailableRooms { get; set; }
+
+	protected override async Task OnInitializedAsync()
+	{
+		await GetRooms();
+	}
+
+	async Task SearchRooms()
+	{
+		await GetRooms();
+	}
+
+	async Task GetRooms()
+	{
+		if (startDate != null && endDate != null)
+		{
+			phongs = await RoomService.GetAvailableRooms("https://localhost:44359/api/Room/GetRoomInfo", startDate, endDate);
+
+		}
+	}
+
+	void updateCheckoutDate()
+	{
+		endDate = startDate.AddDays(1); // Update on check-in change
+	}
+}

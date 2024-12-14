@@ -16,6 +16,10 @@ namespace Hotel_App.Data
         public int MaKhachHang { get; set; }
         [Required]
         public int MaPhong { get; set; }
+        public decimal TongTien { get; set; }
+        public Phong phong { get; set; }
+        public int TrangThai { get; set; }
+
         public DatPhong() { }
     }
 }
