@@ -48,7 +48,7 @@ namespace WebAPI.Controllers.V1
 		public async Task<IActionResult> GetById(int id)
 		{
 			var room = await _context.phong
-				.Include(h => h.MaLoaiPhong)
+				//.Where(h => h.MaPhong==id)
 				//.ThenInclude(ct => ct.)// Include related CTHoaDon entities
 				.FirstOrDefaultAsync(h => h.MaPhong == id);
 
