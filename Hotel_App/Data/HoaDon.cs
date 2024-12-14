@@ -17,6 +17,7 @@ namespace Hotel_App.Data
         public int MaDatPhong { get; set; }
         public int TrangThai { get; set; }
 
+
         public ICollection<CTHoaDon> CTHoaDon { get; set; } = []; // One-to-Many with CTHoaDon
 
         public HoaDon() { }

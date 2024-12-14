@@ -1,4 +1,4 @@
-﻿@page "/bills/details"
+@page "/bills/details"
 @using Hotel_App.Service
 @using Hotel_App.Data
 @using Blazored.LocalStorage
@@ -7,6 +7,7 @@
 @using Microsoft.JSInterop
 @using System.Globalization
 @using Newtonsoft.Json
+
 @inject HotelService<HoaDon> BillService
 @inject HoaDonService CTHoaDonService
 @inject HotelService<CTHoaDon> cthdservice;
@@ -70,6 +71,7 @@
                         </tr>
                         <br />
                 <table class ="table table-bordered table-striped table-responsive-md">
+
                     <thead>
                         <tr>
                             <th>Mã dịch vụ</th>
