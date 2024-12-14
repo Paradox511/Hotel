@@ -7,6 +7,7 @@ using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Domain.Entities;
 using Hotel_App.Service;
+using Microsoft.AspNetCore.Hosting.Server;
 //using Hotel_App.Data;
 
 namespace WebAPI.Controllers.V1
@@ -29,19 +30,20 @@ namespace WebAPI.Controllers.V1
 			[HttpGet("GetRooms")]
 			public async Task<IActionResult> GetAll()
 			{
-				if (_context == null)
-				{
-					return StatusCode(500, "Internal Server Error: DbContext not injected");
-				}
-
-				var rooms = await _context.phong.Where(Room=>Room.TrangThai==1).ToListAsync(); // Assuming your bills are stored in "hoadon" DbSet
-				if (rooms == null)
-				{
-					return NotFound("No rooms found");
-				}
-
-				return Ok(rooms);
+			if (_context == null)
+			{
+				return StatusCode(500, "Internal Server Error: DbContext not injected");
 			}
+			await AutoUpdateRoomsStatus();
+			var rooms = await _context.phong.Where(Room => Room.TrangThai == 1).ToListAsync(); // Assuming your bills are stored in "hoadon" DbSet
+
+			if (rooms == null)
+			{
+				return NotFound("No rooms found");
+			}
+
+			return Ok(rooms);
+		}
 		[HttpGet("/api/Rooms/{id}")]
 		public async Task<IActionResult> GetById(int id)
 		{
@@ -70,6 +72,7 @@ namespace WebAPI.Controllers.V1
 				{
 					return BadRequest("Invalid command data");
 				}
+				
 				_context.phong.Add(command.Entity);
 				await _context.SaveChangesAsync();
 				return Ok("Room created successfully");
@@ -125,6 +128,47 @@ namespace WebAPI.Controllers.V1
 
 			return Ok("Room status updated to 0");
 		}
+
+		[HttpDelete("AutoUpdateRoomsStatus")]
+		public async Task<IActionResult> AutoUpdateRoomsStatus()
+		{ 
+			if (_context == null)
+			{
+				return StatusCode(500, "Internal Server Error: DbContext not injected");
+			}
+			var currentDateTime = DateTime.Now;
+			string formatDateTime = currentDateTime.ToString("yyyy-MM-dd HH:mm:ss");
+			DateTime formattedDateTime = DateTime.Parse(formatDateTime);
+			//lấy id của phòng đã được đặt
+			//var Roombooked = await _context.datphong.Where(booking => booking.CheckOutDate > formattedDateTime).ToListAsync();
+			var Roombooked = await _context.datphong.Where(booking => booking.CheckOutDate > formattedDateTime).ToListAsync();
+			var roomidbooked = Roombooked.Select(booking => booking.MaPhong).ToList();
+			//lay danh sach phong co trang thai 1 
+			var rooms = await _context.phong.Where(Room => Room.TrangThai == 1).ToListAsync();
+
+			// đổi trạng thái của tất cả phòng được đặt thành 0(đã đặt) nếu tồn tại trong Roombooked còn không thì set lại trạng thái thành 1(Trống)
+				foreach (var room in rooms)
+			{
+				if (roomidbooked.Contains(room.MaPhong))
+				{
+					room.TrangThaiPhong = 0;
+					_context.phong.Entry(room).State = EntityState.Modified;
+				}
+				else
+				{
+					room.TrangThaiPhong = 1;
+					_context.phong.Entry(room).State = EntityState.Modified;
+				}
+			}
+			await _context.SaveChangesAsync(); // Save all changes at once
+
+			var phong = await _context.phong
+				.Where(room => room.TrangThai == 1)
+				.ToListAsync();
+
+			return Ok("Room status updated to 0");
 		}
+
+	}
 	
 }

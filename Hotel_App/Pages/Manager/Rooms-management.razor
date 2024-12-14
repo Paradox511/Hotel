@@ -1,4 +1,4 @@
-﻿@page "/rooms"
+﻿@page "/rooms/"
 <h3>Rooms_management</h3>
 @using Hotel_App.Service
 @using Hotel_App.Data
@@ -65,7 +65,7 @@
 
         @* <div class="form-group">  *@
         @*     <label for="TrangThai">Trạng Thái Phòng:</label>  *@
-        @*     <select class="form-control" id="TrangThai" @bind="png.TrangThaiPhong" name="TrangThai" readonly>  *@
+        @*     <select class="form-control" id="TrangThaiPhong" @bind="png.TrangThaiPhong" name="TrangThai" readonly>  *@
         @*         <option value="0" >Đã đặt</option>  *@
         @*         <option value="1" >Trống</option>  *@
         @*     </select> *@
@@ -394,12 +394,12 @@
         }
 
         // Đếm số phòng hiện tại đã tạo cho loại phòng này
-        int currentRoomCount = Rooms.ToList().Where(r => r.MaLoaiPhong == maLoaiPhong).Count();
+        int currentRoomCount = Rooms.ToList().Count(r => r.MaLoaiPhong == maLoaiPhong);
 
-        // if (png.MaPhong==0)
-        // {
-        //     currentRoomCount += 1;
-        // }
+        if (png.MaPhong==0)
+        {
+            currentRoomCount += 1;
+        }
         // Kiểm tra nếu tổng số phòng đã đạt giới hạn
         if (currentRoomCount >= loaiPhong.SoLuongPhong)
         {
@@ -480,7 +480,6 @@
     private void OnSearchTextChanged(ChangeEventArgs e)
     {
         string searchValue = e.Value.ToString().ToLower();
-
         // Lọc danh sách theo tất cả các trường dữ liệu
         filteredRoomList = Rooms.Where(room =>
             room.MaPhong.ToString().Contains(searchValue) ||
@@ -500,31 +499,9 @@
     }
 
     private async Task DeleteRoom()
-    {
-        //Phong TPhong = await privateRoomService.DeletePhongAsync(room,room.MaPhong);
-        // RoomService.DeleteAsync("https:localhost:44359/api/Rooms/DeleteRoom/", id);
-        // LoadRooms(); Làm mới danh sách khách hàng
-        // showDeleteConfirmation = false; Ẩn bảng xác nhận
-        // successMessage = "Xóa phòng thành công."; Thông báo thành công
-        // StateHasChanged();
+    {       
         try
-        {
-            // Kiểm tra xem khách hàng có đặt phòng hay không
-            // var roomDuplicated = Rooms.Where(r => r.MaLoaiPhong == RoomTypeIdToDelete);
-            // if (roomDuplicated.Any())
-            // {
-            //     List<int> arr = [];
-            //     Rooms = await RoomService.GetAllAsync("https:localhost:44359/api/Rooms/GetRooms");
-            //     filteredRoomList = Rooms.ToList();
-            //     arr.AddRange(filteredRoomList.Where(r => r.MaLoaiPhong == RoomTypeIdToDelete && r.TrangThai == 1).Select(r => r.SoPhong));
-            //     Nếu khách hàng có đặt phòng, hiển thị thông báo không thể xóa
-            //     errorMessage = $"Không xóa được!!! Tồn tại phòng {string.Join(", ", arr)} chứa mã loại phòng.";
-            //     successMessage = null; Xóa thông báo thành công nếu có lỗi
-            //     showDeleteConfirmation = false; Ẩn bảng xác nhận
-            //     StateHasChanged(); Cập nhật giao diện
-            //     return; Dừng việc xóa khách hàng
-            // }
-
+        {       
             // Nếu không có phòng chứa mã
             await RoomService.DeleteAsync("https://localhost:44359/api/Rooms/DeleteRoom/", RoomIdToDelete);
             await LoadRooms();
@@ -643,13 +620,13 @@
             // Handle errors, e.g., display error message to the user
             Console.Error.WriteLine("Error saving room: " + ex.Message);
         }
-        // await LoadRooms();
-        // StateHasChanged();
+        await LoadRooms();
+        StateHasChanged();
     }
-    // protected async Task LoadReservations()
-    //     {
-    //     reservations = await dpservice.GetAllAsync("https:localhost:44359/api/DatPhong/GetDatPhong");
-    // }
+    protected async Task LoadReservations()
+        {
+        reservations = await dpservice.GetAllAsync("https:localhost:44359/api/DatPhong/GetDatPhong");
+    }
     protected async Task Loadloaiphong()
     {
         loaiphong = await RoomTypeService.GetAllAsync("https://localhost:44359/api/RoomTypes/GetRoomTypes");

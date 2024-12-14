@@ -532,7 +532,7 @@
 
     private bool IsRoomTypeNameDuplicated(string tenloaiphong)
     {
-        return filteredRoomTypeList.Any(roomType=> roomType.TenLoaiPhong.Equals(tenloaiphong, StringComparison.OrdinalIgnoreCase) && (Type.MaLoaiPhong == 0 || roomType.MaLoaiPhong != Type.MaLoaiPhong));
+        return filteredRoomTypeList.Any(roomType=> roomType.TenLoaiPhong.ToLower().Equals(tenloaiphong.ToLower(), StringComparison.OrdinalIgnoreCase) && (Type.MaLoaiPhong == 0 || roomType.MaLoaiPhong != Type.MaLoaiPhong));
     }
 
     private async Task SaveRoomType()
