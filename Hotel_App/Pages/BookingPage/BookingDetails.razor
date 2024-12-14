@@ -1,44 +1,23 @@
 ﻿	@page "/booking/GetRoomDetails/{RoomID:int}/{StartDate:datetime}/{EndDate:datetime}/{PriceRoom:decimal}/{TypeRoomID:int}"
 	@using Hotel_App.Service
 	@using Hotel_App.Data
+	@using Blazored.LocalStorage
+	@using Hotel_App.Shared
+	@using System;
+	@using Microsoft.JSInterop
+	@using Newtonsoft.Json
 	@inject RoomService RoomService
 	@inject HotelService<PhuongThucThanhToan> paymentMethodService;
 	@inject NavigationManager NavigationManager
 	@inject IJSRuntime JSRuntime
 	@inject HotelService<HoaDon> BillService
-@* <header class="px-2 py-3" style="background-color: #2549ff"> *@
-@* 	<div class="container"> *@
-@* 		<div class="d-flex flex-wrap align-items-center justify-content-between justify-content-lg-start"> *@
-@* 			<a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-dark text-decoration-none"> *@
-@* 				<img src="/img/logoSGU.png" width="50" height="50" alt="Logo"> *@
-@* 			</a> *@
+	@inject NavigationManager navigationManager
+	@inject ILocalStorageService localStorageService
+	@inject IAuthorizationService authorizationService
+	@inject Blazored.LocalStorage.ILocalStorageService localStorageService
+	@inject IUserService userService
+	@inject HotelService<TaiKhoan> nvservice;
 
-@* 			<ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0"> *@
-@* 				<li class="nav-item"><a href="#" class="nav-link px-2 link-secondary">Overview</a></li> *@
-@* 				<li class="nav-item"><a href="#" class="nav-link px-2 link-dark">Inventory</a></li> *@
-@* 				<li class="nav-item"><a href="#" class="nav-link px-2 link-dark">Customers</a></li> *@
-@* 				<li class="nav-item"><a href="#" class="nav-link px-2 link-dark">Products</a></li> *@
-@* 			</ul> *@
-
-@* 			<form class="d-flex col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3"> *@
-@* 				<input type="search" class="form-control" placeholder="Search..." aria-label="Search"> *@
-@* 			</form> *@
-
-@* 			<div class="dropdown"> *@
-@* 				<a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false"> *@
-@* 					<img src="https://github.com/mdo.png" alt="User" width="32" height="32" class="rounded-circle"> *@
-@* 				</a> *@
-@* 				<ul class="dropdown-menu text-small" aria-labelledby="dropdownUser1"> *@
-@* 					<li><a class="dropdown-item" href="#">New project...</a></li> *@
-@* 					<li><a class="dropdown-item" href="#">Settings</a></li> *@
-@* 					<li><a class="dropdown-item" href="#">Profile</a></li> *@
-@* 					<li><hr class="dropdown-divider"></li> *@
-@* 					<li><a class="dropdown-item" href="#">Sign out</a></li> *@
-@* 				</ul> *@
-@* 			</div> *@
-@* 		</div> *@
-@* 	</div> *@
-@* </header> *@
 <div class="container mt-5">
 	<h2 class="text-center">Xác nhận đặt phòng</h2>
 	<p class="text-center">Experience something new every moment.</p>
@@ -68,6 +47,18 @@
 					<li class="list-group-item"><strong>Số tài khoản:</strong> @khachHang.STK</li>
 					<li class="list-group-item"><strong>CCCD:</strong> @khachHang.CCCD</li>
 				</ul>
+				@* <div> *@
+				@* 	<h2><b>Thông tin tài khoản</b></h2> *@
+				@* 	@if (user != null) *@
+				@* 	{ *@
+				@* 		<h3><b>Mã tài khoản:</b>@user.MaTaiKhoan</h3> *@
+				@* 		<h3><b>Họ tên:</b>@user.HoTen</h3> *@
+				@* 		<h3><b>Email:</b>@user.Email</h3> *@
+				@* 		<h3><b>Địa chỉ:</b>@user.DiaChi</h3> *@
+				@* 		<h3><b>SĐT:</b>@user.SoDienThoai</h3> *@
+
+				@* 	} *@
+				@* </div> *@
 			</div>
 			<div class="w-100">
 				<h3 class="mt-1">Thông tin đặt phòng</h3>
@@ -149,6 +140,8 @@
 	private List<KhachHang> listKhachHang { get; set; }
 	private IEnumerable<PhuongThucThanhToan> methods;
 
+	public TaiKhoan user { get; set; }
+
 	PhuongThucThanhToan paymentMethod { get; set; }
 
 	private int countAvailableRooms { get; set; }
@@ -187,7 +180,11 @@
 		methods = await paymentMethodService.GetAllAsync("https://localhost:44359/api/PTTT/GetPTTT");
 		listKhachHang = await RoomService.GetCustomers();
 
-
+		var storedUserData = await localStorageService.GetItemAsync<string>("userData");
+		if (storedUserData != null)
+		{
+			user = JsonConvert.DeserializeObject<TaiKhoan>(storedUserData);
+		}
 
 		await LoadAvailableRooms();
 	}
@@ -271,7 +268,7 @@
 			bill.NgayTao = today;
 			bill.TongSoTien = ToltalPriceRoom;
 			bill.MaPhuongThuc = selectedPaymentMethodId;
-			bill.MaTaiKhoan = 1;
+			if (user != null) bill.MaTaiKhoan = user.MaTaiKhoan;
 			bill.MaDatPhong = result.MaDatPhong;
 			bill.TrangThai = 1;
 			HoaDon savedBill = await BillService.SaveAsync("https://localhost:44359/api/Bills/CreateBill", bill);
