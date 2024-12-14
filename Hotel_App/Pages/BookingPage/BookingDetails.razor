@@ -119,74 +119,75 @@
 
 </div>
 @code {
-	[Parameter]
-	public int RoomID { get; set; }
-	[Parameter]
-	public DateTime StartDate { get; set; }
-	[Parameter]
-	public DateTime EndDate { get; set; }
-	[Parameter]
-	public decimal PriceRoom { get; set; }
-	[Parameter]
-	public int TypeRoomID { get; set; }
+    [Parameter]
+    public int RoomID { get; set; }
+    [Parameter]
+    public DateTime StartDate { get; set; }
+    [Parameter]
+    public DateTime EndDate { get; set; }
+    [Parameter]
+    public decimal PriceRoom { get; set; }
+    [Parameter]
+    public int TypeRoomID { get; set; }
 
-	private int CustomerID { get; set; }
+    private int CustomerID { get; set; }
 
-	KhachHang khachHang { get; set; }
-	LoaiPhong loaiPhong { get; set; }
-	private DatPhong datPhong { get; set; }
-	private Phong room { get; set; }
-	private HoaDon hoaDon { get; set; }
-	private List<KhachHang> listKhachHang { get; set; }
-	private IEnumerable<PhuongThucThanhToan> methods;
+    KhachHang khachHang { get; set; }
+    LoaiPhong loaiPhong { get; set; }
+    private DatPhong datPhong { get; set; }
+    private Phong room { get; set; }
+    private HoaDon hoaDon { get; set; }
+    private List<KhachHang> listKhachHang { get; set; }
+    private IEnumerable<PhuongThucThanhToan> methods;
 
-	public TaiKhoan user { get; set; }
+    public TaiKhoan user { get; set; }
 
-	PhuongThucThanhToan paymentMethod { get; set; }
+    PhuongThucThanhToan paymentMethod { get; set; }
 
-	private int countAvailableRooms { get; set; }
-	private List<int> availableRoomCounts { get; set; }
-	List<string> AvailableRooms { get; set; }
-	private int NumberOfDays => (EndDate - StartDate).Days;
+    private int countAvailableRooms { get; set; }
+    private List<int> availableRoomCounts { get; set; }
+    List<string> AvailableRooms { get; set; }
+    private int NumberOfDays => (EndDate - StartDate).Days;
 
-	private decimal ToltalPriceRoom;
-	private int selectedPaymentMethodId = 0;
+    private decimal ToltalPriceRoom;
+    private int selectedPaymentMethodId = 0;
 
-	private DateTime today = DateTime.Today;
+    private DateTime today = DateTime.Today;
 
-	private int selectedCustomerID { get; set; }
-	public HoaDon bill { get; set; }
+    private int selectedCustomerID { get; set; }
+    public HoaDon bill { get; set; }
 
-	private string errorMessage = "";
+    private string errorMessage = "";
 
-	private bool paymentSuccess = false;
+    private bool paymentSuccess = false;
 
-	protected async override Task OnInitializedAsync()
-	{
-		khachHang = new KhachHang();
-		room = new Phong();
-		loaiPhong = new LoaiPhong();
-		paymentMethod = new PhuongThucThanhToan();
-		availableRoomCounts = new List<int>();
-		AvailableRooms = new List<string>();
-		listKhachHang = new List<KhachHang>();
-		bill = new HoaDon();
+    protected async override Task OnInitializedAsync()
+    {
+        khachHang = new KhachHang();
+        room = new Phong();
+        loaiPhong = new LoaiPhong();
+        paymentMethod = new PhuongThucThanhToan();
+        availableRoomCounts = new List<int>();
+        AvailableRooms = new List<string>();
+        listKhachHang = new List<KhachHang>();
+        bill = new HoaDon();
 
 
-		await RoomService.GetByIdAsync("https://localhost:44359/api/Room/GetRoomDetails/{0}/{1}/{2}{3}/{4}", RoomID, StartDate, EndDate, PriceRoom, TypeRoomID);
-		// khachHang = await RoomService.GetCustomerByIdAsync("https:localhost:44359/api/Room/api/Room/GetCustomerInfo/{0}", 1);
-		room = await RoomService.GetRoomByIdAsync("https://localhost:44359/api/Room/GetRoomInfo/{0}", RoomID);
-		loaiPhong = await RoomService.GetRoomTypeByIdAsync("https://localhost:44359/api/Room/GetRoomTypeInfo/{0}", TypeRoomID);
-		methods = await paymentMethodService.GetAllAsync("https://localhost:44359/api/PTTT/GetPTTT");
-		listKhachHang = await RoomService.GetCustomers();
+        await RoomService.GetByIdAsync("https://localhost:44359/api/Room/GetRoomDetails/{0}/{1}/{2}{3}/{4}", RoomID, StartDate, EndDate, PriceRoom, TypeRoomID);
+        // khachHang = await RoomService.GetCustomerByIdAsync("https:localhost:44359/api/Room/api/Room/GetCustomerInfo/{0}", 1);
+        room = await RoomService.GetRoomByIdAsync("https://localhost:44359/api/Room/GetRoomInfo/{0}", RoomID);
+        loaiPhong = await RoomService.GetRoomTypeByIdAsync("https://localhost:44359/api/Room/GetRoomTypeInfo/{0}", TypeRoomID);
+        methods = await paymentMethodService.GetAllAsync("https://localhost:44359/api/PTTT/GetPTTT");
+        listKhachHang = await RoomService.GetCustomers();
 
-		var storedUserData = await localStorageService.GetItemAsync<string>("userData");
-		if (storedUserData != null)
-		{
-			user = JsonConvert.DeserializeObject<TaiKhoan>(storedUserData);
-		}
+        var storedUserData = await localStorageService.GetItemAsync<string>("userData");
+        if (storedUserData != null)
+        {
+            user = JsonConvert.DeserializeObject<TaiKhoan>(storedUserData);
+        }
+        StateHasChanged();
+        await LoadAvailableRooms();
 
-		await LoadAvailableRooms();
 	}
 
 	private async Task LoadAvailableRooms()

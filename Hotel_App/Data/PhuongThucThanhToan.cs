@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Hotel_App.Data
 {
-	[Table("PhuongThucThanhToan")]
+	[Table("ptthanhtoan")]
 	public class PhuongThucThanhToan
 	{
 		[Key]

@@ -118,7 +118,7 @@
 
         <div class="form-group">
             <label for="MaHoaDon">Mã Hóa Đơn:</label>
-            <input type="text" class="form-control" value="@BillId" name="MaHoaDon" readonly>
+            <input type="text" class="form-control" value="@bill.MaHoaDon" name="MaHoaDon" readonly>
         </div>
         <div class="form-group">
             <label for="MaDichVu">Mã dịch vụ:</label>
@@ -259,7 +259,7 @@
         decimal newPrice = rent * loaiPhong.Gia;
         sum += datPhong.TongTien;
         await rservice.UpdateTotal(datPhong.MaDatPhong, newPrice);
-        await CTHoaDonService.UpdateTotal(BillId, sum);
+        await CTHoaDonService.UpdateTotal(bill.MaHoaDon, sum);
         StateHasChanged();
         await ReloadDetails();
 
@@ -296,7 +296,7 @@
     private async Task SaveDetail()
     {
         dichVu = await dvservice.GetByIdAsync("https://localhost:44359/api/DichVu/GetById/{0}", cthd.MaDichVu);
-        cthd.MaHoaDon = BillId;
+        cthd.MaHoaDon = bill.MaHoaDon;
 
         foreach (var ct in bill.CTHoaDon)
         {

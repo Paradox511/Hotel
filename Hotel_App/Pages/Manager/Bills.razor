@@ -81,8 +81,8 @@
                     }
                 }
 
-            </select>
-        </div>
+			</select>
+		</div>
 
         <div class="form-group">
             <label for="MaPhuongThuc">Phương Thức Thanh Toán:</label>
@@ -313,50 +313,6 @@
     public TaiKhoan user{ get; set; }
     private IEnumerable<HoaDon> bills;
     private IEnumerable<DatPhong> reservations;
-	private IEnumerable<NhanVien> employees;
-	private IEnumerable<PhuongThucThanhToan> methods;
-	public HoaDon bill { get; set; }
-	public IEnumerable<HoaDon> filteredAuthorList { get; set; }
-	public bool IsVisible { get; set; }
-	public bool Result { get; set; }
-	public string RecordName { get; set; }
-	public bool IsGridViewFiltered { get; set; }
-	bool isLoading = true;
-
-	protected async Task LoadBills()
-	{
-		bills = await BillService.GetAllAsync("https://localhost:44359/api/Bills/GetBills");
-	}
-	protected override void OnInitialized()
-	{
-		Console.WriteLine("Authors - OnInitialized");
-		base.OnInitialized();
-	}
-=========
-    private IEnumerable<HoaDon> bills;
-    private IEnumerable<DatPhong> reservations;
-	private IEnumerable<NhanVien> employees;
-	private IEnumerable<PhuongThucThanhToan> methods;
-	public HoaDon bill { get; set; }
-	public IEnumerable<HoaDon> filteredAuthorList { get; set; }
-	public bool IsVisible { get; set; }
-	public bool Result { get; set; }
-	public string RecordName { get; set; }
-	public bool IsGridViewFiltered { get; set; }
-	bool isLoading = true;
-
-	protected async Task LoadBills()
-	{
-		bills = await BillService.GetAllAsync("https://localhost:44359/api/Bills/GetBills");
-	}
-	protected override void OnInitialized()
-	{
-		Console.WriteLine("Authors - OnInitialized");
-		base.OnInitialized();
-	}
-=========
-    private IEnumerable<HoaDon> bills;
-    private IEnumerable<DatPhong> reservations;
     private IEnumerable<TaiKhoan> employees;
     private IEnumerable<PhuongThucThanhToan> methods;
     private IEnumerable<CTHoaDon> cthd;
@@ -388,6 +344,50 @@
         string searchValue = e.Value.ToString().ToLower();
 
         // Lọc danh sách theo tất cả các trường dữ liệu
+        filteredAuthorList = bills.Where(hd =>
+            hd.MaHoaDon.ToString().Contains(searchValue)
+        ).ToList();
+
+        totalBills = filteredAuthorList.Count(); // Cập nhật tổng số lượng nhân viên sau khi lọc
+        currentPage = 1; // Reset về trang đầu tiên
+
+        // Áp dụng phân trang cho danh sách đã lọc
+        filteredAuthorList = filteredAuthorList
+        .Skip((currentPage - 1) * itemsPerPage)
+        .Take(itemsPerPage)
+        .ToList();
+        StateHasChanged(); // Cập nhật lại giao diện
+    }
+
+    protected async Task LoadBills()
+    {
+        isLoading = true;
+        try
+        {
+            // Fetch all employees (no filtering applied yet)
+            var allBills = await BillService.GetAllAsync("https://localhost:44359/api/Bills/GetBills");
+
+            bills = allBills; // Store all employees for search filtering later
+            filteredAuthorList = bills; // Initially, no filtering
+            totalBills = bills.Count(); // Get the total count for pagination
+
+            // Apply pagination to the employees
+            PaginateEmployees();
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine("Error loading employees: " + ex.Message);
+        }
+        //bills = await BillService.GetAllAsync("https://localhost:44359/api/Bills/GetBills");
+        isLoading = false;
+        StateHasChanged();
+    }
+    protected override void OnInitialized()
+    {
+        Console.WriteLine("Authors - OnInitialized");
+        base.OnInitialized();
+    }
+
     protected override async Task OnInitializedAsync()
     {
         // await localStorageService.RemoveItemAsync("billData");
@@ -397,39 +397,39 @@
         bill = new HoaDon();
         //authorList = await authorService.GetAuthors();
 
-        // Áp dụng phân trang cho danh sách đã lọc
-        filteredAuthorList = filteredAuthorList
+        await base.OnInitializedAsync();
+    }
 
-        .Take(itemsPerPage)
+
     protected override bool ShouldRender()
     {
         base.ShouldRender();
         Console.WriteLine("Authors - ShouldRender");
-<<<<<<<<< Temporary merge branch 1
-		bill = new HoaDon();
-		//authorList = await authorService.GetAuthors();
-=========
-        bill = new HoaDon();
-        //authorList = await authorService.GetAuthors();
-            Console.Error.WriteLine("Error loading employees: " + ex.Message);
-        }
-        //bills = await BillService.GetAllAsync("https://localhost:44359/api/Bills/GetBills");
->>>>>>>>> Temporary merge branch 2
+
+		return true;
+	}
+
+	protected override void OnAfterRender(bool firstRender)
+	{
+		Console.WriteLine("Authors - OnAfterRender - firstRender = " + firstRender);
+		base.OnAfterRender(firstRender);
+	}
+
 	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
 		Console.WriteLine("Authors - OnAfterRenderAsync - firstRender = " + firstRender);
 
-<<<<<<<<< Temporary merge branch 1
-	protected override void OnParametersSet()
-	{
-		Console.WriteLine("Authors - OnParametersSet");
-		base.OnParametersSet();
-	}
+        if (firstRender)
+        {
+            LoadReservations();
+            LoadEmployees();
+            LoadMethods();
+            await LoadBills();
 
 			isLoading = false;
 			StateHasChanged();
 		}
-    }
+
 		await base.OnAfterRenderAsync(firstRender);
 	}
 
@@ -439,105 +439,11 @@
     }
 
 
-	{
+
     private async Task SaveBill()
     {
         bill.TrangThai = 1;
         bill.TongSoTien = 0;
-		await base.OnAfterRenderAsync(firstRender);
-	}
-
-	public void Dispose()
-	{
-		Console.WriteLine("Authors - Dispose");
-	}
-	private async Task DeleteBill(int Id)
-	{
-		await BillService.DeleteAsync("authors/DeleteAuthor/", Id);
-		await LoadBills();
-
-		//throw new Exception("DeleteAuthor");
-	}
-
-	private void EditBill(HoaDon argAuthor)
-	{
-		bill = argAuthor;
-	}
-	private void SaveBill(HoaDon bill)
-	{
-<<<<<<<<< Temporary merge branch 1
-	}
-	protected async Task LoadReservations()
-	{
-		reservations = await dpservice.GetAllAsync("https://localhost:44359/api/DatPhong/GetDatPhong");
-	}
-	protected async Task LoadEmployees()
-	{
-		employees = await nvservice.GetAllAsync("https://localhost:44359/api/NhanVien/GetNhanVien");
-	}
-	protected async Task LoadMethods()
-	{
-		methods = await ptservice.GetAllAsync("https://localhost:44359/api/PTTT/GetPTTT");
-	}
-=========
-    public void Dispose()
-    {
-        Console.WriteLine("Authors - Dispose");
-    }
-    private async Task DeleteBill()
-    {
-        try
-        {
-            var billReservations = cthd.Where(cthd => cthd.MaHoaDon == billIdToDelete);
-            if (billReservations.Any())
-            {
-                // Nếu khách hàng có đặt phòng, hiển thị thông báo không thể xóa
-                errorMessage = "không xóa được hóa đơn";
-                successMessage = null; // Xóa thông báo thành công nếu có lỗi
-                showDeleteConfirmation = false; // Ẩn bảng xác nhận
-                StateHasChanged(); // Cập nhật giao diện
-                return; // Dừng việc xóa khách hàng
-            }
-            await BillService.DeleteAsync("https://localhost:44359/api/Bills/DeleteBill/", billIdToDelete);
-            await LoadEmployees();
-            showDeleteConfirmation = false; // Ẩn bảng xác nhận
-            successMessage = "Xóa hóa đơn thành công."; // Thông báo thành công
-            StateHasChanged();
-        }
-        catch (Exception ex)
-        {
-            errorMessage = "Không thể xóa hóa đơn: " + ex.Message; // Hiển thị thông báo lỗi
-            showDeleteConfirmation = false; // Ẩn bảng xác nhận
-            StateHasChanged();
-        }
-    }
-
-    private void EditBill(HoaDon savedbill)
-    {
-        bill = savedbill;
-        StateHasChanged();
-                showDeleteConfirmation = false; // Ẩn bảng xác nhận
-                StateHasChanged(); // Cập nhật giao diện
-                return; // Dừng việc xóa khách hàng
-            }
-            await BillService.DeleteAsync("https://localhost:44359/api/Bills/DeleteBill/", billIdToDelete);
-            await LoadEmployees();
-            showDeleteConfirmation = false; // Ẩn bảng xác nhận
-            successMessage = "Xóa hóa đơn thành công."; // Thông báo thành công
-            StateHasChanged();
-        }
-        catch (Exception ex)
-        {
-            errorMessage = "Không thể xóa hóa đơn: " + ex.Message; // Hiển thị thông báo lỗi
-            showDeleteConfirmation = false; // Ẩn bảng xác nhận
-            StateHasChanged();
-        }
-    }
-
-    private void EditBill(HoaDon savedbill)
-    {
-        bill = savedbill;
-        StateHasChanged();
 
         // Call the service to save the bill
         try
