@@ -83,7 +83,7 @@
             <input type="text" class="form-control" id="Password" @bind="employee.Password" name="Password">
         </div>
         <br />
-        <button type="submit" class="btn btn-primary">Tạo</button>
+        <button type="submit" class="btn btn-primary ">Tạo</button>
     </EditForm>
 </div>
 <br />
@@ -318,7 +318,7 @@
     public bool IsGridViewFiltered { get; set; }
     bool isLoading = true;
     private string searchText = string.Empty;
-    private List<Employees> lemployees = new List<Employees>();
+    //private List<Employees> lemployees = new List<Employees>();
     // Error messages for validation
     private string emailError;
     private string phoneError;
@@ -469,13 +469,13 @@
             }
 
             // Tải lại danh sách nhân viên sau khi thêm hoặc cập nhật thành công
-            await LoadEmployees();
+            
         }
         catch (Exception ex)
         {
             successMessage = "Nhân viên đã được thêm thành công!";
         }
-
+        await LoadEmployees();
         StateHasChanged();
     }
 
@@ -484,16 +484,16 @@
     {
         try
         {
-            var employeesReservations = bills.Where(h => h.MaTaiKhoan == employeesIdToDelete);
-            if (employeesReservations.Any())
-            {
-                // Nếu khách hàng có đặt phòng, hiển thị thông báo không thể xóa
-                errorMessage = "không xóa được nhân viên";
-                successMessage = null; // Xóa thông báo thành công nếu có lỗi
-                showDeleteConfirmation = false; // Ẩn bảng xác nhận
-                StateHasChanged(); // Cập nhật giao diện
-                return; // Dừng việc xóa khách hàng
-            }
+           /* var employeesReservations = bills.Where(h => h.MaNhanVien == employeesIdToDelete);
+             if (employeesReservations.Any())
+             {
+                 // Nếu khách hàng có đặt phòng, hiển thị thông báo không thể xóa
+                 errorMessage = "không xóa được nhân viên";
+                 successMessage = null; // Xóa thông báo thành công nếu có lỗi
+                 showDeleteConfirmation = false; // Ẩn bảng xác nhận
+                 StateHasChanged(); // Cập nhật giao diện
+                 return; // Dừng việc xóa khách hàng
+             }*/
             await nvservice.DeleteAsync("https://localhost:44359/api/NhanVien/DeleteNhanVien/", employeesIdToDelete);
             await LoadEmployees();
             showDeleteConfirmation = false; // Ẩn bảng xác nhận
@@ -573,26 +573,26 @@
     // Kiểm tra email có trùng cho việc cập nhật (bỏ qua nhân viên hiện tại)
     private bool IsEmailDuplicatedForUpdate(string email, int currentEmployeeId)
     {
-        return filteredEmployees.Any(emp => emp.Email.Equals(email, StringComparison.OrdinalIgnoreCase) && emp.MaTaiKhoan != currentEmployeeId);
+        return employees.Any(emp => emp.Email.Equals(email, StringComparison.OrdinalIgnoreCase) && emp.MaTaiKhoan != currentEmployeeId);
     }
 
     // Kiểm tra số điện thoại có trùng cho việc cập nhật (bỏ qua nhân viên hiện tại)
     private bool IsPhoneNumberDuplicatedForUpdate(string phoneNumber, int currentEmployeeId)
     {
-        return filteredEmployees.Any(emp => emp.SoDienThoai.Equals(phoneNumber, StringComparison.OrdinalIgnoreCase) && emp.MaTaiKhoan != currentEmployeeId);
+        return employees.Any(emp => emp.SoDienThoai.Equals(phoneNumber, StringComparison.OrdinalIgnoreCase) && emp.MaTaiKhoan != currentEmployeeId);
     }
 
 
     // Kiểm tra email có trùng trong danh sách hay không
     private bool IsEmailDuplicated(string email)
     {
-        return filteredEmployees.Any(emp => emp.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+        return employees.Any(emp => emp.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
     }
 
     // Kiểm tra số điện thoại có trùng trong danh sách hay không
     private bool IsPhoneNumberDuplicated(string phoneNumber)
     {
-        return filteredEmployees.Any(emp => emp.SoDienThoai.Equals(phoneNumber, StringComparison.OrdinalIgnoreCase));
+        return employees.Any(emp => emp.SoDienThoai.Equals(phoneNumber, StringComparison.OrdinalIgnoreCase));
     }
 
     private void NextPage()
@@ -618,10 +618,10 @@
 
     protected async Task LoadBills()
     {
-        
+
 
         bills = await BillService.GetAllAsync("https://localhost:44359/api/Bills/GetBills");
-       
+
     }
 
     protected override void OnInitialized()
@@ -690,5 +690,4 @@
         Console.WriteLine("Authors - Dispose");
     }
 }
-
 

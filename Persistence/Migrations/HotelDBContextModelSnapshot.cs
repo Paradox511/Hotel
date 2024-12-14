@@ -342,6 +342,11 @@ namespace Persistence.Migrations
                 {
                     b.Navigation("CTHoaDon");
                 });
+
+            modelBuilder.Entity("Domain.Entities.LoaiPhong", b =>
+                {
+                    b.Navigation("phong");
+                });
 #pragma warning restore 612, 618
         }
     }

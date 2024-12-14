@@ -1,10 +1,16 @@
-﻿@page "/index"
-
+﻿@page "/index/{userid:int}"
+@using Hotel_App.Service
 @using Hotel_App.Data
 @using Blazored.LocalStorage
+@using Hotel_App.Shared
+@using System;
+@using Microsoft.JSInterop
 @inject NavigationManager navigationManager
 @inject ILocalStorageService localStorageService
 @inject IAuthorizationService authorizationService
+@inject Blazored.LocalStorage.ILocalStorageService localStorageService
+@inject IUserService userService
+@inject HotelService<TaiKhoan> nvservice;
 
 <PageTitle>Index</PageTitle>
 
@@ -13,3 +19,17 @@
 Welcome to your new app.
 
 <SurveyPrompt Title="How is Blazor working for you?" />
+@code{
+    [Parameter]
+    public int userid { get; set; }
+    public TaiKhoan user { get; set; }
+    bool isLoading = true;
+
+    protected async override Task OnInitializedAsync()
+    {
+        isLoading = true;
+        var task = nvservice.GetByIdAsync("https://localhost:44359/api/index/{0}", userid);
+        
+        isLoading = false; // Set loading indicator to false
+    }
+}

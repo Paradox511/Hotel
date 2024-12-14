@@ -80,16 +80,23 @@ namespace WebAPI.Controllers.V1
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpDelete("Deletetaikhoan/{id}")]
-        public async Task<IActionResult> Delete(int id) { 
-            if (id == null)
+        [HttpDelete("DeleteTaiKhoan/{id}")]
+        public async Task<IActionResult> Delete(int id) {
+            var employee = await _context.taikhoan.FindAsync(id);
+            if (employee == null)
             {
                 return BadRequest("Invalid command data");
             }
-            var entity = _context.taikhoan.Find(id);
-            _context.taikhoan.Remove(entity);
-            await _context.SaveChangesAsync();
-            return Ok("Nhan vien deleted."); // No content to return on successful deletion
+            employee.TrangThai = 0;
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal Server Error: DbContext not injected");
+            }
+            return Ok("employee status updated to 0");
         }
         /// <summary>
         /// Updates the Product Entity based on Id.   

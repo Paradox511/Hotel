@@ -12,8 +12,13 @@ using Persistence.Context;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(HotelDBContext))]
+<<<<<<<< HEAD:Persistence/Migrations/20241214080317_first.Designer.cs
     [Migration("20241214080317_first")]
     partial class first
+========
+    [Migration("20241211103608_ab")]
+    partial class ab
+>>>>>>>> origin/endo:Persistence/Migrations/20241211103608_ab.Designer.cs
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -328,7 +333,11 @@ namespace Persistence.Migrations
             modelBuilder.Entity("Domain.Entities.Phong", b =>
                 {
                     b.HasOne("Domain.Entities.LoaiPhong", "LoaiPhong")
+<<<<<<<< HEAD:Persistence/Migrations/20241214080317_first.Designer.cs
                         .WithMany()
+========
+                        .WithMany("phong")
+>>>>>>>> origin/endo:Persistence/Migrations/20241211103608_ab.Designer.cs
                         .HasForeignKey("MaLoaiPhong")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -344,6 +353,11 @@ namespace Persistence.Migrations
             modelBuilder.Entity("Domain.Entities.HoaDon", b =>
                 {
                     b.Navigation("CTHoaDon");
+                });
+
+            modelBuilder.Entity("Domain.Entities.LoaiPhong", b =>
+                {
+                    b.Navigation("phong");
                 });
 #pragma warning restore 612, 618
         }

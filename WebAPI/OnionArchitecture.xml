@@ -19,6 +19,14 @@
             <param name="command"></param>
             <returns></returns>
         </member>
+        <member name="M:WebAPI.Controllers.V1.CustomersController.Update(System.Int32,Domain.Entities.KhachHang)">
+            <summary>
+            Updates the Product Entity based on Id.   
+            </summary>
+            <param name="id"></param>
+            <param name="command"></param>
+            <returns></returns>
+        </member>
         <member name="M:WebAPI.Controllers.V1.DichVuController.Delete(System.Int32)">
             <summary>
             Deletes Product Entity based on Id.
@@ -42,6 +50,14 @@
             <returns></returns>
         </member>
         <member name="M:WebAPI.Controllers.V1.taikhoanController.Update(System.Int32,Domain.Entities.TaiKhoan)">
+            <summary>
+            Updates the Product Entity based on Id.   
+            </summary>
+            <param name="id"></param>
+            <param name="command"></param>
+            <returns></returns>
+        </member>
+        <member name="M:WebAPI.Controllers.V1.TaiKhoanController.Update(Application.Features.Commands.UpdateCommand{Domain.Entities.TaiKhoan})">
             <summary>
             Updates the Product Entity based on Id.   
             </summary>

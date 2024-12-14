@@ -1,5 +1,8 @@
 ﻿using Hotel_App.Data;
+using System.Net.Http;
+using Blazored.LocalStorage;
 using Newtonsoft.Json;
+using System.Net;
 using System.Text;
 
 namespace Hotel_App.Service
@@ -10,6 +13,7 @@ namespace Hotel_App.Service
 
 		public RoomService(HttpClient httpClient)
 		{
+			
 			_httpClient = httpClient;
 		}
 
@@ -32,7 +36,7 @@ namespace Hotel_App.Service
 				if (response.IsSuccessStatusCode)
 				{
 					phongs = await response.Content.ReadFromJsonAsync<List<Phong>>();
-				}
+			}
 			}
 			catch (Exception ex)
 			{
@@ -194,5 +198,6 @@ namespace Hotel_App.Service
 				throw new HttpRequestException($"Lỗi khi thêm hóa đơn, mã lỗi: {response.StatusCode}");
 			}
 		}
+
 	}
 }

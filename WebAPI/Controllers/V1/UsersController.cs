@@ -13,6 +13,7 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace WebAPI.Controllers.V1
 {
@@ -56,16 +57,22 @@ namespace WebAPI.Controllers.V1
         }
 
         [HttpPost("Login")]
-        public async Task<ActionResult<TaiKhoan>> Login([FromBody] TaiKhoan taiKhoan)
+        public async Task<ActionResult<TaiKhoan>> Login(String users , String pass)
         {
-            if (taiKhoan == null || string.IsNullOrWhiteSpace(taiKhoan.Username) || string.IsNullOrWhiteSpace(taiKhoan.Password))
-            {
-                return BadRequest("Invalid login credentials.");
-            }
+
+            //if (taiKhoan == null || string.IsNullOrWhiteSpace(taiKhoan.Username) || string.IsNullOrWhiteSpace(taiKhoan.Password))
+            //{
+            //    return BadRequest("Invalid login credentials.");
+            //}
 
             //var hashedPassword = Hotel_App.Utility.Encrypt(taiKhoan.Password);
-            var user = await _context.taikhoan.FirstOrDefaultAsync(u => u.Username == taiKhoan.Username && u.Password == taiKhoan.Password);
-
+            //var user = await _context.taikhoan.FirstOrDefaultAsync(u => u.Username == taiKhoan.Username 
+            //                                                        && u.Password == taiKhoan.Password
+            //                                                        .Where(u => u.EmailAddress == user.EmailAddress
+            //                                    && u.Password == user.Password).FirstOrDefaultAsync()
+            //                                                        );
+            var user = await _context.taikhoan.Where(u => u.Username == users
+                                                && u.Password == pass).FirstOrDefaultAsync();
             if (user == null)
             {
                 return Unauthorized("Invalid username or password.");
@@ -93,8 +100,9 @@ namespace WebAPI.Controllers.V1
 
             var newUser = new TaiKhoan
             {
+                MaTaiKhoan = user.MaTaiKhoan,
                 Username = user.Username,
-                Password = Hotel_App.Utility.Encrypt(user.Password)
+                Password = user.Password
             };
 
             _context.taikhoan.Add(newUser);
@@ -103,29 +111,5 @@ namespace WebAPI.Controllers.V1
 
             return CreatedAtAction(nameof(GetUser), new { id = newUser.MaTaiKhoan }, user);
         }
-
-        //private RefreshToken GenerateRefreshToken()
-        //{
-        //    var randomNumber = new byte[32];
-        //    using (var rng = RandomNumberGenerator.Create())
-        //    {
-        //        rng.GetBytes(randomNumber);
-        //        return new RefreshToken { Token = Convert.ToBase64String(randomNumber), Expiry = DateTime.UtcNow.AddDays(7) };
-        //    }
-        //}
-
-        //private string GenerateAccessToken(int userId)
-        //{
-        //    var tokenHandler = new JwtSecurityTokenHandler();
-        //    var key = Encoding.ASCII.GetBytes(_jwtSettings.SecretKey);
-        //    var tokenDescriptor = new SecurityTokenDescriptor
-        //    {
-        //        Subject = new ClaimsIdentity(new Claim[] { new Claim(ClaimTypes.NameIdentifier, userId.ToString()) }),
-        //        Expires = DateTime.UtcNow.AddHours(1),
-        //        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-        //    };
-        //    var token = tokenHandler.CreateToken(tokenDescriptor);
-        //    return tokenHandler.WriteToken(token);
-        //}
     }
 }
