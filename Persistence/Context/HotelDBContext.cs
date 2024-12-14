@@ -1,5 +1,5 @@
-﻿using Domain.Entities;
-using Application.Interfaces;
+﻿using Application.Interfaces;
+using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Persistence.Context
@@ -71,10 +71,6 @@ namespace Persistence.Context
 				.WithMany(lp => lp.phong)
 				.HasForeignKey(ct => ct.MaLoaiPhong);
 
-			modelBuilder.Entity<LoaiPhong>()
-		   .HasMany(h => h.phong)
-		   .WithOne(ct => ct.LoaiPhong)
-		   .HasForeignKey(ct => ct.MaLoaiPhong);
 
             base.OnModelCreating(modelBuilder);
 

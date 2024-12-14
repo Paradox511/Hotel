@@ -217,6 +217,9 @@ namespace Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaPhong"));
 
+                    b.Property<int?>("LoaiPhongMaLoaiPhong")
+                        .HasColumnType("int");
+
                     b.Property<int>("MaLoaiPhong")
                         .HasColumnType("int");
 
@@ -230,6 +233,8 @@ namespace Persistence.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("MaPhong");
+
+                    b.HasIndex("LoaiPhongMaLoaiPhong");
 
                     b.HasIndex("MaLoaiPhong");
 
@@ -250,7 +255,7 @@ namespace Persistence.Migrations
 
                     b.HasKey("MaPhuongThuc");
 
-                    b.ToTable("ptthanhtoan");
+                    b.ToTable("PhuongThucThanhToan");
                 });
 
             modelBuilder.Entity("Domain.Entities.TaiKhoan", b =>
@@ -324,8 +329,12 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Domain.Entities.Phong", b =>
                 {
-                    b.HasOne("Domain.Entities.LoaiPhong", "LoaiPhong")
+                    b.HasOne("Domain.Entities.LoaiPhong", null)
                         .WithMany("phong")
+                        .HasForeignKey("LoaiPhongMaLoaiPhong");
+
+                    b.HasOne("Domain.Entities.LoaiPhong", "LoaiPhong")
+                        .WithMany()
                         .HasForeignKey("MaLoaiPhong")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

@@ -3,10 +3,11 @@ using Hotel_App.Service;
 
 namespace Hotel_App.Service
 {
-	public interface IRoomService 
+	public interface IRoomService<T>
 	{
+		//public Task<List<T>> GetAllRoomTypes(string requestUri);
+		//public Task<List<T>> GetAllRooms(string requestUri);
 		
-		Task<IEnumerable<Phong>> GetPhongsByLoaiPhongIdAsync(int loaiPhongId);
-		Task<Phong> DeletePhongAsync(Phong obj,int Id );
+		Task<List<T>> GetRoomInfo();
 	}
 }

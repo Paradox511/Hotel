@@ -1,0 +1,293 @@
+﻿	@page "/booking/GetRoomDetails/{RoomID:int}/{StartDate:datetime}/{EndDate:datetime}/{PriceRoom:decimal}/{TypeRoomID:int}"
+	@using Hotel_App.Service
+	@using Hotel_App.Data
+	@using Blazored.LocalStorage
+	@using Hotel_App.Shared
+	@using System;
+	@using Microsoft.JSInterop
+	@using Newtonsoft.Json
+	@inject RoomService RoomService
+	@inject HotelService<PhuongThucThanhToan> paymentMethodService;
+	@inject NavigationManager NavigationManager
+	@inject IJSRuntime JSRuntime
+	@inject HotelService<HoaDon> BillService
+	@inject NavigationManager navigationManager
+	@inject ILocalStorageService localStorageService
+	@inject IAuthorizationService authorizationService
+	@inject Blazored.LocalStorage.ILocalStorageService localStorageService
+	@inject IUserService userService
+	@inject HotelService<TaiKhoan> nvservice;
+
+<div class="container mt-5">
+	<h2 class="text-center">Xác nhận đặt phòng</h2>
+	<p class="text-center">Experience something new every moment.</p>
+	@if (!string.IsNullOrEmpty(errorMessage))
+	{
+		<p class="alert alert-danger" style="color: black;">@errorMessage</p>
+	}
+	<div class="row">
+		<div class="d-flex justify-content-lg-between">
+			<div class="me-3">
+				<h3>Thông tin khách hàng</h3>
+				<ul class="list-group">
+					<li class="list-group-item d-flex flex-row align-items-baseline">
+						<select class="form-select" style="width: 300px" id="" @onchange="@((e) => OnCustomerChange(e))">
+							<option>Chọn khách hàng</option>
+							@foreach (var item in listKhachHang)
+							{
+								<option value="@item.MaKhachHang">@item.HoTen</option>
+							}
+						</select>
+					</li>
+					<li class="list-group-item"><strong>Mã khách hàng:</strong> @khachHang.MaKhachHang</li>
+					<li class="list-group-item"><strong>Tên:</strong> @khachHang.HoTen</li>
+					<li class="list-group-item"><strong>Số điện thoại:</strong> @khachHang.SoDienThoai</li>
+					<li class="list-group-item"><strong>Email:</strong> @khachHang.Email</li>
+					<li class="list-group-item"><strong>Ngày sinh:</strong> @khachHang.NgaySinh</li>
+					<li class="list-group-item"><strong>Số tài khoản:</strong> @khachHang.STK</li>
+					<li class="list-group-item"><strong>CCCD:</strong> @khachHang.CCCD</li>
+				</ul>
+				@* <div> *@
+				@* 	<h2><b>Thông tin tài khoản</b></h2> *@
+				@* 	@if (user != null) *@
+				@* 	{ *@
+				@* 		<h3><b>Mã tài khoản:</b>@user.MaTaiKhoan</h3> *@
+				@* 		<h3><b>Họ tên:</b>@user.HoTen</h3> *@
+				@* 		<h3><b>Email:</b>@user.Email</h3> *@
+				@* 		<h3><b>Địa chỉ:</b>@user.DiaChi</h3> *@
+				@* 		<h3><b>SĐT:</b>@user.SoDienThoai</h3> *@
+
+				@* 	} *@
+				@* </div> *@
+			</div>
+			<div class="w-100">
+				<h3 class="mt-1">Thông tin đặt phòng</h3>
+				<ul class="list-group">
+					<li class="list-group-item"><strong>Loại phòng:</strong> @loaiPhong.TenLoaiPhong</li>
+					<li class="list-group-item"><strong>Số phòng:</strong> @room.SoPhong</li>
+					<li class="list-group-item"><strong>Giá phòng ngày hôm nay:</strong> @loaiPhong.Gia VNĐ</li>
+					<li class="list-group-item"><strong>Ngày nhận phòng:</strong> @StartDate</li>
+					<li class="list-group-item"><strong>Ngày trả phòng:</strong> @EndDate</li>
+					<li class="list-group-item"><strong>Số ngày đặt:</strong> @NumberOfDays</li>
+
+					<li class="list-group-item d-flex flex-row align-items-baseline">
+						<select @onchange="SelectPaymentMethod" class="form-select" style="width: 300px" id="paymentMethodDropdown">
+							@if (methods != null)
+							{
+								<option>Chọn phương thức thanh toán</option>
+								@foreach (var item in methods)
+								{
+									<option value="@item.MaPhuongThuc">@item.TenPhuongThuc</option>
+								}
+							}
+						</select>
+					</li>
+
+					<li class="list-group-item d-flex flex-row align-items-baseline">
+						<select @onchange="CalculateTotalPrice" class="form-select" style="width: 220px" aria-label="Default select example">
+							@if (AvailableRooms != null)
+							{
+								<option>Chọn số lượng phòng</option>
+								@foreach (var item in AvailableRooms)
+								{
+									<option value="@item">@item phòng</option>
+								}
+							}
+						</select>
+					</li>
+					<li class="list-group-item"><strong>Tổng số tiền phải trả:</strong> <span id="totalPrice"></span></li>
+					<script>
+						window.updateTotalPriceElement = (total) => {
+						document.getElementById("totalPrice").innerText = ` ${total} VNĐ`;
+						};
+											 window.showPaymentStatus = (success) => {
+							if (success) {
+								alert("Thanh toán thành công!");
+							} else {
+								alert("Thanh toán thất bại!");
+							}
+						};
+					</script>
+				</ul>
+				<div class="align-self-end mt-3">
+					<button @onclick="ThanhToan" type="button" class="btn btn-primary">Thanh toán</button>
+					<NavLink href=@string.Format("/booking") class="btn btn-secondary"><i class="fas fa-redo"></i>Quay lại</NavLink>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>
+@code {
+	[Parameter]
+	public int RoomID { get; set; }
+	[Parameter]
+	public DateTime StartDate { get; set; }
+	[Parameter]
+	public DateTime EndDate { get; set; }
+	[Parameter]
+	public decimal PriceRoom { get; set; }
+	[Parameter]
+	public int TypeRoomID { get; set; }
+
+	private int CustomerID { get; set; }
+
+	KhachHang khachHang { get; set; }
+	LoaiPhong loaiPhong { get; set; }
+	private DatPhong datPhong { get; set; }
+	private Phong room { get; set; }
+	private HoaDon hoaDon { get; set; }
+	private List<KhachHang> listKhachHang { get; set; }
+	private IEnumerable<PhuongThucThanhToan> methods;
+
+	public TaiKhoan user { get; set; }
+
+	PhuongThucThanhToan paymentMethod { get; set; }
+
+	private int countAvailableRooms { get; set; }
+	private List<int> availableRoomCounts { get; set; }
+	List<string> AvailableRooms { get; set; }
+	private int NumberOfDays => (EndDate - StartDate).Days;
+
+	private decimal ToltalPriceRoom;
+	private int selectedPaymentMethodId = 0;
+
+	private DateTime today = DateTime.Today;
+
+	private int selectedCustomerID { get; set; }
+	public HoaDon bill { get; set; }
+
+	private string errorMessage = "";
+
+	private bool paymentSuccess = false;
+
+	protected async override Task OnInitializedAsync()
+	{
+		khachHang = new KhachHang();
+		room = new Phong();
+		loaiPhong = new LoaiPhong();
+		paymentMethod = new PhuongThucThanhToan();
+		availableRoomCounts = new List<int>();
+		AvailableRooms = new List<string>();
+		listKhachHang = new List<KhachHang>();
+		bill = new HoaDon();
+
+
+		await RoomService.GetByIdAsync("https://localhost:44359/api/Room/GetRoomDetails/{0}/{1}/{2}{3}/{4}", RoomID, StartDate, EndDate, PriceRoom, TypeRoomID);
+		// khachHang = await RoomService.GetCustomerByIdAsync("https:localhost:44359/api/Room/api/Room/GetCustomerInfo/{0}", 1);
+		room = await RoomService.GetRoomByIdAsync("https://localhost:44359/api/Room/GetRoomInfo/{0}", RoomID);
+		loaiPhong = await RoomService.GetRoomTypeByIdAsync("https://localhost:44359/api/Room/GetRoomTypeInfo/{0}", TypeRoomID);
+		methods = await paymentMethodService.GetAllAsync("https://localhost:44359/api/PTTT/GetPTTT");
+		listKhachHang = await RoomService.GetCustomers();
+
+		var storedUserData = await localStorageService.GetItemAsync<string>("userData");
+		if (storedUserData != null)
+		{
+			user = JsonConvert.DeserializeObject<TaiKhoan>(storedUserData);
+		}
+
+		await LoadAvailableRooms();
+	}
+
+	private async Task LoadAvailableRooms()
+	{
+		var roomCount = await RoomService.GetAvailableRoomCountAsync(TypeRoomID, StartDate, EndDate);
+		AvailableRooms = Enumerable.Range(1, roomCount).Select(i => $"{i}").ToList();
+		foreach (var item in AvailableRooms)
+		{
+			Console.WriteLine("AvailableRooms item: " + item);
+		}
+	}
+
+	// tính tổng số tiền phòng
+	private void CalculateTotalPrice(ChangeEventArgs e)
+	{
+		if (int.TryParse(e.Value.ToString(), out int numberOfRooms))
+		{
+			ToltalPriceRoom = (PriceRoom * NumberOfDays) * numberOfRooms;
+			StateHasChanged(); // Cập nhật giao diện
+			JSRuntime.InvokeVoidAsync("updateTotalPriceElement", ToltalPriceRoom);
+		}
+	}
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+		{
+			await JSRuntime.InvokeVoidAsync("updateTotalPriceElement", ToltalPriceRoom);
+		}
+	}
+	[JSInvokable]
+	private void updateTotalPrice(decimal total)
+	{
+		JSRuntime.InvokeVoidAsync("updateTotalPriceElement", total);
+	}
+
+	//lấy mã phương thức thanh toán
+	private void SelectPaymentMethod(ChangeEventArgs e)
+	{
+		if (int.TryParse(e.Value.ToString(), out int selectedId))
+		{
+			selectedPaymentMethodId = selectedId;
+			paymentMethod = methods.FirstOrDefault(m => m.MaPhuongThuc == selectedPaymentMethodId);
+			StateHasChanged();
+
+		}
+	}
+	private void OnCustomerChange(ChangeEventArgs e)
+	{
+		if (int.TryParse(e.Value.ToString(), out int customerId))
+		{
+			selectedCustomerID = customerId;
+			khachHang = listKhachHang.FirstOrDefault(c => c.MaKhachHang == customerId);
+			StateHasChanged(); // Update UI with new customer information
+
+		}
+	}
+	// thanh toán đặt phòng
+	private async Task ThanhToan()
+	{
+		if (selectedCustomerID == 0 || selectedPaymentMethodId == 0 || ToltalPriceRoom == 0)
+		{
+			Console.WriteLine("Vui lòng chọn đầy đủ thông tin trước khi thanh toán.");
+			// Hiển thị thông báo lỗi trên giao diện người dùng nếu cần
+			errorMessage = "Vui lòng chọn đầy đủ thông tin trước khi thanh toán.";
+			return;
+		}
+		datPhong = new DatPhong();
+		datPhong.MaKhachHang = selectedCustomerID;
+		datPhong.CheckInDate = StartDate;
+		datPhong.CheckOutDate = EndDate;
+		datPhong.MaPhong = RoomID;
+		datPhong.TongTien = ToltalPriceRoom;
+		datPhong.TrangThai = 1;
+
+		var result = await RoomService.AddDatPhong(datPhong);
+		if (result != null)
+		{
+			if (bill.CTHoaDon == null) bill.CTHoaDon = [];
+			bill.NgayTao = today;
+			bill.TongSoTien = ToltalPriceRoom;
+			bill.MaPhuongThuc = selectedPaymentMethodId;
+			if (user != null) bill.MaTaiKhoan = user.MaTaiKhoan;
+			bill.MaDatPhong = result.MaDatPhong;
+			bill.TrangThai = 1;
+			HoaDon savedBill = await BillService.SaveAsync("https://localhost:44359/api/Bills/CreateBill", bill);
+			paymentSuccess = true;
+			// Hiển thị thông báo thành công
+			Console.WriteLine("Thanh toán thành công!");
+
+			JSRuntime.InvokeVoidAsync("showPaymentStatus", paymentSuccess);
+			await Task.Delay(2000);
+			NavigationManager.NavigateTo("/booking");
+		}
+		else
+		{
+			// Xác định thanh toán thất bại
+			paymentSuccess = false;
+
+			// Hiển thị thông báo thất bại
+			Console.WriteLine("Thanh toán thất bại!");
+			JSRuntime.InvokeVoidAsync("showPaymentStatus", paymentSuccess);
+		}
+	}
+}

@@ -1,13 +1,15 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Domain.Entities
 {
-    public class PhuongThucThanhToan
-    {
-        [Key]
-        public int MaPhuongThuc { get; set; }
-        [Required]
-        public string TenPhuongThuc { get; set; }
-        public PhuongThucThanhToan() { }
-    }
+	[Table("PhuongThucThanhToan")]
+	public class PhuongThucThanhToan
+	{
+		[Key]
+		public int MaPhuongThuc { get; set; }
+		[Required]
+		public string TenPhuongThuc { get; set; }
+		public PhuongThucThanhToan() { }
+	}
 }
