@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class ab : Migration
+    public partial class init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -169,11 +169,17 @@ namespace Persistence.Migrations
                     TrangThaiPhong = table.Column<int>(type: "int", nullable: false),
                     SoPhong = table.Column<int>(type: "int", nullable: false),
                     MaLoaiPhong = table.Column<int>(type: "int", nullable: false),
-                    TrangThai = table.Column<int>(type: "int", nullable: false)
+                    TrangThai = table.Column<int>(type: "int", nullable: false),
+                    LoaiPhongMaLoaiPhong = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_phong", x => x.MaPhong);
+                    table.ForeignKey(
+                        name: "FK_phong_loaiphong_LoaiPhongMaLoaiPhong",
+                        column: x => x.LoaiPhongMaLoaiPhong,
+                        principalTable: "loaiphong",
+                        principalColumn: "MaLoaiPhong");
                     table.ForeignKey(
                         name: "FK_phong_loaiphong_MaLoaiPhong",
                         column: x => x.MaLoaiPhong,
@@ -191,6 +197,11 @@ namespace Persistence.Migrations
                 name: "IX_cthoadon_MaHoaDon",
                 table: "cthoadon",
                 column: "MaHoaDon");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_phong_LoaiPhongMaLoaiPhong",
+                table: "phong",
+                column: "LoaiPhongMaLoaiPhong");
 
             migrationBuilder.CreateIndex(
                 name: "IX_phong_MaLoaiPhong",

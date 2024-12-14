@@ -12,13 +12,8 @@ using Persistence.Context;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(HotelDBContext))]
-<<<<<<<< HEAD:Persistence/Migrations/20241214080317_first.Designer.cs
-    [Migration("20241214080317_first")]
-    partial class first
-========
-    [Migration("20241211103608_ab")]
-    partial class ab
->>>>>>>> origin/endo:Persistence/Migrations/20241211103608_ab.Designer.cs
+    [Migration("20241214082103_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -225,6 +220,9 @@ namespace Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaPhong"));
 
+                    b.Property<int?>("LoaiPhongMaLoaiPhong")
+                        .HasColumnType("int");
+
                     b.Property<int>("MaLoaiPhong")
                         .HasColumnType("int");
 
@@ -238,6 +236,8 @@ namespace Persistence.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("MaPhong");
+
+                    b.HasIndex("LoaiPhongMaLoaiPhong");
 
                     b.HasIndex("MaLoaiPhong");
 
@@ -332,12 +332,12 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Domain.Entities.Phong", b =>
                 {
-                    b.HasOne("Domain.Entities.LoaiPhong", "LoaiPhong")
-<<<<<<<< HEAD:Persistence/Migrations/20241214080317_first.Designer.cs
-                        .WithMany()
-========
+                    b.HasOne("Domain.Entities.LoaiPhong", null)
                         .WithMany("phong")
->>>>>>>> origin/endo:Persistence/Migrations/20241211103608_ab.Designer.cs
+                        .HasForeignKey("LoaiPhongMaLoaiPhong");
+
+                    b.HasOne("Domain.Entities.LoaiPhong", "LoaiPhong")
+                        .WithMany()
                         .HasForeignKey("MaLoaiPhong")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
