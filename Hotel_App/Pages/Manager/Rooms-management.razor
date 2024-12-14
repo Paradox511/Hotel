@@ -19,7 +19,7 @@
 @implements IDisposable
 
 <div class="col-12">
-  
+
     @if (!string.IsNullOrEmpty(errorMessage))
     {
         <div class="alert alert-danger">@errorMessage</div>
@@ -56,7 +56,7 @@
             </div>
         </div>
     }
-    
+
     <EditForm Model="@png" OnValidSubmit="@SaveRoom">
         <DataAnnotationsValidator />
         <div class="form-group">
@@ -224,7 +224,7 @@
                 border-radius: 4px;
                 }
 
-               
+
                 .search-bar button {
                 padding: 8px 15px;
                 font-size: 16px;
@@ -256,21 +256,21 @@
                 }
 
                 .button {
-                    float: right;
-                    /* background-color: yellow; /* Màu nền mặc định */ */
-                    color: black; /* Màu chữ mặc định */
-                    border: none; /* Không có viền */
-                    padding: 5px 10px; /* Khoảng cách bên trong */
-                    font-weight: bold; /* Chữ đậm */
-                    margin-top: 10px; /* Khoảng cách phía trên */
-                    cursor: pointer; /* Đổi con trỏ khi hover */
-                    transition: background-color 0.3s, color 0.3s; /* Hiệu ứng chuyển màu */
+                float: right;
+                /* background-color: yellow; /* Màu nền mặc định */ */
+                color: black; /* Màu chữ mặc định */
+                border: none; /* Không có viền */
+                padding: 5px 10px; /* Khoảng cách bên trong */
+                font-weight: bold; /* Chữ đậm */
+                margin-top: 10px; /* Khoảng cách phía trên */
+                cursor: pointer; /* Đổi con trỏ khi hover */
+                transition: background-color 0.3s, color 0.3s; /* Hiệu ứng chuyển màu */
                 }
 
-                    .button:hover {
-                        background-color: orange; /* Màu nền khi hover */
-                        color: white; /* Màu chữ khi hover */
-                    }
+                .button:hover {
+                background-color: orange; /* Màu nền khi hover */
+                color: white; /* Màu chữ khi hover */
+                }
 
                 .search-bar button {
                 padding: 8px 15px;
@@ -388,8 +388,8 @@
         }
 
         isLoading = false;
-        successMessage = null;
-        errorMessage = null;
+        // successMessage = null;
+        // errorMessage = null;
         StateHasChanged(); // Cập nhật giao diện
     }
 
@@ -625,8 +625,10 @@
                 if (TPhong != null)
                 {
                     png = new Phong();
-                    LoadRooms();
-                    StateHasChanged();
+                    successMessage = "Tạo phòng thành công";
+                    // LoadRooms();
+                    // await Task.Delay(3000);
+                     StateHasChanged();
                     // Clear the form
                 }
             }
@@ -635,8 +637,9 @@
                 Phong TPhong = await RoomService.UpdateAsync("https://localhost:44359/api/Rooms/UpdateRoom/", png.MaPhong, png);
                 // Update the bill list
                 png = new Phong();
-                await LoadRooms();
-                StateHasChanged();
+                successMessage = "Sửa thông tin phòng thành công";
+                // await LoadRooms();
+                 StateHasChanged();
 
                 // Clear the form
 

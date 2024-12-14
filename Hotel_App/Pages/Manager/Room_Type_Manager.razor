@@ -346,8 +346,8 @@
         }
 
         isLoading = false;
-        successMessage = null;
-        errorMessage = null;
+        // successMessage = null;
+        // errorMessage = null;
         StateHasChanged(); // Cập nhật giao diện
     }
 
@@ -516,7 +516,7 @@
         }
     }
 
-     private bool ValidateRoomType()
+    private bool ValidateRoomType()
     {
         // Kiểm tra email trùng lặp
         if (IsRoomTypeNameDuplicated(Type.TenLoaiPhong))
@@ -524,7 +524,7 @@
             errorMessage = "Tên phòng này đã tồn tại.";
             successMessage = null; // Xóa thông báo thành công nếu có lỗi
             return false;
-        }      
+        }
         successMessage = "Lưu thành công";
         errorMessage = null; // Xóa thông báo lỗi nếu không có lỗi
         return true; // Dữ liệu hợp lệ
@@ -548,14 +548,16 @@
             if (Type.MaLoaiPhong == 0)
             {
                 //  bill.CTHoaDon = null;
-                 LoaiPhong loaiPhong = await RoomTypeService.SaveAsync("https://localhost:44359/api/RoomTypes/CreateRoomType", Type);
-                 
+                LoaiPhong loaiPhong = await RoomTypeService.SaveAsync("https://localhost:44359/api/RoomTypes/CreateRoomType", Type);
+
                 if (loaiPhong != null)
                 {
                     // Display success message using a modal or dialog
                     //  await _modalService.Show<SuccessMessage>("Bill created successfully!");
                     Type = new LoaiPhong();
-                    await LoadRoomTypes();
+                    successMessage = "Tạo loại phòng thành công";
+                    errorMessage = null;
+                    // await LoadRoomTypes();
                     StateHasChanged();
                     // Clear the form
                 }
@@ -565,9 +567,10 @@
                 LoaiPhong loaiPhong = await RoomTypeService.UpdateAsync("https://localhost:44359/api/RoomTypes/UpdateRoomType/", Type.MaLoaiPhong, Type);
                 // Update the bill list
                 Type = new LoaiPhong();
-                 await LoadRoomTypes();
-                 successMessage = "Tạo loại phòng thành công";
-                 StateHasChanged();
+                // await LoadRoomTypes();
+                successMessage = "Sửa loại phòng thành công";
+                errorMessage = null;
+                StateHasChanged();
 
                 // Clear the form
                
