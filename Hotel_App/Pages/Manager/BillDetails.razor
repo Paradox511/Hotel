@@ -1,4 +1,4 @@
-﻿@page "/bills/details/{billId:int}"
+﻿@page "/bills/details"
 @using Hotel_App.Service
 @using Hotel_App.Data
 @using Blazored.LocalStorage
@@ -6,6 +6,7 @@
 @using System;
 @using Microsoft.JSInterop
 @using System.Globalization
+@using Newtonsoft.Json
 @inject HotelService<HoaDon> BillService
 @inject HoaDonService CTHoaDonService
 @inject HotelService<CTHoaDon> cthdservice;
@@ -21,6 +22,8 @@
 @inject HotelService<LoaiPhong> lpservice;
 @inject IJSRuntime JSRuntime;
 @inject NavigationManager NavigationManager;
+@inject Blazored.LocalStorage.ILocalStorageService localStorageService
+
 <div class="col-12" id="billDetails">
 
     <h3>Bill details</h3>
@@ -94,7 +97,7 @@
                                 <td><input style="width:50px" type="number" @bind-value="@cthd.SoLuong" /></td>
                                 <td>@FormatMoney(@cthd.TongTien) VND</td>
                                 <td>
-                                    <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => EditBillDetail(BillId,cthd.dv.MaDichVu,cthd.SoLuong))">Edit</a>
+                                    <a style="text-underline-position:below; cursor:pointer; color:blue" @onclick="(() => EditBillDetail(bill.MaHoaDon,cthd.dv.MaDichVu,cthd.SoLuong))">Edit</a>
                                     <a style="text-underline-position:below; cursor:pointer; color:red" @onclick="(() => DeleteBillDetail(cthd.Macthd))">Delete</a> |
                                 </td>
                             </tr>
@@ -190,8 +193,7 @@
         GetAllServices();
 
         isLoading = true;
-
-        bill = await BillService.GetByIdAsync("https://localhost:44359/api/Bills/details/{0}", BillId);
+        await GetBill();
         await GetDetails();
 
         if (bill != null)
@@ -202,6 +204,20 @@
         isLoading = false;
         StateHasChanged();
 
+    }
+    protected async Task GetBill()
+    {
+        bill = new HoaDon();
+        var storedUserData = await localStorageService.GetItemAsync<string>("billData");
+        if (storedUserData != null)
+        {
+            var temp = JsonConvert.DeserializeObject<HoaDon>(storedUserData);
+            if (bill.MaHoaDon != temp.MaHoaDon)
+            {
+                bill = await BillService.GetByIdAsync("https://localhost:44359/api/Bills/details/{0}", temp.MaHoaDon);
+            }
+
+        }
     }
 
     protected async Task GetDetails()
@@ -250,7 +266,7 @@
     }
     protected async Task ReloadDetails()
     {
-        bill = await BillService.GetByIdAsync("https://localhost:44359/api/Bills/details/{0}", BillId);
+        await GetBill();
         StateHasChanged();
     }
     private async Task DeleteBillDetail(int Id)
@@ -264,7 +280,7 @@
     }
     private async Task EditBillDetail(int billID, int Id, int newQuantity)
     {
-        await CTHoaDonService.UpdateQuantity(BillId, Id, newQuantity);
+        await CTHoaDonService.UpdateQuantity(billID, Id, newQuantity);
         // LoadBills();
         await UpdateTongTien();
         await ReloadDetails();
@@ -320,21 +336,3 @@
         NavigationManager.NavigateTo($"/bills/details/print/{billId}");
     }
 }
-<script>
-    function printPage() {
-        window.print()
-    }
-    function printComponent(componentSelector) {
-        var elementToPrint = document.querySelector(componentSelector);
-        if (elementToPrint) {
-            var printWindow = window.open('', '_blank');
-            printWindow.document.open();
-            printWindow.document.write('<html><head><title>Print</title></head><body>');
-            printWindow.document.write(elementToPrint.innerHTML);
-            printWindow.document.write('</body></html>');
-            printWindow.document.close();
-            printWindow.print();
-            printWindow.close();
-        }
-    }
-</script>

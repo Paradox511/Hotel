@@ -1,10 +1,11 @@
-﻿@page "/index/{userid:int}"
+﻿@page "/index"
 @using Hotel_App.Service
 @using Hotel_App.Data
 @using Blazored.LocalStorage
 @using Hotel_App.Shared
 @using System;
 @using Microsoft.JSInterop
+@using Newtonsoft.Json
 @inject NavigationManager navigationManager
 @inject ILocalStorageService localStorageService
 @inject IAuthorizationService authorizationService
@@ -14,11 +15,21 @@
 
 <PageTitle>Index</PageTitle>
 
-<h1>Hello, world!</h1>
+<h1><b>Trang chủ</b></h1>
 
-Welcome to your new app.
+Phần mềm quản lý khách sạn.
+<div>
+<h2><b>Thông tin tài khoản</b></h2>
+@if(user!=null){
+        <h3><b>Mã tài khoản:</b>@user.MaTaiKhoan</h3>
+        <h3><b>Họ tên:</b>@user.HoTen</h3>
+        <h3><b>Email:</b>@user.Email</h3>
+        <h3><b>Địa chỉ:</b>@user.DiaChi</h3>
+        <h3><b>SĐT:</b>@user.SoDienThoai</h3>
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+    }
+</div>
+
 @code{
     [Parameter]
     public int userid { get; set; }
@@ -28,8 +39,13 @@ Welcome to your new app.
     protected async override Task OnInitializedAsync()
     {
         isLoading = true;
-        var task = nvservice.GetByIdAsync("https://localhost:44359/api/index/{0}", userid);
-        
+        var storedUserData = await localStorageService.GetItemAsync<string>("userData");
+        if (storedUserData != null)
+        {
+            user = JsonConvert.DeserializeObject<TaiKhoan>(storedUserData);
+        }
+
         isLoading = false; // Set loading indicator to false
     }
+  
 }

@@ -3,10 +3,14 @@
 @using Hotel_App.Data
 @using Blazored.LocalStorage
 @using Hotel_App.Shared
+@using Newtonsoft.Json
 @inject HotelService<HoaDon> BillService
 @inject HotelService<DatPhong> dpservice;
 @inject HotelService<TaiKhoan> nvservice;
 @inject HotelService<PhuongThucThanhToan> ptservice;
+@inject NavigationManager NavigationManager
+@inject Blazored.LocalStorage.ILocalStorageService localStorageService
+
 @implements IDisposable
 
 
@@ -141,7 +145,7 @@
                                 <td>@bill.NgayTao</td>
                                 <td>@bill.TongSoTien</td>
                                 <td>
-                                    <NavLink href=@string.Format("/bills/details/{0}",bill.MaHoaDon)>View Details</NavLink>
+                                        <a @onclick="@(() => ToDetails(bill))"> <u>View Details</u>  </a>
                                 </td>
                             </tr>
                         }
@@ -306,6 +310,7 @@
 
 
 @code {
+    public TaiKhoan user{ get; set; }
     private IEnumerable<HoaDon> bills;
     private IEnumerable<DatPhong> reservations;
     private IEnumerable<TaiKhoan> employees;
@@ -332,6 +337,7 @@
     private string successMessage;
     private string errorMessage;
     private string searchText = string.Empty;
+
 
     private void OnSearchTextChanged(ChangeEventArgs e)
     {
@@ -384,6 +390,8 @@
 
     protected override async Task OnInitializedAsync()
     {
+        // await localStorageService.RemoveItemAsync("billData");
+
         Console.WriteLine("Authors - OnInitializedAsync");
 
         bill = new HoaDon();
@@ -392,16 +400,6 @@
         await base.OnInitializedAsync();
     }
 
-    protected override void OnParametersSet()
-    {
-        Console.WriteLine("Authors - OnParametersSet");
-        base.OnParametersSet();
-    }
-
-    protected override async Task OnParametersSetAsync()
-    {Console.WriteLine("Authors - OnParametersSetAsync");
-        await base.OnParametersSetAsync();
-    }
 
     protected override bool ShouldRender()
     {
@@ -551,5 +549,15 @@
         showDeleteConfirmation = false; // Ẩn bảng xác nhận
         StateHasChanged();
     }
+    private async Task ToDetails(HoaDon temp)
+    {
+        var storedData = await localStorageService.GetItemAsync<string>("billData");
+        if (storedData != null)
+        {
+            await localStorageService.RemoveItemAsync("billData");
+        }
+        await localStorageService.SetItemAsync("billData", JsonConvert.SerializeObject(temp));
+        NavigationManager.NavigateTo("/bills/details"); // Or redirect to login page
 
+    }
 }

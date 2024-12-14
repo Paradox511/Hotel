@@ -70,7 +70,9 @@
             // Kiểm tra xem người dùng có hợp lệ không
             if (returnedUser != null && !string.IsNullOrEmpty(returnedUser.Username))
             {
-                NavigationManager.NavigateTo($"/index/{returnedUser.MaTaiKhoan}");
+                await localStorageService.SetItemAsync("userData", JsonConvert.SerializeObject(returnedUser));
+
+                NavigationManager.NavigateTo($"/index");
             }
             else
             {

@@ -1,4 +1,7 @@
-﻿<div class="top-row pl-4 navbar navbar-dark">
+﻿@inject NavigationManager NavigationManager
+@inject Blazored.LocalStorage.ILocalStorageService localStorageService
+
+<div class="top-row pl-4 navbar navbar-dark">
     <a class="navbar-brand" href="">.NET Hotel</a>
     <button class="navbar-toggler" @onclick="ToggleNavMenu">
         <span class="navbar-toggler-icon"></span>
@@ -8,7 +11,7 @@
 <div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
     <ul class="nav flex-column">
         <li class="nav-item px-3">
-            <NavLink class="nav-link" href="Home">
+            <NavLink class="nav-link" href="/index">
                 <span class="oi oi-home" aria-hidden="true"></span> Home
             </NavLink>
         </li>
@@ -55,8 +58,8 @@
         </li>
       
         <li class="nav-item fixed-bottom px-3">
-            <NavLink class="nav-link" href="login">
-                <span class="oi oi-account-login" aria-hidden="true"></span> Log Out
+            <NavLink class="nav-link" href="/login">
+                <span class="oi oi-account-login" aria-hidden="true" @onclick="@(() => Logout())"></span> Log Out
             </NavLink>
         </li>
     </ul>
@@ -70,5 +73,10 @@
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
+    }
+    private async Task Logout()
+    {
+        await localStorageService.RemoveItemAsync("userData");
+        NavigationManager.NavigateTo("/login"); // Or redirect to login page
     }
 }
