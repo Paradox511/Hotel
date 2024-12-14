@@ -171,7 +171,7 @@ namespace Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Status")
+                    b.Property<int>("TrangThai")
                         .HasColumnType("int");
 
                     b.HasKey("MaKhachHang");

@@ -204,7 +204,7 @@ namespace WebAPI.Controllers.V1
 				return StatusCode(500, "Internal Server Error: DbContext not injected");
 			}
 
-			var customers = await _context.khachhang.Where(cus => cus.Status == 1).ToListAsync();
+			var customers = await _context.khachhang.Where(cus => cus.TrangThai == 1).ToListAsync();
 			// Assuming your bills are stored in "hoadon" DbSet
 			if (customers == null)
 			{

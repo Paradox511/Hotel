@@ -14,7 +14,7 @@ namespace Hotel_App.Data
 		public DateTime? NgaySinh { get; set; }
 		public string CCCD { get; set; }
 		public string STK { get; set; }
-		public int Status { get; set; } = 1;
+		public int TrangThai { get; set; } = 1;
 
 		public KhachHang() { }
 	}
